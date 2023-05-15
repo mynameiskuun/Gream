@@ -1,10 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="main/mainpage">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <link rel="stylesheet" href="/css/additional.css" />
 </head>
 <body>
-$END$
+<th:block layout:fragment="content">
+  <div id="wrapper">
+    <div id="container">
+      <div id="additional-header">
+        <h2>추가 정보를 입력 해 주세요</h2>
+      </div>
+      <form action="/address" method="POST">
+        <div class="additional-input-box">
+          <label for="addressBox" class="form-label">주소를 입력 해 주세요</label>
+          <input type="text" class="register-input" name="address" id="addressBox" placeholder="&nbsp;&nbsp;&nbsp;ADDRESS"/>
+        </div>
+        <div class="register-input-box">
+          <label for="genderBox" class="form-label">성별을 선택 해 주세요</label>
+          <input type="hidden" id="genderBox" />
+          <div id="gender-input-wrapper">
+            <div class="gender-input-container">
+              <label for="man" class="form-label">Man</label>
+              <input type="radio" class="gender-checkbox" name="gender" value="man" id="man" />
+            </div>
+            <div class="gender-input-container">
+              <label for="woman" class="form-label">Woman</label>
+              <input type="radio" class="gender-checkbox" name="gender" value="woman" id="woman" />
+            </div>
+          </div>
+        </div>
+        <div class="btn-box">
+          <input type="submit" class="btn register-btn" value="저장" />
+        </div>
+      </form>
+    </div>
+  </div>
+</th:block>
 </body>
 </html>

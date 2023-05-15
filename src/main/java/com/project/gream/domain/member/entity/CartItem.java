@@ -1,2 +1,38 @@
-package com.project.gream.domain.member.entity;public class CartItem {
+package com.project.gream.domain.member.entity;
+
+import com.project.gream.domain.item.entity.Item;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+
+@Getter
+@NoArgsConstructor
+@Entity
+public class CartItem extends BaseTimeEntity{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cartitem_id")
+    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
+    @Column(name = "cartitem_qty")
+    private int qty;
+
+    public void updateCartIemQty(int qty) {
+        this.qty = qty;}
+
+    @Builder
+    public CartItem(Long id, Item item, Cart cart, int qty) {
+        this.id = id;
+        this.item = item;
+        this.cart = cart;
+        this.qty = qty;
+    }
 }

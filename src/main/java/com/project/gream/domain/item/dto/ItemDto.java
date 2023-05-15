@@ -1,2 +1,4 @@
-package com.project.gream.domain.item.dto;public class ItemDto {
+package com.project.gream.domain.item.dto;
+
+public class ItemDto {
 }

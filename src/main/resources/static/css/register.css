@@ -95,3 +95,13 @@
 input:focus {
     outline: none;
 }
+#gender-input-wrapper {
+    display: flex;
+    justify-content: space-evenly;
+}
+.gender-input-container {
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}

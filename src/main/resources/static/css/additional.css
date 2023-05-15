@@ -1,0 +1,52 @@
+#wrapper {
+    margin: 100px 20px 20px 20px;
+}
+#container {
+    max-width: 80%;
+    margin: 0 auto;
+    /* background: lightblue; */
+}
+#gender-input-wrapper {
+    display: flex;
+    justify-content: space-evenly;
+}
+.gender-input-container {
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+input:focus {
+    outline: none;
+}
+.register-input {
+    border: 0;
+    border-bottom: 1px solid lightGray;
+
+    /* border-top: 0px;
+      border-left: 0px;
+      border-right: 0px;
+      border-bottom: 1px solid lightgray; */
+
+    width: 100%;
+    height: 50px;
+    font-size: 13px;
+}
+.register-input-box {
+    margin-top: 10px;
+}
+.btn-box {
+    display: flex;
+}
+.register-btn {
+    height: 55px;
+    width: 180px;
+    background : lightgray;
+    margin : 0 auto;
+}
+#additional-header {
+    margin-botton: 100px;
+}
+form {
+    margin-top: 100px;
+}

@@ -1,7 +1,7 @@
 package com.project.gream.domain.member.dto;
 
 
-import com.project.gream.common.annotation.LoginUser;
+import com.project.gream.common.annotation.LoginMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -14,21 +14,20 @@ import javax.servlet.http.HttpSession;
 
 @RequiredArgsConstructor
 @Component
-public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
+public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
     private final HttpSession session;
-
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
 
-        boolean isLoginUserAnnotation = parameter.getParameterAnnotation(LoginUser.class) != null;
-        boolean isUserClass = UserDto.class.equals(parameter.getParameterType());
+        boolean isLoginMemberAnnotation = parameter.getParameterAnnotation(LoginMember.class) != null;
+        boolean isMemberClass = MemberDto.class.equals(parameter.getParameterType());
 
-        return isLoginUserAnnotation && isUserClass;
+        return isLoginMemberAnnotation && isMemberClass;
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        return session.getAttribute("loginUser");
+        return session.getAttribute("loginMember");
     }
 
 }

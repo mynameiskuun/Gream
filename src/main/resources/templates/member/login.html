@@ -1,10 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="main/mainpage">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <link rel="stylesheet" href="/css/login.css" />
 </head>
 <body>
-$END$
+<th:block layout:fragment="content">
+  <section>
+    <div id="login-wrapper">
+      <div id="login-container">
+        <div id="login-box">
+          <form action="/formLogin" method="POST">
+            <div class="login-box-header">LOG IN</div>
+            <div class="login-box-body">
+              <div class="login-id-box">
+                <input type="text" placeholder="ID" id="memId" class="login-input" name="memId"/>
+              </div>
+              <div class="login-pw-box">
+                <input type="password" placeholder="Password" id="memPw" class="login-input" name="memPw"/>
+              </div>
+            </div>
+
+            <div class="login-box-footer">
+              <div th:if="${exception != null}">
+                <p th:text="${exception}"></p>
+              </div>
+              <!--                    <input type="button" value="LOG IN" id="login-btn" onclick="memberLogin()"/>-->
+              <input type="submit" value="LOG IN" id="login-btn" />
+              <div id="social-login-box">
+                <div id="google-login-box">
+                  <a href="/oauth2/authorization/google" id="google-btn" class="btn btn-secondary active snsbtn" role="button">GOOGLE LOGIN
+                  </a>
+                </div>
+                <div id="naver-login-box">
+                  <a href="/oauth2/authorization/naver" id="naver-btn" class="btn active snsbtn" role="button">NAVER LOGIN</a>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div id="new-customers-box">
+          <div class="new-customers-header">NEW CUSTOMERS</div>
+          <div class="new-customers-body">
+            By registering as a member, you can store your address and other
+            details and save time during your next checkout. You'll also
+            receive the latest member-exclusive information.
+          </div>
+          <div class="new-customers-footer">
+            <a th:href="@{/join}" role="button" class="btn btn-secondary active">REGISTER AS A MEMBER</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</th:block>
 </body>
 </html>
