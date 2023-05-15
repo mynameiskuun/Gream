@@ -1,0 +1,41 @@
+#order-wrapper {
+    width: 70%;
+    margin: 0 auto;
+    /*background: sandybrown;*/
+    /* height 지우기. 유동적으로 늘어나게 */
+}
+#order-sbar-wrapper {
+    width:90%;
+}
+#order-container {
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+}
+.order-list-header{
+    display: flex;
+}
+#order-info-box {
+    position: relative;
+    width:70%;
+}
+.order-detail-box {
+    display: flex;
+    justify-content: space-between;
+}
+.underline {
+    border-bottom: 1px solid #999;
+}
+#order-side-bar {
+    position: fixed;
+    right: 25px;
+    width: 30%;
+}
+#side-bar-header {
+    display: flex;
+    justify-content: space-between;
+}
+.payment-amount-box{
+    display: flex;
+    justify-content: space-between;
+}

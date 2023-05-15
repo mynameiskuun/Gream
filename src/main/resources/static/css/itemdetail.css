@@ -1,0 +1,211 @@
+#item-detail-wrapper {
+    width: 90%;
+    /*height: 2000px;*/
+    margin: 0 auto;
+    position: relative;
+    padding-top: 120px;
+}
+#item-detail {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    height: 600px;
+    background: white;
+}
+#item-img-box {
+    position: relative;
+}
+
+#item-img-box img {
+    position: absolute;
+    top: 30%;
+    width: 100%;
+}
+#item-img-box {
+    height: 90%;
+    width: 40%;
+}
+
+#item-information {
+    padding-top:10%;
+    height: 90%;
+    width: 40%;
+    overflow: auto;
+}
+
+#item-detail-content {
+    width: 100%;
+    margin: 0 auto;
+    background : lightslategray;
+    height: 500px;
+    /* height 나중에 지우기. 내용 추가되면 자동으로 길이 늘어나게 */
+}
+
+#item-review-box {
+    width: 100%;
+    margin: 0 auto;
+    /* height 나중에 지우기. 내용 추가되면 자동으로 길이 늘어나게 */
+}
+
+#item-qna-box {
+    width: 100%;
+    margin: 0 auto;
+    background : darkolivegreen;
+    height: 400px;
+    /* height 나중에 지우기. 내용 추가되면 자동으로 길이 늘어나게 */
+}
+.order-item-detail {
+    display: flex;
+    align-items: center;
+}
+#buyer-satisfied-score-box {
+    margin: 0 auto;
+    width: 70%;
+}
+.rating-score {
+    height: 40px;
+    line-height: 40px;
+    width: 80%;
+    display: flex;
+    margin: 0 auto;
+    justify-content: space-between;
+}
+.star {
+    font-size: 1.3em;
+    color: transparent;
+    text-shadow: 0 0 0 #f0f0f0;
+}
+.counted-stars {
+    text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+}
+.graph-box {
+    /* position: absolute; */
+    width: 190px;
+    /* height: 40px;
+    line-height: 40px; */
+}
+.event-label {
+    height: 30px;
+    width: 60px;
+    padding-left: 5px;
+    border: 1px solid;
+    border-radius: 2px;
+}
+.progress {
+    position: relative;
+    top: 12px;
+}
+#item-detail-review-wrapper {
+    /*width: 800px;*/
+}
+#review-header {
+    display: flex;
+    margin: 20px 0 20px 20px;
+}
+.review-event-text {
+    margin-left: 20px;
+}
+#review-wrapper {
+    border: 2px solid black;
+    height: 1000px;
+}
+.item-img {
+    height: 100px;
+    width: 100px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgb(250, 250, 250);
+    background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg");
+}
+.item-detail-name {
+    margin-left: 20px;
+    height: 130px;
+    line-height: 130px;
+}
+#review-container {
+    margin: 0px 40px 40px 40px;
+}
+.customer-review-img-box {
+    height: 130px;
+    width: 130px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/2_246947888372000.jpg");
+}
+.review-item-features {
+    margin-top: 10px;
+}
+.customer-profile-img-box {
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/default-profile-image.jpg");
+}
+
+.review-like-box {
+    display: flex;
+    justify-content: space-evenly;
+    width: 130px;
+    height: 35px;
+    align-items: center;
+    border-radius: 20px;
+    border: 1px solid lightgray;
+}
+.review-reply-box {
+    margin-top: 20px;
+}
+.review-reply-box div {
+    margin-bottom: 20px;
+}
+.review-thumbs-up {
+    background-color: steelblue;
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-position-y: 0px;
+    background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png");
+}
+#reply-input-container {
+    background: rgb(245, 245, 245);
+    border: 1px solid rgb(240, 240, 240);
+    cursor: pointer;
+}
+#reply-input-box {
+    display: flex;
+    padding-top: 15px;
+    margin-left: 18px;
+    cursor: pointer;
+}
+#reply-input-area {
+    height: 38px;
+    width: 90%;
+}
+.reply-thumbs-up {
+    background-color: steelblue;
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-position-y: 0px;
+    background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png");
+}
+.reply-cards {
+    display: flex;
+    justify-content: space-between;
+}
+.reply-center-box {
+    width: 70%;
+}
+.reply-like-counts {
+    text-align: center;
+}

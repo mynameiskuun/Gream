@@ -1,0 +1,79 @@
+#regitem-wrapper {
+    height: 750px;
+    width: 100%;
+    border-radius: 8px;
+    margin: 0 auto;
+    position: relative;
+    justify-content: space-around;
+    align-items: center;
+}
+#regitem-wrapper h1 {
+    text-align: center;
+    padding-top: 30px;
+}
+#category-box {
+}
+select {
+    margin-left: 11px;
+}
+#form-content {
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    margin: 0 auto;
+}
+.textbox {
+    width: 300px;
+    height: 30px;
+    border-radius: 3px;
+    margin-left: 30px;
+    margin-top: 15px;
+}
+.textbox2 {
+    margin-top: 15px;
+    width: 100px;
+    margin-left: 15px;
+}
+#prddetail {
+    margin-top: 15px;
+    width: 600px;
+    height: 100px;
+    margin-left: 11px;
+}
+#prd-price-amount-box {
+    display: flex;
+    width: 100%;
+}
+span {
+    margin-left: 30px;
+}
+#prdimg {
+    margin-top: 15px;
+    margin-left: 11px;
+}
+#submitbtn {
+    width: 60px;
+}
+#submit-box {
+    text-align: center;
+    margin-top: 100px;
+}
+.regitem-inputs{
+    border: 0;
+    border-bottom: 1px solid lightGray;
+    width: 100%;
+    height: 50px;
+    font-size: 13px;
+}
+#regitem-form div {
+    margin-top: 15px;
+}
+input:focus {
+    outline: none;
+}
+select:focus {
+    outline: none;
+}
+.form-control:focus {
+    outline: none;
+}

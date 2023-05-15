@@ -1,0 +1,41 @@
+a {
+    color: #747474;
+    text-decoration: none;
+}
+#header-wrapper {
+    margin: 20px 20px 20px 20px;
+    width: 85%;
+    margin: 0 auto;
+    height: 160px;
+}
+#upper-header {
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    height: 50px;
+}
+#upper-header div {
+    margin-left: 30px;
+    color: rgb(122, 122, 122);
+}
+#lower-header {
+    display: flex;
+    justify-content: space-between;
+    height: 80px;
+    align-items: center;
+}
+.nav-bar-right-btns {
+    margin-left: 30px;
+    font-size: 15px;
+}
+#logo-box {
+    font-weight: 900;
+    font-style: italic;
+    font-size: 50px;
+}
+#nav-bar-right {
+    display: flex;
+}
+#header-footer {
+    display: flex;
+}

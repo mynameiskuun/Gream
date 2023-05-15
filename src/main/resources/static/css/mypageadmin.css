@@ -1,0 +1,53 @@
+#mypage-admin-wrapper {
+    margin: 0 auto;
+    width: 90%;
+    height: 900px;
+}
+
+#mypage-admin-container {
+    width: 100%;
+    display: flex;
+}
+
+#mypage-admin-sidebar {
+    width: 28%;
+    margin-top: 50px;
+    position: relative;
+    height: 600px;
+}
+
+#mypage-admin-sidebar div {
+    margin-top: 25px;
+}
+
+#mypage-admin-content {
+    position: relative;
+}
+
+#mypage-admin-upper-box {
+    height: 45%;
+    width: 100%;
+    background:white;
+}
+
+#mypage-admin-bottom-box {
+    display: flex;
+    height: 45%;
+}
+
+#mypage-admin-coupon-box {
+    width: 50%;
+}
+
+#mypage-admin-point-box {
+    width: 50%;
+}
+#admin-fragment-container {
+    width: 100%;
+}
+.nav-bar-title {
+    margin-left: 40px;
+}
+.table>:not(caption)>*>* {
+    background: white;
+}

@@ -1,0 +1,97 @@
+/*@font-face {*/
+/*    font-family: "KreamFont";*/
+/*    src: url("/static/fonts/KreamFont.woff") format("woff");*/
+/*}*/
+/*@font-face {*/
+/*    font-family: "auraleeFont";*/
+/*    src: url("/static/fonts/auraleeFont.woff2") format("woff2");*/
+/*    unicode-range: U+0041-005A, U+0061-007A;*/
+/*}*/
+/*body {*/
+/*    font-family: "auraleeFont", "KreamFont";*/
+/*    margin: 0px 0px 0px 0px;*/
+/*    color: gray;*/
+/*}*/
+#register-wrapper {
+    margin: 100px 20px 20px 20px;
+}
+#register-container {
+    max-width: 80%;
+    margin: 0 auto;
+    /* background: lightblue; */
+}
+.register-header {
+    width: 100%;
+    font-size: 23px;
+    height: 50px;
+}
+.register-body {
+    margin-left: 40px;
+}
+.register-body-main {
+    margin-top: 25px;
+}
+.form-label {
+    display: block;
+    font-size: 15px;
+}
+.register-input-box {
+    display: block;
+}
+.register-input {
+    border: 0;
+    border-bottom: 1px solid lightGray;
+
+    /* border-top: 0px;
+      border-left: 0px;
+      border-right: 0px;
+      border-bottom: 1px solid lightgray; */
+
+    width: 100%;
+    height: 50px;
+    font-size: 13px;
+}
+.register-input-box {
+    margin-top: 10px;
+}
+#register-footer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+.register-btn-box {
+    text-align: center;
+    width: 250px;
+    height: 40px;
+    line-height: 30px;
+    text-decoration: none;
+    background: darkgray;
+    cursor: pointer;
+}
+.register-btn-box:hover {
+    background: lightgray;
+    color: gray;
+    transition: 0.5s;
+}
+.register-btn {
+    font-size: 15px;
+    color: white;
+}
+#register-validation-box {
+    width: 210px;
+    margin: 20px auto;
+}
+.validation-body {
+    margin-top: 10px;
+    width: 100%;
+}
+.validation-category {
+    display: flex;
+}
+.validation-category div {
+    height: 30px;
+    margin-right: 10px;
+}
+input:focus {
+    outline: none;
+}

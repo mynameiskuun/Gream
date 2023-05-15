@@ -1,0 +1,47 @@
+#mypage-customer-wrapper {
+    position: relative;
+    top:100px;
+    margin: 0 auto;
+    width: 80%;
+    background: rosybrown;
+    height: 900px;
+}
+
+#mypage-customer-container {
+    width: 100%;
+    display: flex;
+}
+#mypage-sidebar {
+    width: 28%;
+    position: relative;
+    height: 600px;
+    background:darkseagreen ;
+}
+
+#mypage-content {
+    width: 72%;
+    position: relative;
+    height: 600px;
+    background:mediumvioletred;
+}
+
+#mypage-upper-box {
+    height: 45%;
+    width: 100%;
+    background:darkslategrey;
+}
+
+#mypage-bottom-box {
+    display: flex;
+    height: 45%;
+}
+
+#mypage-coupon-box {
+    width: 50%;
+    background:khaki;
+}
+
+#mypage-point-box {
+    width: 50%;
+    background:darkblue;
+}
