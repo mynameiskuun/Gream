@@ -1,0 +1,34 @@
+#coupon-create-wrapper {
+    width: 100%;
+    margin: 20px 20px 20px 20px;
+}
+#coupon-create-container {
+    margin: 0 auto;
+}
+.coupon-create-header {
+    padding-bottom: 30px;
+    border-bottom: 3px solid black;
+}
+.coupon-inputs {
+    border: 0;
+    border-bottom: 1px solid lightGray;
+    width: 100%;
+    height: 50px;
+    font-size: 13px;
+}
+#coupon-btn-box {
+    width: 200px;
+    height: 60px;
+    display: flex;
+    margin: 30px auto;
+    align-items: center;
+    background: lightGray;
+    cursor: pointer;
+}
+#couponBtn {
+    margin: 0 auto;
+    color: white;
+}
+input:focus {
+    outline:none;
+}

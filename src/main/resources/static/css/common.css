@@ -1,0 +1,137 @@
+@font-face {
+  font-family: "KreamFont";
+  src: url("../fonts/KreamFont.woff") format("woff");
+}
+
+@font-face {
+  font-family: "auraleeFont";
+  src: url("../fonts/auraleeFont.woff2") format("woff2");
+  unicode-range: U+0041-005A, U+0061-007A;
+}
+
+#carousel {
+  width: 100%;
+  height: 300px;
+  background: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/carousel.jpg");
+  background-size: 100%;
+  background-position: 15% 15%;
+  background-repeat: no-repeat;
+}
+
+body {
+  font-family: "auraleeFont";
+  margin: 0px 0px 0px 0px;
+}
+
+#wrapper {
+  position: relative;
+  min-width: 1020px;
+  height: 2300px;
+  border : 0;
+}
+
+#main-container {
+  /*position: relative;*/
+  /*top: 120px;*/
+}
+
+#master-container {
+  /*position: relative;*/
+  align-items: center;
+  min-width: 1020px;
+  /*padding-top: 120px;*/
+  height: 1800px;
+}
+
+#side-bar {
+  display: none;
+  background: rosybrown;
+}
+
+#upper-body {
+  display: flex;
+  width: 100%;
+  height: 720px;
+}
+.upper-body-cards {
+  width: 50%;
+  height: 720px;
+}
+#upper-body-left {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 720px;
+  background: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/main_men.png");
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  cursor : pointer;
+}
+#upper-body-right {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 720px;
+  background: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/main_women.jpg");
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  cursor : pointer;
+}
+.upper-body-menu-fonts {
+  margin-left: 50px;
+  font-size: 23px;
+  color: rgb(131, 131, 131);
+}
+#lower-body {
+  width: 100%;
+  height: 600px;
+}
+.lower-body-header {
+  display: flex;
+  align-items: center;
+  height: 80px;
+}
+.lower-body-header-font {
+  font-size: 20px;
+  margin-left: 50px;
+}
+.lower-body-middle {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 0 auto;
+  width: 1200px;
+  height: 400px;
+}
+.body-style-cards {
+  width: 22%;
+  height: 400px;
+
+  margin-right: 10px;
+  border-radius: 20px;
+}
+.card1 {
+  background: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/card_ex1.jpg");
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+.card2 {
+  background: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/card_ex2.jpg");
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+.card3 {
+  background: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/card_ex3.jpg");
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+.card4 {
+  background: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/card_ex4.jpg");
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}

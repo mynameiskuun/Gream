@@ -1,0 +1,16 @@
+#footer-wrapper {
+    margin-top: 200px;
+}
+#footer-container {
+    height: 150px;
+    margin: 0 auto;
+    width: 85%;
+    display: flex;
+    justify-content: space-between;
+}
+.footer-left-box {
+    display: flex;
+}
+.footer-font-box {
+    margin-right: 80px;
+}

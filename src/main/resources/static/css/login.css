@@ -1,0 +1,124 @@
+@font-face {
+    font-family: "kreamFont";
+    src: url("/fonts/Roboto-Regular.woff") format("woff");
+}
+@font-face {
+    font-family: "auraleeFont";
+    src: url("/fonts/auraleeFont.woff2") format("woff2");
+}
+body {
+    font-family: "auraleeFont";
+    margin: 0px 0px 0px 0px;
+    color: gray;
+}
+#login-wrapper {
+    margin: 100px 20px 20px 20px;
+}
+#login-container {
+    display: flex;
+    max-width: 90%;
+    margin: 0 auto;
+    /* background: lightblue; */
+}
+#login-box {
+    width: 50%;
+    border-right: 1px solid black;
+}
+.login-box-header {
+    font-size: 20px;
+    width: 80%;
+    margin: 0 auto;
+}
+.login-box-body {
+    width: 80%;
+    margin: 40px auto;
+}
+.login-input {
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    border-bottom: 1px solid lightgray;
+    width: 100%;
+    height: 50px;
+}
+#social-login-box {
+    display: flex;
+    justify-content: space-between;
+}
+#social-login-box div {
+    width: 90%;
+}
+.snsbtn {
+    margin-top: 5px;
+    width: 95%;
+    border-radius: 0px;
+}
+.login-box-footer {
+    width: 80%;
+    margin: 0 auto;
+}
+#login-btn {
+    margin-top: 50px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    border-bottom: 0px;
+    height: 40px;
+    width: 97.5%;
+    color: white;
+}
+#google-btn:hover {
+    background: white;
+    border: 1px solid lightgray;
+    color: gray;
+    transition: 0.4s;
+}
+#naver-btn {
+    background: #33ca59;
+    color: white;
+}
+#naver-btn:hover {
+    background: white;
+    color: #33ca59;
+    transition: 0.4s;
+}
+#login-btn:hover {
+    background: rgb(160, 160, 160);
+    border: 0px;
+    color: white;
+    transition: 0.4s;
+}
+#new-customers-box {
+    width: 50%;
+    padding-left: 40px;
+}
+.new-customers-header {
+    font-size: 20px;
+}
+.new-customers-btn {
+    height: 85px;
+    width: 100%;
+    color: gray;
+    background: white;
+    border: 1px solid gray;
+}
+.new-customers-body {
+    margin-top: 30px;
+}
+.new-customers-footer {
+    margin-top: 128px;
+}
+.new-customers-footer a {
+    line-height: 68px;
+    width: 100%;
+    color: gray;
+    background: white;
+    border: 1px solid gray;
+    border-radius: 0;
+}
+.new-customers-footer a:hover {
+    background: lightgray;
+    border: 1px solid lightgray;
+    color: gray;
+    transition: 0.4s;
+}

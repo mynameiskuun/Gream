@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lagn="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<th:block th:fragment="header">
+    <section id="header-wrapper">
+        <div id="header-container">
+            <div id="upper-header">
+                <div class="upper-header-btn">
+                    <a th:href="@{/inquiry}">Q & A</a>
+                </div>
+                <th:block th:if="${session.loginUser ne null && session.loginUser.role.getValue().equals('ROLE_USER')}">
+                    <div class="upper-header-btn"><a th:href="@{/item/like}">LIKE</a></div>
+                     <div class="upper-header-btn"><a th:href="@{/user/cart}">CART</a></div>
+                </th:block>
+                <div class="upper-header-btn" th:if="${session.loginUser == null}">
+                    <a th:href="@{/login}">LOG IN</a>
+                </div>
+                <div class="upper-header-btn" th:if="${session.loginUser != null}">
+                    <a th:href="@{/logout}">LOG OUT</a>
+                </div>
+            </div>
+            <div id="lower-header">
+                <div id="logo-box"><a th:href="@{/}">GREAM</a></div>
+                <div id="nav-bar-right">
+                    <div class="nav-bar-right-btns bold-font"><a th:href="@{/}">HOME</a></div>
+                    <div class="nav-bar-right-btns"><a th:href="@{/style}">STYLE</a></div>
+                    <div class="nav-bar-right-btns"><a th:href="@{/shop}">SHOP</a></div>
+                    <th:block th:if="${session.loginUser ne null && session.loginUser.role.getValue().equals('ROLE_ADMIN')}">
+                        <div class="nav-bar-right-btns">
+                            <a th:href="@{/admin}">ADMIN</a>
+                        </div>
+                    </th:block>
+                    <th:block th:if="${session.loginUser ne null && session.loginUser.role.getValue().equals('ROLE_USER')}">
+                        <div class="nav-bar-right-btns">
+                            <a th:href="@{/user/mypage}">MY</a>
+                        </div>
+                    </th:block>
+                    <div class="nav-bar-right-btns">SEARCH</div>
+                </div>
+            </div>
+            <div id="header-footer">
+                <!-- <div class="header-footer-btns">BRAND</div> -->
+                <!-- <div class="header-footer-btns">남성</div> -->
+                <!-- <div class="header-footer-btns">여성</div> -->
+            </div>
+        </div>
+    </section>
+</th:block>
+    </body>
+</html>
