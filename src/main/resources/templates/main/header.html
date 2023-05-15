@@ -17,14 +17,14 @@
                 <div class="upper-header-btn">
                     <a th:href="@{/inquiry}">Q & A</a>
                 </div>
-                <th:block th:if="${session.loginUser ne null && session.loginUser.role.getValue().equals('ROLE_USER')}">
+                <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_MEMBER')}">
                     <div class="upper-header-btn"><a th:href="@{/item/like}">LIKE</a></div>
-                     <div class="upper-header-btn"><a th:href="@{/user/cart}">CART</a></div>
+                    <div class="upper-header-btn"><a th:href="@{/member/cart}">CART</a></div>
                 </th:block>
-                <div class="upper-header-btn" th:if="${session.loginUser == null}">
+                <div class="upper-header-btn" th:if="${session.loginMember == null}">
                     <a th:href="@{/login}">LOG IN</a>
                 </div>
-                <div class="upper-header-btn" th:if="${session.loginUser != null}">
+                <div class="upper-header-btn" th:if="${session.loginMember != null}">
                     <a th:href="@{/logout}">LOG OUT</a>
                 </div>
             </div>
@@ -34,14 +34,14 @@
                     <div class="nav-bar-right-btns bold-font"><a th:href="@{/}">HOME</a></div>
                     <div class="nav-bar-right-btns"><a th:href="@{/style}">STYLE</a></div>
                     <div class="nav-bar-right-btns"><a th:href="@{/shop}">SHOP</a></div>
-                    <th:block th:if="${session.loginUser ne null && session.loginUser.role.getValue().equals('ROLE_ADMIN')}">
+                    <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_ADMIN')}">
                         <div class="nav-bar-right-btns">
                             <a th:href="@{/admin}">ADMIN</a>
                         </div>
                     </th:block>
-                    <th:block th:if="${session.loginUser ne null && session.loginUser.role.getValue().equals('ROLE_USER')}">
+                    <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_MEMBER')}">
                         <div class="nav-bar-right-btns">
-                            <a th:href="@{/user/mypage}">MY</a>
+                            <a th:href="@{/member/mypage}">MY</a>
                         </div>
                     </th:block>
                     <div class="nav-bar-right-btns">SEARCH</div>
@@ -55,5 +55,5 @@
         </div>
     </section>
 </th:block>
-    </body>
+</body>
 </html>

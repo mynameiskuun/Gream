@@ -1,10 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Title</title>
+  <link rel="stylesheet" href="/css/common.css" />
+  <th:block th:replace="/main/config :: config"></th:block>
+  <!-- layout -->
 </head>
 <body>
-$END$
+<!-- header start-->
+<th:block th:replace="/main/header :: header"></th:block>
+<!-- header end -->
+<div id="wrapper">
+
+
+  <div id="master-container">
+
+    <!-- sidebar start -->
+    <section id="side-bar">
+      sidebar(hidden)
+    </section>
+    <!-- sidebar end -->
+
+    <section id="main-container" layout:fragment="content">
+
+      <!-- carousel start-->
+      <section>
+        <div id="carousel"></div>
+      </section>
+      <!-- carousel end-->
+
+      <section>
+        <div id="upper-body">
+          <div class="upper-body-cards">
+            <div id="upper-body-left">
+              <div class="upper-body-menu-fonts"><a th:href="@{/item/men}">MEN</a></div>
+            </div>
+          </div>
+          <div class="upper-body-cards">
+            <div id="upper-body-right">
+              <div class="upper-body-menu-fonts"><a th:href="@{/item/women}">WOMEN</a></div>
+            </div>
+          </div>
+        </div>
+        <div id="lower-body">
+          <div id="lower-body-container">
+            <div class="lower-body-header">
+              <div class="lower-body-header-font">STYLES</div>
+            </div>
+            <div class="lower-body-middle">
+              <div class="body-style-cards card1"></div>
+              <div class="body-style-cards card2"></div>
+              <div class="body-style-cards card3"></div>
+              <div class="body-style-cards card4"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- item card start-->
+      <!--          <div class="row row-cols-3 row-cols-md-3" style="width:85%; margin:0 auto; position: relative;">-->
+      <!--            <div class="col" th:each="item: ${itemList}">-->
+      <!--              <div class="card" style="cursor:pointer;">-->
+      <!--                <th:block th:each="img : ${imgList}">-->
+      <!--                  <th:block th:if="|${img.getItemDto.getItemId.equals(item.itemId)}|">-->
+      <!--                    <a th:href="@{/item/{itemId}(itemId=${item.itemId})}">-->
+      <!--                      <img th:src="|${img.imgUrl}|" class="card-img-top" style="height: 230px">-->
+      <!--                    </a>-->
+      <!--                  </th:block>-->
+      <!--                </th:block>-->
+      <!--                <div class="card-body">-->
+      <!--                  <h5 class="card-title" th:text="${item.itemName}"></h5>-->
+      <!--                  <p class="card-text" th:text="${item.itemDetail}"></p>-->
+      <!--                </div>-->
+      <!--                <ul class="list-group list-group-flush">-->
+      <!--                  <li class="list-group-item" th:text="|${item.itemPrice}원|"></li>-->
+      <!--                </ul>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!-- item card end-->
+
+    </section>
+  </div>
+  <!--   footer start   -->
+  <th:block th:replace="/main/footer :: footer"></th:block>
+  <!--   footer end   -->
+</div>
+</div>
 </body>
+</div>
 </html>

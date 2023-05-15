@@ -1,4 +1,4 @@
-package com.mall.march.marchproject.common.config;
+package com.project.gream.common.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.mall.march.marchproject.domain.item.entity.Item;
+import com.project.gream.domain.item.entity.Item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +50,7 @@ public class S3Config {
 
         for (MultipartFile file : multipartFiles) {
             String fileExtension = getFileExtension(Objects.requireNonNull(file.getOriginalFilename(), "이미지 파일이 존재하지 않습니다"));
-            String fileName = createFileName(item.getItemId()) + fileExtension;
+            String fileName = createFileName(item.getId()) + fileExtension;
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());

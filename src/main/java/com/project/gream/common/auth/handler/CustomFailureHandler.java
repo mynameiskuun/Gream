@@ -1,4 +1,4 @@
-package com.mall.march.marchproject.common.util.auth;
+package com.project.gream.common.auth.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -36,7 +36,6 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
             errorMessage = "알 수 없는 이유로 로그인에 실패하였습니다 관리자에게 문의하세요.";
         }
 
-//        setDefaultFailureUrl("/login?error=true&exception=" + errorMessage);
         setDefaultFailureUrl("/login?error=true&exception=" + URLEncoder.encode(errorMessage, "UTF-8"));
 
         log.info(errorMessage);
