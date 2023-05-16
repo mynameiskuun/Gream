@@ -13,6 +13,16 @@
 }
 #category-box {
 }
+#category-radio-wrapper {
+    justify-content: space-between;
+    display: flex;
+}
+#gender-box {
+}
+#gender-radio-wrapper {
+    justify-content: space-between;
+    display: flex;
+}
 select {
     margin-left: 11px;
 }

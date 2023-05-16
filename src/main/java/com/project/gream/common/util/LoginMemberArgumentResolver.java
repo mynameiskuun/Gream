@@ -1,7 +1,8 @@
-package com.project.gream.domain.member.dto;
+package com.project.gream.common.util;
 
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.domain.member.dto.MemberVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     public boolean supportsParameter(MethodParameter parameter) {
 
         boolean isLoginMemberAnnotation = parameter.getParameterAnnotation(LoginMember.class) != null;
-        boolean isMemberClass = MemberDto.class.equals(parameter.getParameterType());
+        boolean isMemberClass = MemberVO.class.equals(parameter.getParameterType());
 
         return isLoginMemberAnnotation && isMemberClass;
     }

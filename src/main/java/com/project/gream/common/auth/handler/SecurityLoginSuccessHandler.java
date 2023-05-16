@@ -1,6 +1,6 @@
 package com.project.gream.common.auth.handler;
 
-import com.project.gream.domain.member.dto.MemberDto;
+import com.project.gream.domain.member.dto.MemberVO;
 import com.project.gream.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +33,10 @@ public class SecurityLoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         String memberId = authentication.getName();
-        MemberDto memberDto = MemberDto.fromEntity(memberRepository.findById(memberId)
+        MemberVO memberVO = MemberVO.fromEntity(memberRepository.findById(memberId)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("<SuccessHandler> userId [%s] 는 존재하지 않습니다", memberId))));
 
-        session.setAttribute("loginMember", memberDto);
+        session.setAttribute("loginMember", memberVO);
         resultRedirectStrategy(request, response);
     }
 

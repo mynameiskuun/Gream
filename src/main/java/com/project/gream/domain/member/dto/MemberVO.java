@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MemberDto {
+public class MemberVO {
 
     private String id;
     private String password;
@@ -46,8 +46,8 @@ public class MemberDto {
      *  */
 
     @Builder
-    public MemberDto(String id, String password, String name, String address, String email, int point,
-                     Role role, Gender gender, CartDto cartDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
+    public MemberVO(String id, String password, String name, String address, String email, int point,
+                    Role role, Gender gender, CartDto cartDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.password = password;
         this.name = name;
@@ -75,8 +75,8 @@ public class MemberDto {
                 .build();
     }
 
-    public static MemberDto fromEntity(Member member) {
-        return MemberDto.builder()
+    public static MemberVO fromEntity(Member member) {
+        return MemberVO.builder()
                 .id(member.getId())
                 .password(member.getPassword())
                 .name(member.getName())

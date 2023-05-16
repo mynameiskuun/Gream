@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <link rel="stylesheet" href="/css/mypage-customer-main.css" />
+    <th:block th:replace="/main/config :: config"></th:block>
+</head>
+<body>
+
+<th:block th:replace="/main/header :: header"></th:block>
+
+<nav id="navbar-example2" class="navbar bg-light px-3 mb-3">
+    <a class="navbar-brand" href="#">마이페이지</a>
+</nav>
+    <div id="mypage-customer-wrapper">
+        <div id="mypage-customer-container">
+            <div id="mypage-customer-sidebar">
+                <div>
+                    <a href="/user/mypage"><h3>회원 정보</h3></a>
+                    <!-- 마이페이지 열면 나오는 첫 화면. -->
+                    <!-- 간략한 최근 주문목록, 쿠폰, 포인트 출력 -->
+                </div>
+                <div>
+                    <a href="/user/orderlist"><h3>주문 목록</h3></a>
+                    <!-- 이 안에서 주문 취소, 배송 확인 -->
+<!--              수령 완료된 건에 한해서 리뷰 작성 가능하게     -->
+                </div>
+                <div>
+                    <a href="/user/like"><h3>좋아요</h3></a>
+                        <!--  좋아요 상품 출력  -->
+                </div>
+                <div>
+                    <a href="/user/review"><h3>리뷰 작성</h3></a>
+                    <!-- 리뷰 혹은 qna 글 출력 -->
+                </div>
+                <div>
+                    <a href="/user/postlist"><h3>작성 글 목록</h3></a>
+                    <!-- 리뷰 혹은 qna 글 출력 -->
+                </div>
+                <div>
+                    <h3>회원 정보 수정</h3>
+                    <!-- 닉네임, 비밀번호 등 회원 개인정보 수정. -->
+                </div>
+            </div>
+
+                <!-- fragment area -->
+            <section id="mypage-customer-main-container" layout:fragment="mypage-content">
+                <!-- fragment area -->
+
+                <div id="mypage-main-wrapper">
+                    <div id="mypage-main-container">
+                        <section id="main-header">
+                            <div class="main-header-upper">
+                                <h3>마이페이지 메인</h3>
+                                <div class="main-header-btn">
+                                    <div class="order-status-btn">
+                                        <a class="text-secondary">입금 / 결제</a>
+                                    </div>
+                                    <div class="order-status-btn">
+                                        <a class="text-secondary">배송중</a>
+                                    </div>
+                                    <div class="order-status-btn">
+                                        <a class="text-secondary">배송완료</a>
+                                    </div>
+                                    <div class="order-status-btn">
+                                        <a class="text-secondary">구매확정</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="mypage-main-body">
+                            <table id="order-history-table" class="table align-middle text-center">
+                                <thead>
+                                <tr>
+                                    <th scope="col">상품 정보</th>
+                                    <th scope="col">구매 / 구매확정일</th>
+                                    <th scope="col">주문 금액(수량)</th>
+                                    <th scope="col">주문 상태</th>
+                                </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                <tr class="purchased-item-rows">
+                                    <th scope="row">
+                                        <div class="item-information">
+                                            <div class="order-item-image"></div>
+                                            <div class="order-item-detail">
+                                                <div class="item-name">자바 ORM 표준 JPA 프로그래밍</div>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <td class="purchased-date">
+                                        <div>구매일</div>
+                                        <div>2023/04/10</div>
+                                    </td>
+                                    <td>
+                                        <div>20,000원</div>
+                                        <div>2개</div>
+                                    </td>
+                                    <td>
+                                        <div>배송 대기중</div>
+                                    </td>
+                                </tr>
+                                <tr class="purchased-item-rows">
+                                    <th scope="row">
+                                        <div class="item-information">
+                                            <div class="order-item-image"></div>
+                                            <div class="order-item-detail">
+                                                <div class="item-name">자바 ORM 표준 JPA 프로그래밍</div>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <td class="purchased-date">
+                                        <div>구매일</div>
+                                        <div>2023/04/01</div>
+                                    </td>
+                                    <td>
+                                        <div>39,200원</div>
+                                        <div>40개</div>
+                                    </td>
+                                    <td>
+                                        <div>배송 완료</div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <section id="like-items-wrapper">
+                                <div id="like-item-header" class="align-middle">
+                                    <div><h3>좋아요 한 상품</h3></div>
+                                </div>
+                                <div id="like-items-body">
+                                    <div class="like-item-container row row-cols-1 row-cols-md-3 g-4">
+                                        <div class="like-item-card">
+                                            <div class="like-item-img-box">
+                                                <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg" class="card-img-top" alt="..."/>
+                                            </div>
+                                            <div class="like-item-detail">
+                                                <div class="item-name">샤넬 파자마</div>
+                                                <div class="item-price">43,900원</div>
+                                                <div class="item-like-box">
+                                                    <div class="thumbs-up-img-box">
+                                                        <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
+                                                    </div>
+                                                    <div class="thumbs-up-counts">2,189</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="like-item-card">
+                                            <div class="like-item-img-box">
+                                                <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg" class="card-img-top" alt="..."/>
+                                            </div>
+                                            <div class="like-item-detail">
+                                                <div class="item-name">
+                                                    COVERNAT X MONTBELL 19A/W REVERSIBLE
+                                                </div>
+                                                <div class="item-price">43,900원</div>
+                                                <div class="item-like-box">
+                                                    <div class="thumbs-up-img-box">
+                                                        <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
+                                                    </div>
+                                                    <div class="thumbs-up-counts">2,189</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="like-item-card">
+                                            <div class="like-item-img-box">
+                                                <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg" class="card-img-top" alt="..."/>
+                                            </div>
+                                            <div class="like-item-detail">
+                                                <div class="item-name">
+                                                    reversible quilted fleece jacket black
+                                                </div>
+                                                <div class="item-price">43,900원</div>
+                                                <div class="item-like-box align-items-end">
+                                                    <div class="thumbs-up-img-box">
+                                                        <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
+                                                    </div>
+                                                    <div class="thumbs-up-counts">2,189</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="like-item-card">
+                                            <div class="like-item-img-box">
+                                                <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg" class="card-img-top" alt="..."/>
+                                            </div>
+                                            <div class="like-item-detail">
+                                                <div class="item-name col">
+                                                    리얼 와이드 히드 밴딩 슬랙스
+                                                </div>
+                                                <div class="item-price">43,900원</div>
+                                                <div class="item-like-box align-text-bottom">
+                                                    <div class="thumbs-up-img-box">
+                                                        <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
+                                                    </div>
+                                                    <div class="thumbs-up-counts">2,189</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section id="coupon-wrapper">
+                                <div class="coupon-box-header">
+                                    <div><h3>쿠폰</h3></div>
+                                    <div class="coupon-qty">151장</div>
+                                </div>
+                                <div class="coupon-box-body">
+                                    <table id="coupon-box-table" class="table align-middle text-center">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">쿠폰명</th>
+                                            <th scope="col">할인 금액</th>
+                                            <th scope="col">적용 범위</th>
+                                            <th scope="col">유효 기간</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="table-group-divider">
+                                        <tr class="coupon-rows">
+                                            <th scope="row">
+                                                <div class="coupon-information">
+                                                    <div class="coupon-name">
+                                                        자바 ORM 표준 JPA 프로그래밍
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <td>
+                                                <div class="discount-rate">30%</div>
+                                            </td>
+                                            <td>
+                                                <div class="usable-area">식품</div>
+                                            </td>
+                                            <td>
+                                                <div class="valid-date">23.04.01 ~ 23.04.31</div>
+                                            </td>
+                                        </tr>
+                                        <tr class="coupon-rows">
+                                            <th scope="row">
+                                                <div class="coupon-information">
+                                                    <div class="coupon-information">
+                                                        <div class="coupon-name">
+                                                            자바 ORM 표준 JPA 프로그래밍
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <td>
+                                                <div>2,000원</div>
+                                            </td>
+                                            <td>
+                                                <div>일부 상품</div>
+                                            </td>
+                                            <td>
+                                                <div>23.01.01 ~ 23.12.31</div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                            <section id="item-inquiry-wrapper">
+                                <div class="inquiry-header">
+                                    <div><h3>상품 문의</h3></div>
+                                </div>
+                                <div class="inquiry-body">
+                                    <table id="item-inquiry-table" class="table align-middle text-center">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 15%">상품 정보</th>
+                                            <th scope="col" style="width: 40%">내용</th>
+                                            <th scope="col">문의 유형</th>
+                                            <th scope="col">작성일</th>
+                                            <th scope="col">처리 상태</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="table-group-divider">
+                                        <tr class="item-inquiry-rows">
+                                            <td>
+                                                <div class="item-information">
+                                                    <div class="inquiry-item-image"></div>
+
+                                                    <div class="inquiry-item-name">
+                                                        자바 ORM 표준 JPA 프로그래밍
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <th scope="col" class="align-left">
+                                                <div class="item-inquiry-content">상품문의</div>
+                                            </th>
+                                            <td>
+                                                <div class="item-inquiry-type">상품</div>
+                                            </td>
+                                            <td>
+                                                <div class="item-inquiry-date">2023.04.17</div>
+                                            </td>
+                                            <td>
+                                                <div class="item-inquiry-status">답변 대기중</div>
+                                            </td>
+                                        </tr>
+                                        <tr class="item-inquiry-rows">
+                                            <td>
+                                                <div class="item-information">
+                                                    <div class="inquiry-item-image"></div>
+
+                                                    <div class="inquiry-item-name">
+                                                        자바 ORM 표준 JPA 프로그래밍
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <th scope="col">
+                                                <div class="item-inquiry-content">배송문의</div>
+                                            </th>
+                                            <td>
+                                                <div class="item-inquiry-type">배송</div>
+                                            </td>
+                                            <td>
+                                                <div class="item-inquiry-date">2023.04.01</div>
+                                            </td>
+                                            <td>
+                                                <div class="item-inquiry-status">답변 완료</div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                            <section id="common-inquiry-wrapper">
+                                <div id="common-inquiry-header">
+                                    <div><h3>1:1 문의</h3></div>
+                                </div>
+                                <div id="common-inquiry-body">
+                                    <table id="common-inquiry-table" class="table align-middle text-center">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 20%">문의 유형</th>
+                                            <th scope="col" style="width: 50%">내용</th>
+                                            <th scope="col">주문 번호</th>
+                                            <th scope="col">작성일</th>
+                                            <th scope="col">처리 상태</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="table-group-divider">
+                                        <tr class="common-inquiry-rows">
+                                            <th scope="row">
+                                                <div class="common-inquiry-information">
+                                                    <div class="common-inquiry-category">
+                                                        적립금 문의
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <td>
+                                                <div class="common-inquiry-content">적립이 안되여</div>
+                                            </td>
+                                            <td>
+                                                <div class="order-number">2</div>
+                                            </td>
+                                            <td>
+                                                <div class="common-inquiry-date">23.04.01</div>
+                                            </td>
+                                            <td>
+                                                <div class="common-inquiry-state">처리중</div>
+                                            </td>
+                                        </tr>
+                                        <tr class="common-inquiry-rows">
+                                            <th scope="row">
+                                                <div class="common-inquiry-information">
+                                                    <div class="common-inquiry-detail">
+                                                        <div class="common-inquiry-category">
+                                                            비밀번호 변경 문의
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <td>
+                                                <div class="common-inquiry-content">변경이 안됩니다</div>
+                                            </td>
+                                            <td>
+                                                <div class="order-number">3</div>
+                                            </td>
+                                            <td>
+                                                <div class="common-inquiry-date">23.01.01</div>
+                                            </td>
+                                            <td>
+                                                <div class="common-inquiry-state">답변 완료</div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+<th:block th:replace="/main/footer :: footer"></th:block>
+
+</body>
+</div>
+</html>

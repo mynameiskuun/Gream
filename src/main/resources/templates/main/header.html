@@ -41,7 +41,7 @@
                     </th:block>
                     <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_MEMBER')}">
                         <div class="nav-bar-right-btns">
-                            <a th:href="@{/member/mypage}">MY</a>
+                            <a th:href="@{/member/mypage/{memberId}(memberId=${session.loginMember.getId()})}">MY</a>
                         </div>
                     </th:block>
                     <div class="nav-bar-right-btns">SEARCH</div>
