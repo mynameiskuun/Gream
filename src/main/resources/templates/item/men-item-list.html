@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="main/mainpage">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/item-list.css" />
+    <style>
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+<section id="item-wrapper">
+    <div id="item-container">
+        <div id="item-sidebar">
+            <div class="sidebar-header">
+                <h3>카테고리별</h3>
+            </div>
+            <div class="sidebar-body">
+                <ul>
+                    <a><li>아우터</li></a>
+                    <a><li>티셔츠</li></a>
+                    <a><li>스웨트셔츠</li></a>
+                    <a><li>셔츠</li></a>
+                    <a><li>니트</li></a>
+                    <a><li>원피스</li></a>
+                    <a><li>신발</li></a>
+                    <a><li>악세사리</li></a>
+                </ul>
+            </div>
+        </div>
+        <div id="item-main">
+            <div class="item-header">MENS</div>
+            <div class="item-body">
+                <th:block th:each="item : ${items}">
+                <a th:href="@{/item/{itemId}(itemId=${item.getId()})}"><div class="item-cards">
+                    <div class="item-cards-body">
+                        <div class="item-cards-img-box" th:style="'background-image: url('+ ${item.getThumbnailUrl()} + ');'"></div>
+                        <div class="item-name" th:text="${item.getName()}">
+                        </div>
+                        <div class="item-price" th:text="${#numbers.formatInteger(item.getPrice(), 3, 'COMMA') + '원'} ">
+                        </div>
+                    </div>
+                </div></a></th:block>
+            </div>
+        </div>
+    </div>
+</section>
+</th:block>
+</body>
+</html>

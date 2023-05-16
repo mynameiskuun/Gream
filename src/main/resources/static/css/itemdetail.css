@@ -13,19 +13,12 @@
     background: white;
 }
 #item-img-box {
-    position: relative;
+    width: 480px;
+    height: 550px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
 }
-
-#item-img-box img {
-    position: absolute;
-    top: 30%;
-    width: 100%;
-}
-#item-img-box {
-    height: 90%;
-    width: 40%;
-}
-
 #item-information {
     padding-top:10%;
     height: 90%;
@@ -36,8 +29,6 @@
 #item-detail-content {
     width: 100%;
     margin: 0 auto;
-    background : lightslategray;
-    height: 500px;
     /* height 나중에 지우기. 내용 추가되면 자동으로 길이 늘어나게 */
 }
 

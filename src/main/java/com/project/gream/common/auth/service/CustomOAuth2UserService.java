@@ -3,16 +3,11 @@ package com.project.gream.common.auth.service;
 import com.project.gream.common.auth.dto.OAuthAttributes;
 import com.project.gream.common.enumlist.Role;
 import com.project.gream.domain.member.dto.CartDto;
-import com.project.gream.domain.member.dto.MemberDto;
-import com.project.gream.domain.member.entity.Cart;
-import com.project.gream.domain.member.entity.Member;
+import com.project.gream.domain.member.dto.MemberVO;
 import com.project.gream.domain.member.repository.MemberRepository;
 import groovy.util.logging.Slf4j;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -27,7 +22,6 @@ import java.util.Collections;
 import java.util.UUID;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -57,7 +51,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String uuid = UUID.randomUUID().toString().substring(0, 6);
         String password = bCryptPasswordEncoder.encode(uuid);
 
-        MemberDto memberDto = MemberDto.builder()
+        MemberVO memberVO = MemberVO.builder()
                 .id(attributes.getEmail())
                 .password(password)
                 .name(attributes.getName())
@@ -66,11 +60,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .cartDto(new CartDto())
                 .build();
 
-        memberRepository.save(memberDto.toEntity());
-        session.setAttribute("loginMember", memberDto);
+        if(memberRepository.findById(attributes.getEmail()).isEmpty()) {
+            memberRepository.save(memberVO.toEntity());
+        }
+
+        session.setAttribute("loginMember", memberVO);
 
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(Role.MEMBER.name())),
+                Collections.singleton(new SimpleGrantedAuthority(Role.MEMBER.getValue())),
                 attributes.getAttributes(),
                 attributes.getNameAttributeKey());
     }

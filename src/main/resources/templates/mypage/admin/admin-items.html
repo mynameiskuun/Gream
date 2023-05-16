@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="mypage/customer/admin-main">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        #admin-items-wrapper {
+            width: 100%;
+        }
+        .admin-items-header {
+            height: 80px;
+            border-bottom: 3px solid black;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="mypage-content">
+
+    <div id="admin-items-wrapper">
+        <div id="admin-items-container">
+            <div class="admin-items-header">
+                <h3>판매 상품 관리</h3>
+            </div>
+            <div class="admin-items-body">
+                <h3>판매 상품 페이징처리</h3>
+                <h3>가격수정, </h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</div>
+</html>

@@ -1,0 +1,36 @@
+#item-wrapper {
+    margin: 30px 30px 30px 30px;
+}
+#item-sidebar {
+    width: 300px;
+}
+#item-container {
+    display: flex;
+}
+.sidebar-header {
+    margin-bottom: 50px;
+}
+.sidebar-body ul li {
+    list-style: none;
+    margin-bottom: 20px;
+}
+.item-body {
+    flex-wrap: wrap;
+    width: 1000px;
+    display: flex;
+    float: left;
+}
+.item-cards {
+    width: 30%;
+    height: 600px;
+    margin-right: 20px;
+    cursor : pointer;
+}
+.item-cards-img-box {
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/carousel.jpg");
+    width: 300px;
+    height: 400px;
+}

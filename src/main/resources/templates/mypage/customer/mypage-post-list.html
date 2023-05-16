@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="mypage/customer/mypage-customer-main">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        #mypage-postlist-wrapper {
+            width: 100%;
+        }
+        #mypage-review-list-container {
+            height: 700px;
+        }
+        .mypage-review-list-header {
+            height: 80px;
+            border-bottom: 3px solid black;
+        }
+        #mypage-inquiry-container {
+            height: 700px;
+        }
+        .mypage-inquiry-list-header {
+            height: 80px;
+            border-bottom: 3px solid black;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="mypage-content">
+
+    <div id="mypage-postlist-wrapper">
+        <div id="mypage-review-list-container">
+            <div class="mypage-review-list-header">
+                <h3>나의 리뷰</h3>
+            </div>
+            <div class="mypage-review-list-body">
+                리뷰 목록 페이징처리
+            </div>
+        </div>
+        <div id="mypage-inquiry-container">
+            <div class="mypage-inquiry-list-header">
+                <h3>나의 문의</h3>
+            </div>
+            <div class="mypage-inquiry-list-body">
+                문의 글 목록 페이징처리
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</div>
+</html>

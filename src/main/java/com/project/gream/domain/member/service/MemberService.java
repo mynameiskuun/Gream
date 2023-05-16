@@ -2,9 +2,8 @@ package com.project.gream.domain.member.service;
 
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.domain.member.dto.CartItemDto;
-import com.project.gream.domain.member.dto.MemberDto;
+import com.project.gream.domain.member.dto.MemberVO;
 import com.project.gream.domain.member.dto.MemberRequestDto;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 import java.util.Map;
@@ -12,12 +11,12 @@ import java.util.Map;
 
 public interface MemberService {
 
-    int userRegister(MemberDto memberDto);
-    List<CartItemDto> getCartItemsByUserId(MemberDto memberDto);
-    String checkQtyAndAddToCart(Map<String, Object> itemMap, MemberDto memberDto);
-    String addItemToCart(Map<String, Object> itemMap, MemberDto memberDto);
+    int userRegister(MemberVO memberVO);
+    List<CartItemDto> getCartItemsByUserId(MemberVO memberVO);
+    String checkQtyAndAddToCart(Map<String, Object> itemMap, MemberVO memberVO);
+    String addItemToCart(Map<String, Object> itemMap, MemberVO memberVO);
     void deleteCartItemById(Long cartItemId);
     void deleteAllCartItems(Long cartId);
-    ModelAndView updateAddressAndGender(MemberRequestDto req, @LoginMember MemberDto memberDto);
+    void updateAddressAndGender(MemberRequestDto req, @LoginMember MemberVO memberVO);
 
 }

@@ -4,9 +4,7 @@ import com.project.gream.common.enumlist.Gender;
 import com.project.gream.common.enumlist.Role;
 import com.project.gream.common.enumlist.converter.GenderConverter;
 import com.project.gream.common.enumlist.converter.RoleConverter;
-import com.project.gream.common.util.StringToEnumUtil;
-import com.project.gream.domain.member.dto.MemberDto;
-import com.project.gream.domain.member.dto.MemberRequestDto;
+import com.project.gream.common.util.BaseTimeEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +32,7 @@ public class Member extends BaseTimeEntity {
     @Column(columnDefinition = "integer default 0", name = "member_point")
     private int point;
     @Convert(converter = RoleConverter.class)
-    @Column(name = "member_role")
+    @Column(name = "role")
     private Role role;
     @Convert(converter = GenderConverter.class)
     @Column(name = "member_gender")
