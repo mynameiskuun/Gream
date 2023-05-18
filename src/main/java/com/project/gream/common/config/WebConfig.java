@@ -1,7 +1,6 @@
 package com.project.gream.common.config;
 
-import com.project.gream.common.annotation.LoginMember;
-import com.project.gream.domain.member.dto.LoginMemberArgumentResolver;
+import com.project.gream.common.util.LoginMemberArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

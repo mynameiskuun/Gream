@@ -7,9 +7,10 @@ import com.project.gream.domain.item.dto.ItemVO;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberVO;
-import org.springframework.web.multipart.MultipartFile;
+import com.project.gream.domain.member.entity.CartItem;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemService {
     List<ItemVO> selectAllItems();
@@ -25,5 +26,6 @@ public interface ItemService {
     ItemVO getItemById(Long itemId);
     void deleteImg(Long imgId);
     String addItemToCart(CartItemDto cartItemDto, @LoginMember MemberVO memberVo);
-
+    Optional<CartItem> getOldCartItem(MemberVO memberVo, CartItemDto cartItemDto);
+    String deleteCartItem(List<Long> cartItemIds);
 }

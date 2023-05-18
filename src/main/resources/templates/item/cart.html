@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="layout/view">
+      layout:decorate="/main/mainpage">
 <div layout:fragment="content">
 <head>
     <meta charset="UTF-8">
@@ -14,12 +14,29 @@
             display: flex;
             justify-content: space-between;
         }
+        .checkDelBox {
+            display: flex;
+            justify-content: space-between;
+        }
+        #checkedDelete {
+            cursor: pointer;
+        }
+        .deleteBtn {
+            cursor: pointer;
+        }
+        .cartItemImg {
+            background-size: 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100px;
+            height: 100px;
+        }
     </style>
 </head>
 <body>
 
 <nav id="navbar-example2" class="navbar bg-light px-3 mb-3">
-    <a class="navbar-brand" href="#"></a>
+    <a class="navbar-brand" href="#">장바구니</a>
     <ul class="nav nav-pills">
         <div class="btn-group" role="group" aria-label="Basic example">
             <button type="button" class="btn btn-dark" id="tocart-btn">01 장바구니</button>
@@ -34,11 +51,57 @@
     <div id="cart-container">
         <div id="cart-content">
             <div class="cart-title">
-                <span><button id="allCheckBtn">전체선택</button><input type="checkbox" id="checkAll" checked="checked"/></span>
+<!--                <span><button id="allCheckBtn">전체선택</button><input type="checkbox" id="checkAll" checked="checked"/></span>-->
             </div>
             <div>
+                <div id="cart-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr><td th:colspan="7"><h3>장바구니</h3></td></tr>
+                                <tr>
+                                    <td th:colspan="7">
+                                        <div class="checkDelBox">
+                                            <div class="checkAllBox">
+                                                <input type="checkbox" class="checkbox" id="checkAll" />
+                                                <span>전체선택</span>
+                                            </div>
+                                            <div>
+                                                <a id="checkedDelete">선택삭제</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr><td></td><td></td><td><h4>상품명</h4></td><td><h4>수량</h4></td><td><h4>상품 단가</h4></td><td><h4>합계</h4></td><td><h4>삭제</h4></td></tr>
+                            </thead>
+                            <tbody id="cartTableBody">
+                                <th:block th:if="${cartItem ne null}">
+                                    <tr th:each="cartItem : ${cartItem}">
+                                        <td><input type="checkbox" class="checkbox checkOne" /></td>
+                                        <td><div class="cartItemImg" th:style="'background-image: url('+ ${cartItem.item.getThumbnailUrl()} + ');'"></div></td>
+                                        <td th:text="${cartItem.item.getName()}"></td>
+                                        <td class="qty" th:text="${cartItem.getQuantity()}"></td>
+                                        <td class="price" th:text="${#numbers.formatInteger(cartItem.item.getPrice(), 3, 'COMMA')}"></td>
+                                        <td class="totalPrice" th:text="${#numbers.formatInteger(cartItem.item.getPrice() * cartItem.getQuantity(), 3, 'COMMA')}"></td>
+                                        <td>
+                                           <!--/* <a th:href="@{/cart/{cartItemId}(cartItemId=${cartItem.id})}" class="deleteBtn">삭제</a> */-->
+                                            <a class="deleteBtn">삭제</a>
+                                            <input type="hidden" th:value="${cartItem.getId()}"/>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                                <th:block th:unless="${cartItem ne null}">
+                                    <h3>장바구니에 담은 상품이 없습니다</h3>
+                                </th:block>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <table class="table align-middle table-striped table-hover">
+<!--/*
+        <table class="table align-middle table-striped table-hover">
                     <thead class="table-secondary">
                     <tr><td colspan="8" class="text-center"><span><h2></h2></span></td></tr>
                     <tr><td></td><td></td><td>상품명</td><td>수량</td><td>상품 가격</td><td>합계</td><td>쿠폰</td><td>삭제</td></tr>
@@ -80,8 +143,8 @@
                     </th:block>
                     </tbody>
                 </table>
-            </div>
-        </div>
+*/-->
+
         <div id="cart-side-bar">
             <div>
                 <span><h2>적립혜택</h2></span><span id="reward"></span>
@@ -100,8 +163,6 @@
             </div>
             <div>
                 <input type="submit" id="orderBtn" class="btn btn-outline-danger" value="주문하기" />
-                <button type="button" id="deleteAllBtn" class="btn btn-danger">모두삭제</button>
-                <button type="button" id="test" class="btn btn-danger">테스트</button>
                 <!-- 주문하면 주문창으로 -->
             </div>
         </div>
@@ -114,13 +175,22 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
+
+    $('.item-qty').on('propertychange change keyup paste input', function() {
+        setTotalPrice();
+    })
+
+    function removeCommaAndGetNumber(price) {
+        return price.replace(/,/g, '').replace(/\D/g, '');
+    }
+
     function setTotalPrice() {
         let totalPrice = 0;
-        let qtyList = document.querySelectorAll('input.item-qty');
-        let priceList = document.querySelectorAll('div.item-price-box');
+        let qtyList = document.querySelectorAll('.qty');
+        let priceList = document.querySelectorAll('.price');
 
         for (let i = 0; i < qtyList.length; i++) {
-            let price = qtyList[i].value * priceList[i].textContent;
+            let price = qtyList[i].innerHTML * removeCommaAndGetNumber(priceList[i].innerHTML);
             totalPrice += price;
         }
 
@@ -132,52 +202,81 @@
             (totalPrice * 3/100) + 'Point'
     }
 
-    $(document).ready(setTotalPrice());
     // 장바구니 페이지 전환시 가격 출력을 위한 함수
-
+    $(document).ready(setTotalPrice());
 
     // 전체선택 버튼 이벤트 메소드
     $(document).ready(function() {
+        $('#checkAll').change(function() {
+            $('.checkOne').prop('checked', $(this).prop('checked'));
+        });
+    });
 
-        $('#allCheckBtn').click(function() {
-            if($('#checkAll').prop('checked')) {
-                $('#checkAll').prop('checked', false);
-                $('input[class=cart-checkbox]').prop('checked', false);
-            } else {
-                $('#checkAll').prop('checked', true);
-                $('input[class=cart-checkbox]').prop('checked', true);
-            }
-        })
-    })
+    // 장바구니 선택삭제 이벤트
+    $(document).ready(function() {
+        $('#checkedDelete').click(function() {
 
+            const hiddenValueArray = [];
+            const checkedDomArray = [];
 
-    $('#deleteAllBtn').click(function() {
+            const checkedCheckBoxes = document.querySelectorAll('.checkOne:checked');
+            checkedCheckBoxes.forEach((checkbox) => {
+                hiddenValueArray.push(checkbox.closest('tr').querySelector('input[type="hidden"]').value);
+                checkedDomArray.push(checkbox.closest('tr'));
+            });
 
-        let cartList = [[${cartItemList}]];
+            console.log("hiddenValueArray", hiddenValueArray);
+            console.log("checkedDomArray", checkedDomArray);
 
-        console.log(cart);
-        console.log(cartList);
-        console.log(cartId);
+            $.ajax({
+                url: '/cart/all',
+                method: 'DELETE',
+                contentType: 'application/json',
+                dataType: 'text',
+                data: JSON.stringify(hiddenValueArray),
+                success(data) {
+                    alert(data);
+                    checkedDomArray.forEach((dom) => {dom.remove()})
+                },
+                error(result) {
+                    console.log(result)
+                }
+            })
+        });
+    });
+
+    // 장바구니 상품 개별 삭제 이벤트
+    $('.deleteBtn').on('click', function() {
+        let cartItemId = $(this).next().val();
+        let targetDom = $(this).parent().parent();
 
         $.ajax({
-            url:'/user/cart/all',
+            url: '/cart/' + cartItemId,
             type: 'DELETE',
-            contentType: 'application/json; charset=UTF-8',
-            data: JSON.stringify(cartId),
-            success: function() {
-                $('#cart-wrapper').load(location.href+' #cart-wrapper');
-            }
+            contentType: 'text',
+            dataType: 'text',
+            data: cartItemId,
+            success: function(data) {
+                console.log("result : " + data);
+                targetDom.remove();
+            },
+            error(xhr, status, error) {
+                console.log(xhr)
+                console.log(status)
+                console.log(error)
+            },
         })
     })
 
-    $('.item-qty').on('propertychange change keyup paste input', function() {
-        setTotalPrice();
-    })
+    // 장바구니 checkbox 전체선택 이벤트
+    $(document).ready(function() {
+        if ($('#checkAll').prop('checked')) {
+            $('.checkOne').prop('checked', $(this).prop('checked'));
+        } else {
+            $('.checkOne').prop('checked', $(this).prop('unchecked'));
+        }
+    });
 
-    // 숫자 이외 문자는 전부 ''처리 메소드 + parseInt
-    function getNumberFromString(value) {
-        return parseInt(value.replace(/[^0-9]/g, ''));
-    }
 
 
     // // 주문하기 버튼 이벤트 메소드
