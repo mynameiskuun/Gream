@@ -26,7 +26,7 @@ public class CartItem extends BaseTimeEntity {
     @Column(name = "cartitem_qty")
     private int quantity;
 
-    public void updateCartIemQty(int quantity) {
+    public void updateCartItemQty(int quantity) {
         this.quantity = quantity;}
 
     @Builder
@@ -36,5 +36,4 @@ public class CartItem extends BaseTimeEntity {
         this.cart = cart;
         this.quantity = quantity;
     }
-
 }

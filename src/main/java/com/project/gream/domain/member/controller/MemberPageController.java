@@ -4,9 +4,12 @@ import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.enumlist.Role;
 import com.project.gream.domain.item.dto.ItemVO;
 import com.project.gream.domain.item.service.ItemService;
+import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberVO;
 import com.project.gream.domain.member.entity.Cart;
+import com.project.gream.domain.member.entity.CartItem;
 import com.project.gream.domain.member.entity.Member;
+import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,17 +36,18 @@ public class MemberPageController {
     private final ItemService itemService;
     private final MemberRepository memberRepository;
     private final PasswordEncoder encoder;
+    private final CartItemRepository cartItemRepository;
 
     @GetMapping("/")
     public ModelAndView toMainPage(@AuthenticationPrincipal Object principal, @LoginMember MemberVO memberVO) {
 
         if (memberRepository.findById("admin").isEmpty()) {
             Member admin = Member.builder()
-                            .id("admin")
-                            .password(encoder.encode("1111"))
-                            .role(Role.ADMIN)
-                            .cart(new Cart())
-                            .build();
+                    .id("admin")
+                    .password(encoder.encode("1111"))
+                    .role(Role.ADMIN)
+                    .cart(new Cart())
+                    .build();
             memberRepository.save(admin);
         }
 
@@ -58,12 +63,14 @@ public class MemberPageController {
         mav.setViewName("main/mainpage");
         return mav;
     }
+
     @GetMapping("/join")
     public ModelAndView toJoinPage() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("member/join");
         return mav;
     }
+
     @GetMapping("/login")
     public ModelAndView toLoginPage(@RequestParam(value = "error", required = false) String error,
                                     @RequestParam(value = "exception", required = false) String exception) {
@@ -74,66 +81,94 @@ public class MemberPageController {
         mav.addObject("exception", exception);
         return mav;
     }
+
     @GetMapping("/address")
     public ModelAndView toAdditionlPage() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("member/additional-input");
         return mav;
     }
+
     @GetMapping("/user/order")
     public ModelAndView toOrderList() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("mypage/customer/mypage-orderlist");
         return mav;
     }
+
     @GetMapping("/user/review")
     public ModelAndView toReviewWrite() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("board/review/mypage-customer-review-write");
         return mav;
     }
+
     @GetMapping("/user/postlist")
     public ModelAndView toPostList() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("mypage/customer/mypage-post-list");
         return mav;
     }
+
     @GetMapping("/user/orderlist")
     public ModelAndView toUserOrderList() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("mypage/customer/mypage-orderlist");
         return mav;
     }
+
     @GetMapping("/user/mypage/{memberId}")
     public ModelAndView toBuyer(@PathVariable("memberId") String memberId) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/mypage/customer/mypage-customer-main");
         return mav;
     }
+
     @GetMapping("/admin/coupon")
     public ModelAndView toCouponCreate() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("mypage/admin/create-coupon");
         return mav;
     }
+
     @GetMapping("/admin/item/registration")
     public ModelAndView toRegitem() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/mypage/admin/admin-registration");
         return mav;
     }
+
     @GetMapping("/user/like")
     public ModelAndView toLikeList() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("mypage/customer/mypage-like-list");
         return mav;
     }
+
     @GetMapping("/admin")
     public ModelAndView toAdmin() {
         ModelAndView mav = new ModelAndView();
         List<ItemVO> itemList = itemService.selectAllItems();
         mav.addObject("itemList", itemList);
         mav.setViewName("/mypage/admin/admin-main");
+        return mav;
+    }
+
+    @GetMapping("/cart")
+    public ModelAndView toCart(@LoginMember MemberVO memberVo) {
+        ModelAndView mav = new ModelAndView();
+
+        List<CartItem> cartItemList = null;
+        if (memberVo == null) {
+            mav.setViewName("/member/login");
+            return mav;
+        } else {
+            cartItemList = cartItemRepository.findAllByCart_Id(memberVo.getCartDto().getId());
+        }
+        mav.setViewName("/item/cart");
+        mav.addObject("cartItem", cartItemList);
+        // 장바구니에 담긴 상품 검색
+        // List<Dto>로 mav에 저장 후 리턴
         return mav;
     }
 //    @GetMapping("/user/cart")

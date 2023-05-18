@@ -6,6 +6,7 @@ import com.project.gream.domain.item.dto.ItemVO;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberVO;
+import com.project.gream.domain.member.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.Banner;
@@ -13,27 +14,28 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+import java.util.Optional;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 public class ItemController {
 
     private final ItemService itemService;
-
-
-    @GetMapping("/cart/{userId}")
-    public ModelAndView toCart(@PathVariable("userId") String userId) {
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/item/cart");
-        return mav;
-    }
+    private final CartItemRepository cartItemRepository;
 
     @PostMapping("/cart")
     public String addItemToCart(@RequestBody CartItemDto cartItemDto, @LoginMember MemberVO memberVo) {
-
-
-        return "성공";
+        return itemService.addItemToCart(cartItemDto, memberVo);
     }
+
+    @DeleteMapping("/cart/{cartItemId}")
+    public Long deleteCartItem(@PathVariable Long cartItemId) {
+//        cartItemRepository.deleteById(cartItemId);
+        return cartItemId;
+    }
+
     @GetMapping("/item/{itemId}")
     public ModelAndView toItemDetail(@PathVariable("itemId") Long itemId) {
         ModelAndView mav = new ModelAndView();
@@ -64,6 +66,12 @@ public class ItemController {
         mav.setViewName("mypage/admin/admin-registration");
         itemService.registerItemAndImgs(itemRequestDto);
         return mav;
+    }
+
+    @DeleteMapping("/cart/all")
+    public String deleteCartItemAll(@RequestBody List<Long> cartItemIds) {
+        log.info(String.valueOf(cartItemIds));
+        return itemService.deleteCartItem(cartItemIds);
     }
 
 
