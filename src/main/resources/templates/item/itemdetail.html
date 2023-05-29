@@ -32,7 +32,7 @@
                 </div>
                 <div style="display: flex">
                     <h3>주문 수량</h3>
-                        <input type="number" name="itemQty" class="countBox" id="itemQty" style="width: 50px;" value="1" min="1"/>
+                        <input type="number" name="orderQuantity" class="countBox" id="orderQuantity" style="width: 50px;" value="1" min="1"/>
                     <span><button id="orderBtn">주문하기</button></span>
                     <span><button onclick="cartBtn()">장바구니 추가</button></span>
                 </div>
@@ -274,12 +274,12 @@
     /* 구매수량 변화 감지, 남은 재고수량 이상으로 장바구니 혹은 결제 안되게 뷰단에서 처리 */
     // 페이지에 나와있는 상품 재고 초과하여 카운트 up 시 alert 출력
     $(".countBox").on('propertychange change keyup paste input', function() {
-        let currentVal = $('#itemQty').val();
+        let currentVal = $('#orderQuantity').val();
         let stock = [[${item.itemStock}]];
         console.log(currentVal);
         if(currentVal > stock) {
             alert('주문 가능한 수량을 초과 하였습니다.');
-            $('#itemQty').val(stock);
+            $('#orderQuantity').val(stock);
         }
         if(stock === 0) {
             alert(`품절된 상품입니다`);
@@ -295,12 +295,12 @@
         }
 
         let cartItem = {
-            itemVo : [[${item}]],
-            quantity : document.getElementById('itemQty').value
+            itemDto : [[${item}]],
+            quantity : document.getElementById('orderQuantity').value
         };
 
         // let itemVo = [[${item}]];
-        // let quantity = document.getElementById('itemQty').value;
+        // let quantity = document.getElementById('orderQuantity').value;
 
         // 뷰단에서 상품 재고 이상으로 주문 안되게 처리
 
@@ -323,19 +323,18 @@
     // 개별상품 주문 이벤트 메소드
     $('#orderBtn').click(function () {
 
-        if([[${session.loginUser}]] == null) {
+        if([[${session.loginMember}]] == null) {
             alert('로그인을 해주세요')
             location.href = '/login';
         } else {
-            let orderQuantity = $('#itemQty').val();
-            let itemVO = [[${item}]];
-            let imgList = [[${imgList}]]
+            let orderQuantity = $('#orderQuantity').val();
+            let itemDto = [[${item}]];
 
-            localStorage.setItem("itemVO", JSON.stringify(itemVO));
+            localStorage.setItem("itemDto", JSON.stringify(itemDto));
             localStorage.setItem("orderQuantity", orderQuantity);
             localStorage.setItem('itemImg', imgList[0].modImgName);
 
-            location.href='/detail/order/' + itemVO.getItemId();
+            location.href='/detail/order/' + itemDto.getItemId();
         }
     })
 

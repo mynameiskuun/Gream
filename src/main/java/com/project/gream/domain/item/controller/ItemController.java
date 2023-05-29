@@ -1,21 +1,19 @@
 package com.project.gream.domain.item.controller;
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.domain.item.dto.CartItemRequestDto;
 import com.project.gream.domain.item.dto.ItemRequestDto;
-import com.project.gream.domain.item.dto.ItemVO;
+import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
-import com.project.gream.domain.member.dto.MemberVO;
+import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.Banner;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,8 +24,8 @@ public class ItemController {
     private final CartItemRepository cartItemRepository;
 
     @PostMapping("/cart")
-    public String addItemToCart(@RequestBody CartItemDto cartItemDto, @LoginMember MemberVO memberVo) {
-        return itemService.addItemToCart(cartItemDto, memberVo);
+    public String addItemToCart(@RequestBody CartItemDto cartItemDto, @LoginMember MemberDto memberDto) {
+        return itemService.addItemToCart(cartItemDto, memberDto);
     }
 
     @DeleteMapping("/cart/{cartItemId}")
@@ -39,8 +37,8 @@ public class ItemController {
     @GetMapping("/item/{itemId}")
     public ModelAndView toItemDetail(@PathVariable("itemId") Long itemId) {
         ModelAndView mav = new ModelAndView();
-        ItemVO itemVO = itemService.getItemById(itemId);
-        mav.addObject("item", itemVO);
+        ItemDto itemDto = itemService.getItemById(itemId);
+        mav.addObject("item", itemDto);
         mav.setViewName("/item/itemdetail");
         return mav;
     }
@@ -63,7 +61,7 @@ public class ItemController {
     @PostMapping("/item")
     public ModelAndView regItem(ItemRequestDto itemRequestDto) throws Exception {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("mypage/admin/admin-registration");
+        mav.setViewName("member/mypage/admin/admin-registration");
         itemService.registerItemAndImgs(itemRequestDto);
         return mav;
     }
@@ -74,6 +72,17 @@ public class ItemController {
         return itemService.deleteCartItem(cartItemIds);
     }
 
+    @PostMapping("cart/item/quantity")
+    public String updateCartItemQuantity(@RequestBody CartItemRequestDto req) {
 
+        log.info("------------------------상품 수량 업데이트");
 
+        return itemService.updateCartItemQuantity(req);
+
+//        if (quantity == 0) {
+//            return "실패";
+//        } else {
+//
+//        }
+    }
 }

@@ -5,7 +5,6 @@ import com.project.gream.domain.item.entity.Item;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.ibatis.annotations.Many;
 
 import javax.persistence.*;
 
@@ -16,21 +15,22 @@ public class OrderItem extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "orderitem_id")
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
-    private int qty;
+    private int quantity;
     private int totalPrice;
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
+    @ManyToOne
+    @JoinColumn(name = "orderhistory_id")
+    private OrderHistory orderHistory;
 
     @Builder
-    public OrderItem(Long id, Order order, int qty, int totalPrice, Item item) {
+    public OrderItem(Long id, OrderHistory orderHistory, int quantity, int totalPrice, Item item) {
         this.id = id;
-        this.order = order;
-        this.qty = qty;
+        this.orderHistory = orderHistory;
+        this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.item = item;
     }

@@ -1,6 +1,7 @@
 package com.project.gream.domain.member.entity;
 
 import com.project.gream.common.util.BaseTimeEntity;
+import com.project.gream.domain.item.entity.Item;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,4 @@ public class Cart extends BaseTimeEntity {
     public Cart(Long id) {
         this.id = id;
     }
-
 }

@@ -1,7 +1,7 @@
 package com.project.gream.domain.item.dto;
 
 
-import com.project.gream.domain.member.dto.MemberVO;
+import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.entity.Review;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,11 +20,11 @@ public class ReviewDto {
     private int deliveryScore;
     private int repurchaseScore;
     private String content;
-    private MemberVO memberVO;
-    private ItemVO itemVO;
+    private MemberDto memberDto;
+    private ItemDto itemDto;
 
     @Builder
-    public ReviewDto(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore, String content, MemberVO memberVO, ItemVO itemVO) {
+    public ReviewDto(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore, String content, MemberDto memberDto, ItemDto itemDto) {
         this.id = id;
         this.starValue = starValue;
         this.priceScore = priceScore;
@@ -32,8 +32,8 @@ public class ReviewDto {
         this.deliveryScore = deliveryScore;
         this.repurchaseScore = repurchaseScore;
         this.content = content;
-        this.memberVO = memberVO;
-        this.itemVO = itemVO;
+        this.memberDto = memberDto;
+        this.itemDto = itemDto;
     }
 
     public Review toEntity() {
@@ -45,8 +45,8 @@ public class ReviewDto {
                 .deliveryScore(deliveryScore)
                 .repurchaseScore(repurchaseScore)
                 .content(content)
-                .member(memberVO.toEntity())
-                .item(itemVO.toEntity())
+                .member(memberDto.toEntity())
+                .item(itemDto.toEntity())
                 .build();
     }
 
@@ -59,8 +59,8 @@ public class ReviewDto {
                 .deliveryScore(review.getDeliveryScore())
                 .repurchaseScore(review.getRepurchaseScore())
                 .content(review.getContent())
-                .memberVO(MemberVO.fromEntity(review.getMember()))
-                .itemVO(ItemVO.fromEntity(review.getItem()))
+                .memberDto(MemberDto.fromEntity(review.getMember()))
+                .itemDto(ItemDto.fromEntity(review.getItem()))
                 .build();
     }
 }
