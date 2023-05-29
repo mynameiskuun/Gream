@@ -1,22 +1,23 @@
 package com.project.gream.domain.member.service;
 
 import com.project.gream.common.annotation.LoginMember;
-import com.project.gream.domain.member.dto.CartItemDto;
-import com.project.gream.domain.member.dto.MemberVO;
+import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.dto.MemberRequestDto;
+import com.project.gream.domain.order.dto.KakaoPayDto;
 
-import java.util.List;
 import java.util.Map;
 
 
 public interface MemberService {
 
-    int userRegister(MemberVO memberVO);
-    List<CartItemDto> getCartItemsByUserId(MemberVO memberVO);
-    String checkQtyAndAddToCart(Map<String, Object> itemMap, MemberVO memberVO);
-    String addItemToCart(Map<String, Object> itemMap, MemberVO memberVO);
+    int userRegister(MemberDto memberDto);
+
+    void updateCartItems(KakaoPayDto kakaoPayDto);
+
+    String checkQtyAndAddToCart(Map<String, Object> itemMap, MemberDto memberDto);
+    String addItemToCart(Map<String, Object> itemMap, MemberDto memberDto);
     void deleteCartItemById(Long cartItemId);
     void deleteAllCartItems(Long cartId);
-    void updateAddressAndGender(MemberRequestDto req, @LoginMember MemberVO memberVO);
+    void updateAddressAndGender(MemberRequestDto req, @LoginMember MemberDto memberDto);
 
 }

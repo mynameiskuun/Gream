@@ -9,29 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>장바구니</title>
     <link rel="stylesheet" href="/css/cart.css" />
-    <style>
-        .cart-title{
-            display: flex;
-            justify-content: space-between;
-        }
-        .checkDelBox {
-            display: flex;
-            justify-content: space-between;
-        }
-        #checkedDelete {
-            cursor: pointer;
-        }
-        .deleteBtn {
-            cursor: pointer;
-        }
-        .cartItemImg {
-            background-size: 100%;
-            background-repeat: no-repeat;
-            background-position: center;
-            width: 100px;
-            height: 100px;
-        }
-    </style>
 </head>
 <body>
 
@@ -46,7 +23,6 @@
     </ul>
 </nav>
 
-<form action="/user/cart/order" method="Post">
 <div id="cart-wrapper">
     <div id="cart-container">
         <div id="cart-content">
@@ -77,12 +53,19 @@
                             <tbody id="cartTableBody">
                                 <th:block th:if="${cartItem ne null}">
                                     <tr th:each="cartItem : ${cartItem}">
-                                        <td><input type="checkbox" class="checkbox checkOne" /></td>
-                                        <td><div class="cartItemImg" th:style="'background-image: url('+ ${cartItem.item.getThumbnailUrl()} + ');'"></div></td>
-                                        <td th:text="${cartItem.item.getName()}"></td>
-                                        <td class="qty" th:text="${cartItem.getQuantity()}"></td>
-                                        <td class="price" th:text="${#numbers.formatInteger(cartItem.item.getPrice(), 3, 'COMMA')}"></td>
-                                        <td class="totalPrice" th:text="${#numbers.formatInteger(cartItem.item.getPrice() * cartItem.getQuantity(), 3, 'COMMA')}"></td>
+                                        <td><input type="checkbox" class="checkbox checkOne" checked="checked"/></td>
+                                        <td><div class="cartItemImg" th:style="'background-image: url('+ ${cartItem.getItemDto().getThumbnailUrl()} + ');'"></div></td>
+                                        <td th:text="${cartItem.getItemDto().getName()}"></td>
+                                        <td>
+                                           <!--/* <div class="qty" th:text="${cartItem.getQuantity()}"></div> */-->
+                                            <div>
+                                                <input type="hidden" th:value="${cartItem.getId()}" />
+                                                <input type="number" class="qty qtybox" name="quantity" min="1" th:max="${cartItem.getItemDto().getItemStock()}" th:value="${cartItem.getQuantity()}"/>
+                                                <a class="updateBtn btn-secondary button">변경</a>
+                                            </div>
+                                        </td>
+                                        <td class="price" th:text="${#numbers.formatInteger(cartItem.getItemDto().getPrice(), 3, 'COMMA')}"></td>
+                                        <td class="totalPrice" th:text="${#numbers.formatInteger(cartItem.getItemDto().getPrice() * cartItem.getQuantity(), 3, 'COMMA')}"></td>
                                         <td>
                                            <!--/* <a th:href="@{/cart/{cartItemId}(cartItemId=${cartItem.id})}" class="deleteBtn">삭제</a> */-->
                                             <a class="deleteBtn">삭제</a>
@@ -99,51 +82,6 @@
                 </div>
             </div>
         </div>
-
-<!--/*
-        <table class="table align-middle table-striped table-hover">
-                    <thead class="table-secondary">
-                    <tr><td colspan="8" class="text-center"><span><h2></h2></span></td></tr>
-                    <tr><td></td><td></td><td>상품명</td><td>수량</td><td>상품 가격</td><td>합계</td><td>쿠폰</td><td>삭제</td></tr>
-                    </thead>
-                    <tbody>
-                        <tr class="align-middle" th:if="${not #strings.isEmpty(cartItemList)}" th:each="cartItem : ${cartItemList}">
-
-                            <td class="cart-info-td">
-                                <input type="checkbox" class="cart-checkbox" checked="checked"/>
-                                <input type="hidden" class="cartitem-id-hidden" th:value="${cartItem.getCartItemId()}" />
-                                <input type="hidden" class="cart-hidden" th:value="${cartItem.getCartDto()}" />
-                                <input type="hidden" class="item-hidden" th:value="${cartItem.getItemDto()}" />
-                                <input type="hidden" class="item-qty-hidden" th:value="${cartItem.getQty()}" />
-                                <input type="hidden" class="item-price-hidden" th:value="${cartItem.getItemDto().getItemPrice()}" />
-                                <input type="hidden" class="total-item-price" th:value="${cartItem.getItemDto().getItemPrice() * cartItem.getQty()}"/>
-                            </td>
-                            <th:block th:if="${not #strings.isEmpty(imgList)}" th:each="img : ${imgList}">
-                                <th:block th:if="|${img.getItemDto().itemId.equals(cartItem.getItemDto().getItemId())}|">
-                                    <td><img th:src="|${img.imgUrl}|" style="width: 100px; height: 100px;"/></td>
-                                </th:block>
-                            </th:block>
-                            <td>[[${cartItem.getItemDto().getItemName()}]]</td>
-                            <td>
-                                <input type="number" class="item-qty" name="itemQty" min="1" th:max="${cartItem.getItemDto().getItemStock()}" style="width: 50px;" th:value="${cartItem.getQty()}">
-                                <button>변경</button>
-                            </td>
-                            <td th:with="priceAward=${cartItem.getItemDto().getItemPrice() * cartItem.getQty() * 3/100}">
-                                <div class="item-price-box" th:text="|${cartItem.getItemDto().getItemPrice()}|"></div>원
-                                <div class="item-reward-box" th:text="|${#numbers.formatInteger(priceAward, 0, 'COMMA')}|"></div>포인트 적립
-                            </td>
-                            <td class="total-price-box" th:text="|${cartItem.getQty() * cartItem.getItemDto().getItemPrice() + '원'}|"></td>
-                            <td>쿠폰사용</td>
-                            <td>
-                                <form th:action="@{/user/cart/delete/{itemId}(itemId=${cartItem.cartItemId})}" th:method="delete">
-                                    <input type="submit" value="삭제"/>
-                                </form>
-                            </td>
-                        </tr>
-                    </th:block>
-                    </tbody>
-                </table>
-*/-->
 
         <div id="cart-side-bar">
             <div>
@@ -162,13 +100,15 @@
                 </div>
             </div>
             <div>
-                <input type="submit" id="orderBtn" class="btn btn-outline-danger" value="주문하기" />
+                <form action="/cart/order" method="POST">
+                    <input type="submit" id="orderBtn" class="btn btn-outline-danger" value="주문하기" />
+                    <input type="hidden" id="checkedItemIds" name="cartItemIds"/>
+                </form>
                 <!-- 주문하면 주문창으로 -->
             </div>
         </div>
     </div>
 </div>
-</form>
 </body>
 </div>
 </html>
@@ -176,34 +116,51 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
 
-    $('.item-qty').on('propertychange change keyup paste input', function() {
-        setTotalPrice();
-    })
-
+    // 숫자에서 콤마 제거하는 메소드
     function removeCommaAndGetNumber(price) {
         return price.replace(/,/g, '').replace(/\D/g, '');
     }
 
-    function setTotalPrice() {
-        let totalPrice = 0;
-        let qtyList = document.querySelectorAll('.qty');
-        let priceList = document.querySelectorAll('.price');
-
-        for (let i = 0; i < qtyList.length; i++) {
-            let price = qtyList[i].innerHTML * removeCommaAndGetNumber(priceList[i].innerHTML);
-            totalPrice += price;
-        }
-
-        document.getElementById('totalPriceBeforeDiscount').innerHTML =
-            totalPrice + '원';
-        document.getElementById('totalPriceAfterDiscount').innerHTML =
-            totalPrice + '원';
-        document.getElementById('reward').innerHTML =
-            (totalPrice * 3/100) + 'Point'
+    // 콤마 추가 메소드
+    function addCommas(price) {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
-    // 장바구니 페이지 전환시 가격 출력을 위한 함수
-    $(document).ready(setTotalPrice());
+    // 총 결제금액 계산 후 출력하는 이벤트
+    function setPrice() {
+        let totalPrice = 0;
+        let checkedItemIds = [];
+
+        let checkedCheckBoxes =
+            document.querySelectorAll(".checkOne:checked");
+        checkedCheckBoxes.forEach((dom) => {
+            let eachTotalPrice = dom.closest("tr").querySelector('td[class="totalPrice"]').innerHTML;
+            let eachItemId = dom.closest("tr").querySelector('input[type="hidden"]').value;
+
+            totalPrice += parseInt(removeCommaAndGetNumber(eachTotalPrice));
+            checkedItemIds.push(eachItemId);
+
+            console.log("dom value : " + dom.value);
+        });
+
+        console.log("totalPrice : " + totalPrice);
+        let rewardRate = (totalPrice * 3) / 100;
+
+        document.getElementById("totalPriceBeforeDiscount").innerHTML = addCommas(totalPrice) + '원';
+        document.getElementById("totalPriceAfterDiscount").innerHTML = addCommas(totalPrice) + '원';
+        document.getElementById("reward").innerHTML =
+            addCommas(rewardRate) + " Point";
+        $('#checkedItemIds').val(checkedItemIds);
+        console.log("hiddenIdArray : " + $('#checkedItemIds').val());
+    }
+
+    $(document).ready(function() {
+        setPrice();
+    });
+
+    $(".checkbox").change(function() {
+        setPrice();
+    });
 
     // 전체선택 버튼 이벤트 메소드
     $(document).ready(function() {
@@ -277,6 +234,34 @@
         }
     });
 
+    // 장바구니 개별 수량 변경 이벤트
+    $('.updateBtn').on('click', function() {
+
+        // let changedQuantity = $(this).prev().val();
+        // let targetItem = $(this).prev().prev().val();
+
+        let req = {
+            changedQuantity : $(this).prev().val(),
+            cartItemId : $(this).prev().prev().val()
+        }
+
+        $.ajax({
+            url: "cart/item/quantity",
+            type: "POST",
+            data: JSON.stringify(req),
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'text',
+            success: function(result) {
+                alert(result);
+                console.log(result);
+                location.reload();
+            },
+            error: function(error) {
+                alert(error);
+                console.log("ajax 통신 실패" + error);
+            }
+        })
+    })
 
 
     // // 주문하기 버튼 이벤트 메소드
@@ -285,13 +270,13 @@
     //         return this.value;
     //     }).get();
     //     localStorage.setItem("qtyList", JSON.stringify(qtyList));
-    //     location.href='/user/cart/order'
+    //     location.href='/cart/order'
     // })
 
     // 주문하기 버튼 이벤트 메소드
     // $('#orderBtn').click(function() {
 
-        // 버튼을 누르면 itemQty domList에 담긴 숫자를 가져와서 컨트롤러에 보내준다
+        // 버튼을 누르면 orderQuantity domList에 담긴 숫자를 가져와서 컨트롤러에 보내준다
         // 컨트롤러에서는 받은 값으로 cartItem의 qty를 수정한다.
         // 수정한 값을 주문서에 출력한다.
 
@@ -301,7 +286,7 @@
         //
         // $.ajax({
         //     type:'POST',
-        //     url : '/user/cart/order',
+        //     url : '/cart/order',
         //     data: JSON.stringify(qtyList),
         //     contentType : 'application/json',
         //     dataType : 'text',
@@ -310,115 +295,7 @@
         //     }
         // })
         // localStorage.setItem("qtyList", JSON.stringify(qtyList));
-        // location.href='/user/cart/order'
+        // location.href='/cart/order'
     // })
 
-
-    // 상품수량 변화가 감지될때마다 함수 실행
-
-
-    // function setTotalInfo() {
-    //
-    //     let itemPrice = 0;
-    //     let itemCount  = 0;
-    //     let itemPoint = 0;
-    //     let deliveryFee = 0;
-    //     let totalPrice = 0;
-    //     let finalTotalPrice = 0;
-    //     const REWARD_RATE = 3/100;
-    //
-    //     $('.cart-info-td').each(function(index, element) {
-    //         if($(element).find('.cart-checkbox').is(':checked') === true) {
-    //             itemPrice += parseInt($(element).find('.item-price-hidden').val());
-    //             totalPrice += parseInt($(element).find('.total-item-price').val());
-    //             itemCount += parseInt($(element).find('.item-qty').val());
-    //             itemPoint += (totalPrice * itemCount) * REWARD_RATE;
-    //         }
-    //     });
-    //
-    //     console.log('totalPrice = ' + isNaN(totalPrice));
-    //     console.log('itemCount = ' + isNaN(itemCount));
-    //     console.log('itemPoint = ' + isNaN(itemPoint));
-    //
-    //     if (totalPrice >= 30000) {
-    //         deliveryFee = 0;
-    //     } else if (totalPrice == 0) {
-    //         deliveryFee = 3000;
-    //     } else {
-    //         deliveryFee = 3000;
-    //     }
-    //
-    //     finalTotalPrice = totalPrice + deliveryFee;
-    //
-    //     // $('.item-price-box').text(totalPrice.toLocaleString());
-    //     $('.item-reward-box').text(itemPoint + '포인트');
-    //     $('.total-price-box').text((itemPrice * itemCount).toLocaleString() + '원');
-    // }
-    //
-    // $(document).ready(function() {
-    //     setTotalInfo();
-    // })
-    // $('.cart-checkbox').on('change', function() {
-    //     setTotalInfo($('#cart-info-td'));
-    // })
-    //
-    // $('.item-qty').on('click', function() {
-    //     setTotalInfo($('#cart-info-td'));
-    // })
-
-    // 전체 삭제 후 카트 페이지 크기 바뀌는점
-    // 삭제 작동은 하지만 콘솔창에 터지는 에러 해결
-
-    // $('.item-qty').on('propertychange change keyup paste input', function() {
-    //
-    //     let cartItemList = [[${cartItemList}]];
-    //     let totalprice = 0;
-    //     let qtyList = document.querySelectorAll("input.item-qty");
-    //     let priceList = document.querySelectorAll("td.itemPrice");
-    //
-    //     console.log("qtylist[1] = " + qtyList[1].value);
-    //     console.log("length = " + qtyList.length);
-    //     console.log("pricelist[1] = " + priceList[1].textContent);
-    //     console.log("length = " + priceList.length);
-    //
-    //     for (let i = 0; i < qtyList.length; i++) {
-    //         let price = qtyList[i].value * priceList[i].textContent;
-    //         totalprice += price;
-    //     }
-    //
-    //     console.log("totalprice = " + totalprice);
-    //
-    //     // let itemQty = $('.item-qty').value;
-    //     // let itemPrice = $('.itemPrice').value;
-    //
-
-    //     $.ajax({
-    //         url: '/showCartPrice',
-    //         type: 'POST',
-    //         async: false,
-    //         data: JSON.stringify(cartItemList),
-    //         contentType: 'application/json; charset=UTF-8',
-    //         dataType: 'text',
-    //         success: function (result) {
-    //             document.getElementById("totalPriceBeforeDiscount").innerHTML =
-    //                 totalprice + '원';
-    //             document.getElementById("totalPriceAfterDiscount").innerHTML =
-    //                 totalprice + '원';
-    //             document.getElementById("reward").innerHTML =
-    //                 (totalprice * 3/100) + 'Point'
-    //             // 기본 적립율 3%showCartPrice
-    //             console.log(result);
-    //         },
-    //     })
-    // })
-    /*]]>*/
 </script>
-<!--
-
-구현 할 기능
-
-개별 상품 주문 & 결제
-체크박스 체크 유무에 따라 최종 결제금액 변하게
-상품 수량 변경에 따라 개별 상품 합계 금액 바뀌게
-
--->

@@ -1,6 +1,6 @@
 package com.project.gream.common.auth.handler;
 
-import com.project.gream.domain.member.dto.MemberVO;
+import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.member.repository.MemberRepository;
 import groovy.util.logging.Slf4j;
@@ -48,7 +48,7 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         String targetUrl;
 
         if (checkBothNotNull(member)) {
-            session.setAttribute("loginMember", MemberVO.fromEntity(member));
+            session.setAttribute("loginMember", MemberDto.fromEntity(member));
             targetUrl = savedRequest == null ? "/" : savedRequest.getRedirectUrl();
         } else
             targetUrl = "/address";

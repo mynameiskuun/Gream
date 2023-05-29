@@ -18,7 +18,7 @@
                     <a th:href="@{/inquiry}">Q & A</a>
                 </div>
                 <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_MEMBER')}">
-                    <div class="upper-header-btn"><a th:href="@{/item/like}">LIKE</a></div>
+                    <div class="upper-header-btn"><a th:href="@{/like}">LIKE</a></div>
                     <div class="upper-header-btn"><a th:href="@{/cart}">CART</a></div>
                 </th:block>
                 <div class="upper-header-btn" th:if="${session.loginMember == null}">
@@ -36,12 +36,12 @@
                     <div class="nav-bar-right-btns"><a th:href="@{/shop}">SHOP</a></div>
                     <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_ADMIN')}">
                         <div class="nav-bar-right-btns">
-                            <a th:href="@{/admin}">ADMIN</a>
+                            <a th:href="@{/admin/main}">ADMIN</a>
                         </div>
                     </th:block>
                     <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_MEMBER')}">
                         <div class="nav-bar-right-btns">
-                            <a th:href="@{/member/mypage/{memberId}(memberId=${session.loginMember.getId()})}">MY</a>
+                            <a th:href="@{/mypage/{memberId}(memberId=${session.loginMember.getId()})}">MY</a>
                         </div>
                     </th:block>
                     <div class="nav-bar-right-btns">SEARCH</div>

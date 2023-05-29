@@ -2,6 +2,7 @@ package com.project.gream.domain.member.entity;
 
 import com.project.gream.common.util.BaseTimeEntity;
 import com.project.gream.domain.item.entity.Item;
+import com.project.gream.domain.member.entity.Cart;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,19 +16,19 @@ public class CartItem extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cartitem_id")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name="item_id")
     private Item item;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id")
+    @JoinColumn(name="cart_id")
     private Cart cart;
-    @Column(name = "cartitem_qty")
+    @Column(nullable = false)
     private int quantity;
 
     public void updateCartItemQty(int quantity) {
-        this.quantity = quantity;}
+        this.quantity = quantity;
+    }
 
     @Builder
     public CartItem(Long id, Item item, Cart cart, int quantity) {
@@ -36,4 +37,6 @@ public class CartItem extends BaseTimeEntity {
         this.cart = cart;
         this.quantity = quantity;
     }
+
 }
+

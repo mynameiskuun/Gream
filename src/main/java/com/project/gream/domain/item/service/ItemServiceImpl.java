@@ -3,23 +3,28 @@ package com.project.gream.domain.item.service;
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.Gender;
+import com.project.gream.domain.item.dto.CartItemRequestDto;
 import com.project.gream.domain.item.dto.ImgDto;
+import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.dto.ItemRequestDto;
-import com.project.gream.domain.item.dto.ItemVO;
 import com.project.gream.domain.item.entity.Img;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;
 import com.project.gream.domain.member.dto.CartItemDto;
-import com.project.gream.domain.member.dto.MemberVO;
+import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.CartItem;
 import com.project.gream.domain.member.repository.CartItemRepository;
+import com.project.gream.domain.order.dto.KakaoPayDto;
+import com.project.gream.domain.order.entity.OrderHistory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,24 +39,24 @@ public class ItemServiceImpl implements ItemService{
     private final CartItemRepository cartItemRepository;
 
     @Override
-    public List<ItemVO> selectAllItems() {
+    public List<ItemDto> selectAllItems() {
         return itemRepository.findAll().stream()
-                .map(ItemVO::fromEntity).collect(Collectors.toList());
+                .map(ItemDto::fromEntity).collect(Collectors.toList());
     }
     @Override
-    public List<ItemVO> selectMenItems() {
+    public List<ItemDto> selectMenItems() {
         return itemRepository.findByGender(Gender.MAN).stream()
-                .map(ItemVO::fromEntity).collect(Collectors.toList());
+                .map(ItemDto::fromEntity).collect(Collectors.toList());
     }
     @Override
-    public List<ItemVO> selectWomenItems() {
+    public List<ItemDto> selectWomenItems() {
         return itemRepository.findByGender(Gender.WOMAN).stream()
-                .map(ItemVO::fromEntity).collect(Collectors.toList());
+                .map(ItemDto::fromEntity).collect(Collectors.toList());
     }
 
     @Override
-    public ItemVO selectItemById(Long itemId) {
-        return ItemVO.fromEntity(itemRepository.findById(itemId).orElseThrow());
+    public ItemDto selectItemById(Long itemId) {
+        return ItemDto.fromEntity(itemRepository.findById(itemId).orElseThrow());
     }
 
     @Override
@@ -62,7 +67,7 @@ public class ItemServiceImpl implements ItemService{
     @Transactional
     @Override
     public void registerItemAndImgs(ItemRequestDto itemRequestDto) throws Exception {
-        Item item = itemRepository.save(new ItemVO(itemRequestDto).toEntity());
+        Item item = itemRepository.save(new ItemDto(itemRequestDto).toEntity());
         List<String> imgPaths = s3Config.imgUpload(item, itemRequestDto.getImgFiles()); // S3 업로드
         saveEntities(item, imgPaths); // DB 업로드
     }
@@ -90,9 +95,9 @@ public class ItemServiceImpl implements ItemService{
                 .map(ImgDto::fromEntityForItem).collect(Collectors.toList());
     }
 
-    public ItemVO getItemById(Long itemId) {
+    public ItemDto getItemById(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow();
-        return ItemVO.fromEntity(item);
+        return ItemDto.fromEntity(item);
     }
 
     @Override
@@ -102,19 +107,19 @@ public class ItemServiceImpl implements ItemService{
 
     @Transactional
     @Override
-    public String addItemToCart(CartItemDto cartItemDto, @LoginMember MemberVO memberVo) {
+    public String addItemToCart(CartItemDto cartItemDto, @LoginMember MemberDto memberDto) {
 
-        Optional<CartItem> oldCartItem = getOldCartItem(memberVo, cartItemDto);
+        Optional<CartItem> oldCartItem = getOldCartItem(memberDto, cartItemDto);
 
         int oldItemQty = oldCartItem.map(CartItem::getQuantity).orElse(0);
         int newItemQty = cartItemDto.getQuantity();
-        int itemStock = cartItemDto.getItemVo().getItemStock();
+        int itemStock = cartItemDto.getItemDto().getItemStock();
 
         if (itemStock <= 0) {
             return "품절된 상품입니다.";
         }
         if (oldCartItem.isEmpty()) {
-            cartItemDto.setCartDto(memberVo.getCartDto());
+            cartItemDto.setCartDto(memberDto.getCartDto());
             cartItemRepository.save(cartItemDto.toEntity());
             return "장바구니에 저장 되었습니다";
         } else if (oldItemQty + newItemQty > itemStock) {
@@ -126,13 +131,12 @@ public class ItemServiceImpl implements ItemService{
             return "장바구니에 저장 되었습니다";
     }
 
-    public Optional<CartItem> getOldCartItem(MemberVO memberVo, CartItemDto cartItemDto) {
-        return cartItemRepository.findByCart_IdAndItem_Id(memberVo.getCartDto().getId(), cartItemDto.getItemVo().getId());
+    public Optional<CartItem> getOldCartItem(MemberDto memberDto, CartItemDto cartItemDto) {
+        return cartItemRepository.findByCart_IdAndItem_Id(memberDto.getCartDto().getId(), cartItemDto.getItemDto().getId());
     }
 
     @Override
     public String deleteCartItem(List<Long> cartItemIds) {
-
         if (cartItemIds.isEmpty()) {
             return "삭제할 상품이 없습니다";
         }
@@ -140,6 +144,61 @@ public class ItemServiceImpl implements ItemService{
             cartItemRepository.deleteById(itemId);
         }
         return "삭제 완료";
+    }
+
+    @Override
+    public String updateCartItemQuantity(CartItemRequestDto requestDto) {
+
+        log.info("changedQuantity : " + String.valueOf(requestDto.getChangedQuantity()));
+        log.info("cartItemId : " + String.valueOf(requestDto.getCartItemId()));
+
+        if (requestDto.getChangedQuantity() == 0 || requestDto.getCartItemId() == null) {
+            return "변경 가능한 수량이 아닙니다";
+        }
+
+        Optional<CartItem> cartItem = cartItemRepository.findById(requestDto.getCartItemId());
+        cartItem.get().updateCartItemQty(requestDto.getChangedQuantity());
+        cartItemRepository.save(cartItem.get());
+          return "수량 변경 완료";
+    }
+
+    @Override
+    public List<CartItemDto> getCartItems(Long cartId) {
+        return cartItemRepository.findAllByCart_Id(cartId).stream()
+                .map(CartItemDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<CartItemDto> getOrderItemsFromCart(String cartItemIds) {
+
+        log.info("------------------------- 장바구니에서 가져온 주문 상품 출력");
+
+        String[] itemIdArray = cartItemIds.split(",");
+        List<Long> idArray = Arrays.stream(itemIdArray)
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+         return idArray.stream()
+                 .map(cartItemRepository::findById)
+                 .map(Optional::orElseThrow)
+                 .map(CartItemDto::fromEntity)
+                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateItemStock(KakaoPayDto kakaoPayDto, OrderHistory orderHistory) {
+
+        log.info("--------------------------- 주문 완료 후 상품 재고 변경");
+
+        String[] itemArray = kakaoPayDto.getItemIds().split("/");
+        String[] qtyArray = kakaoPayDto.getItemQtys().split("/");
+
+        for (int i = 0; i < itemArray.length; i++) {
+            Item item = itemRepository.findById(Long.valueOf(itemArray[i]))
+                    .orElseThrow(() -> new NoSuchElementException("상품 재고 갱신 중 오류가 발생 했습니다."));
+            item.updateItemStock(item.getItemStock() - Integer.parseInt(qtyArray[i]));
+            itemRepository.save(item); // 주문 수량만큼 재고 -
+        }
     }
 
 }

@@ -20,7 +20,7 @@ public class ImgDto {
 
     private Long id;
     private String url;
-    private ItemVO itemVO;
+    private ItemDto itemDto;
     private ReviewDto reviewDto;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -30,10 +30,10 @@ public class ImgDto {
     private LocalDateTime modifiedTime;
 
     @Builder
-    public ImgDto(Long id, String url, ItemVO itemVO, ReviewDto reviewDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
+    public ImgDto(Long id, String url, ItemDto itemDto, ReviewDto reviewDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.url = url;
-        this.itemVO = itemVO;
+        this.itemDto = itemDto;
         this.reviewDto = reviewDto;
         this.createdTime = createdTime;
         this.modifiedTime = modifiedTime;
@@ -43,7 +43,7 @@ public class ImgDto {
         return Img.builder()
                 .id(id)
                 .url(url)
-                .item(itemVO.toEntity())
+                .item(itemDto.toEntity())
                 .build();
     }
 
@@ -51,7 +51,7 @@ public class ImgDto {
         return Img.builder()
                 .id(id)
                 .url(url)
-                .item(itemVO.toEntity())
+                .item(itemDto.toEntity())
                 .review(reviewDto.toEntity())
                 .build();
     }
@@ -60,7 +60,7 @@ public class ImgDto {
         return ImgDto.builder()
                 .id(img.getId())
                 .url(img.getUrl())
-                .itemVO(ItemVO.fromEntity(img.getItem()))
+                .itemDto(ItemDto.fromEntity(img.getItem()))
                 .build();
     }
 
@@ -68,7 +68,7 @@ public class ImgDto {
         return ImgDto.builder()
                 .id(img.getId())
                 .url(img.getUrl())
-                .itemVO(ItemVO.fromEntity(img.getItem()))
+                .itemDto(ItemDto.fromEntity(img.getItem()))
                 .reviewDto(ReviewDto.fromEntity(img.getReview()))
                 .build();
     }

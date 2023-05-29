@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="member/mypage/admin/admin-main">
+<head>
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/regitem.css" />
+</head>
+<body>
+<th:block layout:fragment="content">
+<div id="regitem-wrapper">
+    <h1>상품등록</h1>
+<form method="post" action="/item" enctype="multipart/form-data" id="regitem-form">
+    <div class="col-12">
+        <label for="categoryBox" class="form-label">카테고리</label>
+        <input type="hidden" id="categoryBox" />
+        <div id="category-radio-wrapper">
+            <div class="category-radio-container">
+                <label for="outer" class="form-label">아우터</label>
+                <input type="radio" class="category-radio" name="category" value="OUTER" id="outer" />
+            </div>
+            <div class="category-radio-container">
+                <label for="tshirts" class="form-label">티셔츠</label>
+                <input type="radio" class="category-radio" name="category" value="TSHIRTS" id="tshirts" />
+            </div>
+            <div class="category-radio-container">
+                <label for="sweatshirts" class="form-label">스웨트셔츠</label>
+                <input type="radio" class="category-radio" name="category" value="SWEATSHIRTS" id="sweatshirts" />
+            </div>
+            <div class="category-radio-container">
+                <label for="shirts" class="form-label">셔츠</label>
+                <input type="radio" class="category-radio" name="category" value="SHIRTS" id="shirts" />
+            </div>
+            <div class="category-radio-container">
+                <label for="knit" class="form-label">니트</label>
+                <input type="radio" class="category-radio" name="category" value="KNIT" id="knit" />
+            </div>
+            <div class="category-radio-container">
+                <label for="dress" class="form-label">원피스</label>
+                <input type="radio" class="category-radio" name="category" value="DRESS" id="dress" />
+            </div>
+            <div class="category-radio-container">
+                <label for="bottom" class="form-label">하의</label>
+                <input type="radio" class="category-radio" name="category" value="BOTTOM" id="bottom" />
+            </div>
+            <div class="category-radio-container">
+                <label for="shoes" class="form-label">신발</label>
+                <input type="radio" class="category-radio" name="category" value="SHOES" id="shoes" />
+            </div>
+            <div class="category-radio-container">
+                <label for="accessories" class="form-label">악세사리</label>
+                <input type="radio" class="category-radio" name="category" value="ACCESSORIES" id="accessories" />
+            </div>
+        </div>
+        <label for="genderBox" class="form-label">성별</label>
+        <input type="hidden" id="genderBox" />
+        <div id="gender-radio-wrapper">
+            <div class="gender-radio-container">
+                <label for="man" class="form-label">남성용</label>
+                <input type="radio" class="gender-radio" name="gender" value="MAN" id="man" />
+            </div>
+            <div class="gender-radio-container">
+                <label for="woman" class="form-label">여성용</label>
+                <input type="radio" class="gender-radio" name="gender" value="WOMAN" id="woman" />
+            </div>
+        </div>
+<!--        <select class="form-select" name="category" required aria-label="Default select example" id="categoryBox">-->
+<!--            <option value="OUTER">아우터</option>-->
+<!--            <option value="TSHIRTS">티셔츠</option>-->
+<!--            <option value="SWEATSHIRTS">스웨트셔츠</option>-->
+<!--            <option value="SHIRTS">셔츠</option>-->
+<!--            <option value="KNIT">니트</option>-->
+<!--            <option value="ONEPIECE">원피스</option>-->
+<!--            <option value="BOTTOMS">하의</option>-->
+<!--            <option value="SHOES">신발</option>-->
+<!--            <option value="ACCESSORIES">악세사리</option>-->
+<!--        </select>-->
+    </div>
+    <div class="col-12">
+        <label for="prdName" class="form-label">상품명</label>
+        <input type="text" class="regitem-inputs" id="prdName" name="name">
+    </div>
+    <div class="row g-3 col-12">
+        <div class="col">
+            <label for="prdPrice" class="form-label">상품 가격</label>
+            <input type="text" id="prdPrice" class="regitem-inputs" name="price">
+        </div>
+        <div class="col">
+            <label for="prdAmount" class="form-label">상품 수량</label>
+            <input type="number" class="regitem-inputs" id="prdAmount" name="itemStock">
+        </div>
+    </div>
+    <div class="mb-3 col-12">
+        <label for="prdDetail" class="form-label">상품 설명</label>
+        <textarea class="form-control" id="prdDetail" name="detail" rows="3" style="border: 1px solid lightgray;"></textarea>
+    </div>
+    <div class="mb-3 col-12">
+        <label for="prdImg" class="form-label">상품 사진</label>
+        <input class="form-control" type="file" id="prdImg" name="imgFiles" multiple="multiple">
+    </div>
+    <div class="col-12 text-center">
+        <input type="submit" class="btn btn-secondary" value="상품등록"/><!--id="submitbtn"-->
+    </div>
+</form>
+</div>
+</th:block>
+</body>
+</div>
+</html>

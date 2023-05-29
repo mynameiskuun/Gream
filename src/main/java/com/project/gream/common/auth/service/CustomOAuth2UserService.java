@@ -3,7 +3,8 @@ package com.project.gream.common.auth.service;
 import com.project.gream.common.auth.dto.OAuthAttributes;
 import com.project.gream.common.enumlist.Role;
 import com.project.gream.domain.member.dto.CartDto;
-import com.project.gream.domain.member.dto.MemberVO;
+import com.project.gream.domain.coupon.CouponBoxDto;
+import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.repository.MemberRepository;
 import groovy.util.logging.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,20 +52,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String uuid = UUID.randomUUID().toString().substring(0, 6);
         String password = bCryptPasswordEncoder.encode(uuid);
 
-        MemberVO memberVO = MemberVO.builder()
+        MemberDto memberDto = MemberDto.builder()
                 .id(attributes.getEmail())
                 .password(password)
                 .name(attributes.getName())
                 .email(attributes.getEmail())
                 .role(Role.MEMBER)
                 .cartDto(new CartDto())
+                .couponBoxDto(new CouponBoxDto())
                 .build();
 
         if(memberRepository.findById(attributes.getEmail()).isEmpty()) {
-            memberRepository.save(memberVO.toEntity());
+            memberRepository.save(memberDto.toEntity());
         }
 
-        session.setAttribute("loginMember", memberVO);
+        session.setAttribute("loginMember", memberDto);
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(Role.MEMBER.getValue())),
