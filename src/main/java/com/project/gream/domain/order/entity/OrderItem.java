@@ -5,10 +5,12 @@ import com.project.gream.domain.item.entity.Item;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 
 @NoArgsConstructor
+@DynamicInsert // 실제 DB에 save 되는 시점에 영향을 미침. 이 설정을 통해 insert 시 null인 필드를 제외함.
 @Getter
 @Entity
 public class OrderItem extends BaseTimeEntity {
@@ -19,6 +21,8 @@ public class OrderItem extends BaseTimeEntity {
     private Long id;
     private int quantity;
     private int totalPrice;
+    @Column(columnDefinition = "varchar (100) default '배송 준비중'") // 테이블 생성 시점에 DDL 생성. 실제 db에 업데이트 되는 시점에는 영향 X.
+    private String state;
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
@@ -27,11 +31,12 @@ public class OrderItem extends BaseTimeEntity {
     private OrderHistory orderHistory;
 
     @Builder
-    public OrderItem(Long id, OrderHistory orderHistory, int quantity, int totalPrice, Item item) {
+    public OrderItem(Long id, int quantity, int totalPrice, String state, Item item, OrderHistory orderHistory) {
         this.id = id;
-        this.orderHistory = orderHistory;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
+        this.state = state;
         this.item = item;
+        this.orderHistory = orderHistory;
     }
 }

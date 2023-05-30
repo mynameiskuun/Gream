@@ -27,7 +27,7 @@
 }
 
 .qtybox {
-    width: 40px;
+    display: block;
 }
 
 .cart-title{
@@ -50,4 +50,7 @@
     background-position: center;
     width: 100px;
     height: 100px;
+}
+.updateBtn {
+    cursor: pointer;
 }

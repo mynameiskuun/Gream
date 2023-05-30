@@ -63,7 +63,7 @@
                                     <td th:text="${item.price}"></td>
                                     <td th:text="${item.itemStock}"></td>
                                     <td>입고</td>
-                                    <td th:text="${item.createdTime}"></td>
+                                    <td th:text="${#strings.replace(item.createdTime, 'T', ' ')}"></td>
                                     <td><a th:href="@{/removeItem/{itemId}(itemId=${item.id})}">삭제</a></td>
                                 </tr>
                                 </tbody>
