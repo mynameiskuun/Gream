@@ -1,0 +1,13 @@
+.order-status-btn {
+    margin-right: 20px;
+}
+.order-status-btn a {
+    text-decoration: none;
+}
+#orderlist-wrapper {
+    width: 100%;
+}
+.orderlist-header {
+    height: 80px;
+    border-bottom: 3px solid black;
+}

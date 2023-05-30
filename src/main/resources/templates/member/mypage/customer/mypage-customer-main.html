@@ -21,18 +21,18 @@
                     <!-- 간략한 최근 주문목록, 쿠폰, 포인트 출력 -->
                 </div>
                 <div>
-                    <a href="/orderlist"><h3>주문 목록</h3></a>
+                    <a th:href="@{/orderlist/{memberId}(memberId=${session.loginMember.getId()})}"><h3>주문 목록</h3></a>
                     <!-- 이 안에서 주문 취소, 배송 확인 -->
 <!--              수령 완료된 건에 한해서 리뷰 작성 가능하게     -->
                 </div>
                 <div>
-                    <a href="/like"><h3>좋아요</h3></a>
+                    <a th:href="@{/like/{memberId}(memberId=${session.loginMember.getId()})}"><h3>좋아요</h3></a>
                         <!--  좋아요 상품 출력  -->
                 </div>
-                <div>
-                    <a href="/review"><h3>리뷰 작성</h3></a>
-                    <!-- 리뷰 혹은 qna 글 출력 -->
-                </div>
+<!--                <div>-->
+<!--                    <a href="/review"><h3>리뷰 작성</h3></a>-->
+<!--                    &lt;!&ndash; 리뷰 혹은 qna 글 출력 &ndash;&gt;-->
+<!--                </div>-->
                 <div>
                     <a href="/postlist"><h3>작성 글 목록</h3></a>
                     <!-- 리뷰 혹은 qna 글 출력 -->
@@ -52,20 +52,6 @@
                         <section id="main-header">
                             <div class="main-header-upper">
                                 <h3>최근 구매 목록</h3>
-                                <div class="main-header-btn">
-                                    <div class="order-status-btn">
-                                        <a class="text-secondary">입금 / 결제</a>
-                                    </div>
-                                    <div class="order-status-btn">
-                                        <a class="text-secondary">배송중</a>
-                                    </div>
-                                    <div class="order-status-btn">
-                                        <a class="text-secondary">배송완료</a>
-                                    </div>
-                                    <div class="order-status-btn">
-                                        <a class="text-secondary">구매확정</a>
-                                    </div>
-                                </div>
                             </div>
                         </section>
                         <section id="mypage-main-body">
@@ -79,25 +65,24 @@
                                 </tr>
                                 </thead>
                                 <tbody class="table-group-divider">
-                                    <tr class="purchased-item-rows" th:each="${}">
+                                    <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
                                         <th scope="row">
                                             <div class="item-information">
-                                                <div class="order-item-image"></div>
+                                                <div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div>
                                                 <div class="order-item-detail">
-                                                    <div class="item-name">자바 ORM 표준 JPA 프로그래밍</div>
+                                                    <div class="item-name" th:text="${orderItemList.itemDto.name}"></div>
                                                 </div>
                                             </div>
                                         </th>
                                         <td class="purchased-date">
-                                            <div>구매일</div>
-                                            <div>2023/04/10</div>
+                                            <div th:text="${#strings.replace(orderItemList.createdTime, 'T', ' ')}"></div>
                                         </td>
                                         <td>
-                                            <div>20,000원</div>
-                                            <div>2개</div>
+                                            <div th:text="${#numbers.formatInteger(orderItemList.totalPrice, 3, 'COMMA') + '원'}"></div>
+                                            <div th:text="${orderItemList.quantity + ' 개'}"></div>
                                         </td>
                                         <td>
-                                            <div>배송 대기중</div>
+                                            <div th:text="${orderItemList.state}"></div>
                                         </td>
                                     </tr>
                                 </tbody>

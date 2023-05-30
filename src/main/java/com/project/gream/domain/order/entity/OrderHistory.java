@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
-@DynamicInsert
 @NoArgsConstructor
 @Entity
 public class OrderHistory extends BaseTimeEntity {
@@ -22,16 +22,13 @@ public class OrderHistory extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
-    @Column(columnDefinition = "varchar (100) default '배송 준비중'")
-    private String state;
     private int usePoint;
     private Long totalOrderPrice;
 
     @Builder
-    public OrderHistory(Long id, Member member, String state, int usePoint, Long totalOrderPrice) {
+    public OrderHistory(Long id, Member member, int usePoint, Long totalOrderPrice) {
         this.id = id;
         this.member = member;
-        this.state = state;
         this.usePoint = usePoint;
         this.totalOrderPrice = totalOrderPrice;
     }

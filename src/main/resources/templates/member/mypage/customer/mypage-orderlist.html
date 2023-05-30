@@ -4,27 +4,79 @@
       layout:decorate="member/mypage/customer/mypage-customer-main">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Gream</title>
+    <link rel="stylesheet" href="/css/mypage-customer-orderlist.css" />
     <style>
-        #mypage-orderlist-wrapper {
-            width: 100%;
-        }
-        .mypage-orderlist-header {
-            height: 80px;
-            border-bottom: 3px solid black;
+        .reviewBtn {
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 <div layout:fragment="mypage-content">
 
-    <div id="mypage-orderlist-wrapper">
-        <div id="mypage-orderlist-contailer">
-            <div class="mypage-orderlist-header">
-                <h3>주문목록</h3>
-            </div>
-            <div class="mypage-orderlist-body">
-                주문목록 페이징처리
+    <div id="orderlist-wrapper">
+        <div id="orderlist-contailer">
+            <div class="orderlist-body">
+                <section id="main-header">
+                    <div class="orderlist-header">
+                        <h3>주문목록</h3>
+                    </div>
+                    <div class="main-header-upper">
+                        <div class="main-header-btn">
+                            <div class="order-status-btn">
+                                <a class="text-secondary">입금 / 결제</a>
+                            </div>
+                            <div class="order-status-btn">
+                                <a class="text-secondary">배송중</a>
+                            </div>
+                            <div class="order-status-btn">
+                                <a class="text-secondary">배송완료</a>
+                            </div>
+                            <div class="order-status-btn">
+                                <a class="text-secondary">구매확정</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section id="orderlist-container">
+                    <table id="order-history-table" class="table align-middle text-center">
+                        <thead>
+                        <tr>
+                            <th scope="col">상품 정보</th>
+                            <th scope="col">구매 / 구매확정일</th>
+                            <th scope="col">주문 금액(수량)</th>
+                            <th scope="col">주문 상태</th>
+                            <th scope="col">리뷰 작성</th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                        <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
+                            <th scope="row">
+                                <div class="item-information">
+                                    <div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div>
+                                    <div class="order-item-detail">
+                                        <div class="item-name" th:text="${orderItemList.itemDto.name}"></div>
+                                    </div>
+                                </div>
+                            </th>
+                            <td class="purchased-date">
+                                <div th:text="${#strings.replace(orderItemList.createdTime, 'T', ' ')}"></div>
+                            </td>
+                            <td>
+                                <div th:text="${#numbers.formatInteger(orderItemList.totalPrice, 3, 'COMMA') + '원'}"></div>
+                                <div th:text="${orderItemList.quantity + ' 개'}"></div>
+                            </td>
+                            <td>
+                                <div th:text="${orderItemList.state}"></div>
+                            </td>
+                            <td>
+                                <div th:if="${orderItemList.state.equals('배송 완료')}"><a class="reviewBtn btn-secondary button" th:href="@{/review/{orderItemId}(orderItemId=${orderItemList.id})}">작성</a></div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
             </div>
         </div>
     </div>

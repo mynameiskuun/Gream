@@ -1,6 +1,7 @@
 package com.project.gream.domain.order.service;
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.item.repository.ItemRepository;
 import com.project.gream.domain.item.service.ItemService;
@@ -8,17 +9,18 @@ import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.member.repository.MemberRepository;
 import com.project.gream.domain.member.service.MemberService;
-import com.project.gream.domain.order.dto.KakaoPayApprovedResultVO;
-import com.project.gream.domain.order.dto.KakaoPayDto;
-import com.project.gream.domain.order.dto.KakaoPayRequestVO;
-import com.project.gream.domain.order.dto.OrderItemDto;
+import com.project.gream.domain.order.dto.*;
 import com.project.gream.domain.order.entity.OrderHistory;
 import com.project.gream.domain.order.entity.OrderItem;
 import com.project.gream.domain.order.repository.OrderHistoryRepository;
 import com.project.gream.domain.order.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -35,6 +37,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Validated
 @RequiredArgsConstructor
@@ -169,6 +172,7 @@ public class OrderServiceImpl implements OrderService{
             OrderItem orderItem = OrderItem.builder()
                     .orderHistory(orderHistory)
                     .quantity(Integer.parseInt(qtyArray[i]))
+                    .state("배송 준비중")
                     .totalPrice(item.getPrice() * Integer.parseInt(qtyArray[i]))
                     .item(item)
                     .build();
@@ -222,9 +226,32 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public List<OrderItemDto> findOrderItem(String memberId) {
-        orderHistoryRepository.findAllByMember_Id(memberId);
+    public List<OrderItemDto> findOrderItemForMypage(String memberId) {
 
-        return
+        log.info("------------------------------ 회원 아이디로 주문한 상품 출력 - 마이페이지");
+        List<OrderItem> orderItems = orderItemRepository.findTop4ByOrderHistory_Member_Id(memberId);
+
+        return orderItems.stream()
+                .map(OrderItemDto::fromEntity)
+                .collect(Collectors.toList());
     }
+
+    @Override
+    public Page<OrderItemDto> findAllOrderItem(String memberId, Pageable pageable) {
+
+        log.info("------------------------------ 회원 아이디로 주문한 상품 출력");
+//        orderItemRepository.findAllByOrderHistory_Member_Id(memberId, pageable);
+
+        return orderItemRepository.findAllByOrderHistory_Member_Id(memberId, pageable).map(OrderItem -> OrderItemDto.builder()
+                .id(OrderItem.getId())
+                .quantity(OrderItem.getQuantity())
+                .totalPrice(OrderItem.getTotalPrice())
+                .state(OrderItem.getState())
+                .itemDto(ItemDto.fromEntity(OrderItem.getItem()))
+                .orderHistoryDto(OrderHistoryDto.fromEntity(OrderItem.getOrderHistory()))
+                .createdTime(OrderItem.getCreatedTime())
+                .modifiedTime(OrderItem.getModifiedTime()).build());
+
+    }
+
 }

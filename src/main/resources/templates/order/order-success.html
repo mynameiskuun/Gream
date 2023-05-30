@@ -11,6 +11,18 @@
             margin: 50px 50px 50px 50px;
             text-align: center;
         }
+        #order-success-body {
+            width: 400px;
+            text-align: initial;
+            margin: 0 auto;
+        }
+        #order-success-body div {
+            justify-content: space-between;
+            display: flex;
+            height: 40px;
+            width: 400px;
+            text-align: initial;
+        }
     </style>
 </head>
 <body>
@@ -33,10 +45,11 @@
                     <span>결제 금액</span><span th:text="${orderResult.amount.total + ' 원 '}"></span>
                 </div>
                 <div id="discount-box">
-                    <span>할인 금액</span><span th:text="${orderResult.amount.discount}"></span>
+                    <span>할인 금액</span><span th:text="${orderResult.amount.discount + ' 원 '}"></span>
                 </div>
                 <div id="order-created-time-box">
-                    <span>결제 승인 시각</span><span th:text="${orderResult.approved_at}"></span>
+                    <!--/*<span>결제 승인 시각</span><span th:text="${orderResult.approved_at}"></span>*/-->
+                    <span>결제 승인 시각</span><span th:text="${#strings.replace(orderResult.approved_at, 'T', ' ')}"></span>
                 </div>
             </div>
         </div>
