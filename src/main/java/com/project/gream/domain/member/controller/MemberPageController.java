@@ -1,11 +1,16 @@
 package com.project.gream.domain.member.controller;
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.order.dto.OrderItemDto;
+import com.project.gream.domain.order.entity.OrderItem;
+import com.project.gream.domain.order.repository.OrderItemRepository;
 import com.project.gream.domain.order.service.OrderService;
+import com.project.gream.domain.post.dto.LikesDto;
+import com.project.gream.domain.post.repository.LikesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,23 +31,33 @@ public class MemberPageController {
 
     private final ItemService itemService;
     private final OrderService orderService;
+    private final OrderItemRepository orderItemRepository;
 
     @GetMapping("/mypage/{memberId}")
     public ModelAndView toBuyer(@PathVariable("memberId") String memberId) {
         List<OrderItemDto> orderItemList = orderService.findOrderItemForMypage(memberId);
+        List<ItemDto> likeItems = itemService.getLikedItemList(itemService.getLikedItemIds(memberId));
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("member/mypage/customer/mypage-customer-main");
+        mav.addObject("likeItems", likeItems);
         mav.addObject("orderItemList", orderItemList);
+        mav.setViewName("member/mypage/customer/mypage-customer-main");
 
         return mav;
     }
 
     @GetMapping("/orderlist/{memberId}")
-    public ModelAndView toMemberOrderList(@PathVariable("memberId") String memberId, @PageableDefault(size = 0, value = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ModelAndView toMemberOrderList(@PathVariable("memberId") String memberId, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<OrderItemDto> orderItemList = orderService.findAllOrderItem(memberId, pageable);
-        ModelAndView mav = new ModelAndView();
 
+        ModelAndView mav = new ModelAndView();
+        int nowPage = orderItemList.getPageable().getPageNumber() + 1;
+        int startPage =  Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, orderItemList.getTotalPages());
+
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
         mav.addObject("orderItemList", orderItemList);
         mav.setViewName("member/mypage/customer/mypage-orderlist");
         return mav;
@@ -54,9 +71,16 @@ public class MemberPageController {
 
     }
 
-    @GetMapping("/review")
-    public ModelAndView toReviewWrite() {
+    @GetMapping("/review/{orderItemId}")
+    public ModelAndView toReviewWrite(@PathVariable("orderItemId") Long orderItemId) {
+
+        log.info("-------------------------------- 배송 완료된 상품 리뷰 작성");
+
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new NoSuchElementException(String.format("상품번호 [%s]번은 존재하지 않는 상품입니다.", orderItemId)));
+
         ModelAndView mav = new ModelAndView();
+        mav.addObject("orderItemDetail", OrderItemDto.fromEntity(orderItem));
         mav.setViewName("member/mypage/customer/mypage-review-write");
         return mav;
     }
@@ -136,7 +160,7 @@ public class MemberPageController {
     }
 
     @GetMapping("/test/{memberId}")
-    public Page<OrderItemDto> test(@PathVariable("memberId") String memberId, @PageableDefault(size = 0, value = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<OrderItemDto> test(@PathVariable("memberId") String memberId, @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<OrderItemDto> orderItemList = orderService.findAllOrderItem(memberId, pageable);
         ModelAndView mav = new ModelAndView();
 

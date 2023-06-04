@@ -8,8 +8,8 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.project.gream.domain.item.entity.Item;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @RequiredArgsConstructor
 @Configuration
 public class S3Config {
@@ -44,34 +45,75 @@ public class S3Config {
                 .build();
     }
 
-    public List<String> imgUpload(Item item, List<MultipartFile> multipartFiles) throws Exception {
+//    public List<String> imgUpload(Item item, List<MultipartFile> multipartFiles) throws Exception {
+//
+//        List<String> imgUrlList = new ArrayList<>();
+//
+//        for (MultipartFile file : multipartFiles) {
+//            String fileExtension = getFileExtension(Objects.requireNonNull(file.getOriginalFilename(), "이미지 파일이 존재하지 않습니다"));
+//            String fileName = createFileName(item.getId()) + fileExtension;
+//            ObjectMetadata objectMetadata = new ObjectMetadata();
+//            objectMetadata.setContentLength(file.getSize());
+//            objectMetadata.setContentType(file.getContentType());
+//
+//            try (InputStream inputStream = file.getInputStream()) {
+//                s3Client.putObject(new PutObjectRequest(bucket + "/item/images", fileName, inputStream, objectMetadata)
+//                        .withCannedAcl(CannedAccessControlList.PublicRead));
+//                imgUrlList.add(s3Client.getUrl(bucket + "/item/images", fileName).toString());
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        return imgUrlList;
+//    }
+
+
+    public <T> List<String> imgUpload(Class<T> dto, List<MultipartFile> multipartFiles) throws Exception {
+
+        log.info("------------------------------- S3 이미지 업로드");
 
         List<String> imgUrlList = new ArrayList<>();
 
+        String imgDir = getImgDir(dto);
+
         for (MultipartFile file : multipartFiles) {
             String fileExtension = getFileExtension(Objects.requireNonNull(file.getOriginalFilename(), "이미지 파일이 존재하지 않습니다"));
-            String fileName = createFileName(item.getId()) + fileExtension;
+            String fileName = createFileName(dto) + fileExtension;
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());
 
             try (InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucket + "/item/images", fileName, inputStream, objectMetadata)
+                s3Client.putObject(new PutObjectRequest(bucket + imgDir, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
-                imgUrlList.add(s3Client.getUrl(bucket + "/item/images", fileName).toString());
+                imgUrlList.add(s3Client.getUrl(bucket + imgDir, fileName).toString());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         return imgUrlList;
     }
-
     // 이미지 파일명 중복 방지
-    private String createFileName(Long itemId) {
-        return itemId + "_" + System.nanoTime();
+    private <T> String createFileName(Class<T> dto) {
+
+        log.info("---------------------------- 이미지 파일명 생성");
+
+        String prefix = null;
+
+        if (dto.getSimpleName().equals("ReviewDto")) {
+            prefix = "review";
+        } else if (dto.getSimpleName().equals("ItemRequestDto")) {
+            prefix = "item";
+        } else if (dto.getSimpleName().equals("PostRequestDto")) {
+            prefix = "post";
+        }
+        return prefix + "_" + System.nanoTime();
     }
 
     private String getFileExtension(String fileName) throws Exception {
+
+        log.info("---------------------------- 이미지 확장자 추출");
+
         if(fileName.length() == 0) {
             throw new Exception();
         }
@@ -89,6 +131,21 @@ public class S3Config {
             throw new Exception();
         }
         return fileName.substring(fileName.lastIndexOf("."));
+    }
+
+    private <T> String getImgDir(Class<T> dto) {
+
+        log.info("---------------------------- 이미지 경로 생성");
+        String imgDir = null;
+
+        if (dto.getSimpleName().equals("ReviewDto")) {
+            imgDir = "/review/images";
+        } else if (dto.getSimpleName().equals("ItemRequestDto")) {
+            imgDir = "/item/images";
+        } else if (dto.getSimpleName().equals("PostRequestDto")) {
+            imgDir = "/post/images";
+        }
+        return imgDir;
     }
 
 }

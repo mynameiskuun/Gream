@@ -6,30 +6,278 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
-        #mypage-reviewlist-wrapper {
-            width: 100%;
+        #review-write-wrapper {
+            width: 1000px;
         }
-        .mypage-reviewlist-header {
-            height: 80px;
+        #review-write-container {
+            margin: 20px 20px 20px 20px;
+        }
+        #review-write-header {
+            padding-bottom: 30px;
+            border-bottom: 2px solid lightgray;
+        }
+        .header-title {
             border-bottom: 3px solid black;
+            margin-bottom: 20px;
+        }
+        #review-item-thumbnail {
+            border-radius: 50%;
+            height: 100px;
+            width: 100px;
+            background-size: 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        #review-write-body {
+            margin-top: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid lightgray;
+        }
+        .review-item-detail {
+            align-items: center;
+            display: flex;
+        }
+        #review-item-information {
+            margin-left: 30px;
+        }
+        .star-rating-container {
+            display: flex;
+            margin-top: 30px;
+            align-items: center;
+            justify-content: space-between;
+            width: 500px;
+        }
+        .star {
+            font-size: 1.7em;
+            color: transparent;
+            text-shadow: 0 0 0 #f0f0f0;
+        }
+        .counted-stars {
+            text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+        }
+        .feature-cards {
+            display: flex;
+        }
+        .item-features-container {
+            margin-top: 30px;
+        }
+        .feature-cards {
+            width: 500px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .feature-detail-group label {
+            width: 100px;
+        }
+        #review-write-footer {
+            margin-top: 20px;
+        }
+        .review-textarea-input-container {
+            margin-top: 20px;
+        }
+        #review-content {
+            width: 100%;
+            height: 300px;
+        }
+        .star-rating-area {
+            display: inline-block;
+            direction: rtl;
+            border: 0;
+        }
+        .star-rating-area input {
+            display: none;
+        }
+        .star-rating-area label {
+            font-size: 3em;
+            color: transparent;
+            text-shadow: 0 0 0 #f0f0f0;
+        }
+        .star-rating-area label:hover {
+            text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+        }
+        .star-rating-area label:hover ~ label {
+            text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+        }
+        .star-rating-area input[type="radio"]:checked ~ label {
+            text-shadow: 0 0 0 rgba(250, 208, 0, 0.99);
+        }
+        .file-upload-box {
+            margin-top: 30px;
         }
     </style>
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 </head>
 <body>
-<div layout:fragment="mypage-content">
+    <div layout:fragment="mypage-content">
+        <div id="review-write-wrapper">
+            <div id="review-write-container">
+                <form enctype="multipart/form-data" id="formData" name="formData">
+                    <section id="review-write-header">
+                        <div class="header-title">
+                            <h2>상품 사용 후기</h2>
+                        </div>
+                        <div class="review-informs">
+                            <div class="inform-labels">
+                                <div class="inform-labels">
+                                    * 해당하신 상품을 구매한 고객님만 후기를 작성할 수 있습니다.
+                                </div>
+                                * 작성하신 후기는 홈페이지 이용자 분들에게 공개됩니다.
+                            </div>
+                            <div class="inform-labels">
+                                * 사진 첨부 후기 작성 시 2,000원의 적립금이 평일 기준 2일 전후로
+                                지급됩니다.
+                            </div>
+                            <div class="inform-labels">
+                                * 부적절한 후기 작성 시 관리자에 의해 무통보 삭제 될 수 있습니다.
+                            </div>
+                        </div>
+                    </section>
+                    <section id="review-write-body">
+<!--                        <form id="formData" name="formData">-->
+                        <div class="review-item-detail">
+                            <div id="review-item-thumbnail" th:style="'background-image: url('+ ${orderItemDetail.itemDto.thumbnailUrl} + ');'"></div>
+                            <div id="review-item-information">
+                                <div class="review-item-name" th:text="${orderItemDetail.itemDto.name}"></div>
+                            </div>
+                        </div>
+                        <div class="star-rating-container">
+                            <div class="star-rating-title">별점을 매겨주세요</div>
+                            <!-- <div class="star-rating-area">
+                              <label class="star counted-stars text-primary">★★★★★</label>
+                            </div> -->
+                            <div class="star-rating-area">
+                                <input type="radio" name="starValue" value="5" id="rate1"/><label for="rate1">★</label>
+                                <input type="radio" name="starValue" value="4" id="rate2"/><label for="rate2">★</label>
+                                <input type="radio" name="starValue" value="3" id="rate3"/><label for="rate3">★</label>
+                                <input type="radio" name="starValue" value="2" id="rate4"/><label for="rate4">★</label>
+                                <input type="radio" name="starValue" value="1" id="rate5"/><label for="rate5">★</label>
+                            </div>
+                        </div>
+                        <div class="item-features-container">
+                            <div class="feature-cards">
+                                <div class="feature-title">상품 가격</div>
+                                <div class="feature-detail-group btn-group" role="group">
+                                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                        <input type="radio" class="btn-check" name="priceScore" id="price-radio1" autocomplete="off" value="1"/>
+                                        <label class="btn btn-outline-primary" for="price-radio1">비싸요</label>
 
-    <div id="mypage-reviewlist-wrapper">
-        <div id="mypage-reviewlist-contailer">
-            <div class="mypage-reviewlist-header">
-                <h3>리뷰 작성 목록</h3>
-            </div>
-            <div class="mypage-reviewlist-body">
-                리뷰 목록 페이징처리
-            </div>
+                                        <input type="radio" class="btn-check" name="priceScore" id="price-radio2" autocomplete="off" value="2"/>
+                                        <label class="btn btn-outline-primary" for="price-radio2">보통이에요</label>
+
+                                        <input type="radio" class="btn-check" name="priceScore" id="price-radio3" autocomplete="off" value="3" checked />
+                                        <label class="btn btn-outline-primary" for="price-radio3">저렴해요</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="feature-cards">
+                                <div class="feature-title">상품 품질</div>
+                                <div class="feature-detail-group btn-group" role="group">
+                                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                        <input type="radio" class="btn-check" name="qualityScore" id="quality-radio1" autocomplete="off" value="1"/>
+                                        <label class="btn btn-outline-primary" for="quality-radio1">나빠요</label>
+
+                                        <input type="radio" class="btn-check" name="qualityScore" id="quality-radio2" autocomplete="off" value="2"/>
+                                        <label class="btn btn-outline-primary" for="quality-radio2">보통이에요</label>
+
+                                        <input type="radio" class="btn-check" name="qualityScore" id="quality-radio3" autocomplete="off" value="3" checked/>
+                                        <label class="btn btn-outline-primary" for="quality-radio3">좋아요</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="feature-cards">
+                                <div class="feature-title">상품 배송</div>
+                                <div class="feature-detail-group btn-group" role="group">
+                                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                        <input type="radio" class="btn-check" name="deliveryScore" id="delivery-radio1" autocomplete="off" value="1"/>
+                                        <label class="btn btn-outline-primary" for="delivery-radio1">느려요</label>
+
+                                        <input type="radio" class="btn-check" name="deliveryScore" id="delivery-radio2" autocomplete="off" value="2"/>
+                                        <label class="btn btn-outline-primary" for="delivery-radio2">보통이에요</label>
+
+                                        <input type="radio" class="btn-check" name="deliveryScore" id="delivery-radio3" autocomplete="off" value="3" checked/>
+                                        <label class="btn btn-outline-primary" for="delivery-radio3">빨라요</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="feature-cards">
+                                <div class="feature-title">재구매 의사</div>
+                                <div class="feature-detail-group btn-group" role="group">
+                                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                        <input type="radio" class="btn-check" name="repurchaseScore" id="repurchase-radio1" autocomplete="off" value="1"/>
+                                        <label class="btn btn-outline-primary" for="repurchase-radio1">없어요</label>
+
+                                        <input type="radio" class="btn-check" name="repurchaseScore" id="repurchase-radio2" autocomplete="off" value="2"/>
+                                        <label class="btn btn-outline-primary" for="repurchase-radio2">보통이에요</label>
+
+                                        <input type="radio" class="btn-check" name="repurchaseScore" id="repurchase-radio3" autocomplete="off" value="3" checked/>
+                                        <label class="btn btn-outline-primary" for="repurchase-radio3">있어요</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+<!--                   </form>-->
+                    </section>
+                    <section id="review-write-footer">
+                        <div class="review-textarea-title">
+                            상품에 대한 평가를 20자 이상 작성 해 주세요
+                        </div>
+                        <div class="review-textarea-input-container">
+                            <textarea id="review-content" name="content"></textarea>
+                            <div class="mb-3 file-upload-box">
+                                <input class="form-control" name="imgFiles" type="file" id="imgFiles" multiple="multiple"/>
+                            </div>
+                        </div>
+                        <div id="review-submit-btn-box">
+    <!--                        <input type="submit" value="제출하기"/>-->
+                            <a class="btn button" id="submitBtn">제출하기 </a>
+                        </div>
+                    </section>
+                </form>
         </div>
     </div>
 
-</div>
+    <script th:inline="javascript">
+
+        $(document).ready(function() {
+            $('#submitBtn').on('click', function() {
+
+                let data = {
+                    starValue : $('input[name=starValue]:checked').val(),
+                    priceScore : $('input[name=priceScore]:checked').val(),
+                    qualityScore : $('input[name=qualityScore]:checked').val(),
+                    deliveryScore : $('input[name=deliveryScore]:checked').val(),
+                    repurchaseScore : $('input[name=repurchaseScore]:checked').val(),
+                    content : $('#review-content').val(),
+                    memberDto : [[${session.loginMember}]],
+                    itemDto : [[${orderItemDetail.itemDto}]]
+                };
+
+                let form = $('#formData')[0]
+                let formData = new FormData(form);
+
+                formData.append('reviewDto', new Blob([JSON.stringify(data)] , {type : "application/json"}));
+                formData.append('imgFiles', $('#imgFiles'));
+
+                console.log('data : ' + formData);
+
+                $.ajax({
+                    url: '/review',
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function(result) {
+                        console.log(result);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    },
+                })
+            })
+        })
+
+    </script>
+    </div>
 </body>
-</div>
 </html>

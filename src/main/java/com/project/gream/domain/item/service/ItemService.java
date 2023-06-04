@@ -11,6 +11,7 @@ import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.CartItem;
 import com.project.gream.domain.order.dto.KakaoPayDto;
 import com.project.gream.domain.order.entity.OrderHistory;
+import com.project.gream.domain.post.dto.LikesDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +22,6 @@ public interface ItemService {
     List<ItemDto> selectWomenItems();
     ItemDto selectItemById(Long itemId);
     void deleteItem(Long itemId);
-//    void updateItemStock(KakaoPaymentDto kakaoPaymentDto, OrderHistory orderHistory, String itemQtys);
-//    void registerItemAndImgs(ItemVO itemVO, List<MultipartFile> imgFiles) throws Exception;
     void registerItemAndImgs(ItemRequestDto itemRequestDto) throws Exception;
     void saveEntities(Item item, List<String> imgPaths) throws Exception;
     List<ImgDto> getImgsByItemId(Long itemId);
@@ -34,6 +33,9 @@ public interface ItemService {
     String updateCartItemQuantity(CartItemRequestDto requestDto);
     List<CartItemDto> getCartItems(Long cartId);
     List<CartItemDto> getOrderItemsFromCart(String cartItemIds);
-
     void updateItemStock(KakaoPayDto kakaoPayDto, OrderHistory orderHistory);
+
+    List<Long> getLikedItemIds(String memberId);
+
+    List<ItemDto> getLikedItemList(List<Long> itemIds);
 }

@@ -19,99 +19,98 @@
             <div id="item-img-box" th:style="'background-image: url('+ ${item.getThumbnailUrl()} + ');'">
             </div>
             <div id="item-information">
-                <div class="detail-text-box">
+                <div id="item-name-box">
                     <h1>[[${item.getName()}]]</h1>
                 </div>
-                <div class="detail-text-box" th:text="${#numbers.formatInteger(item.getPrice(), 3, 'COMMA') + '원'} ">
-                </div>
-                <div class="detail-text-box">
+                <div id="item-detail-box">
                     <h3>[[${item.getDetail()}]]</h3>
                 </div>
-                <div class="detail-text-box" id="itemStock">
+                <div id="item-stock-box">
                     잔여수량 : [[${item.getItemStock()}]]
                 </div>
-                <div style="display: flex">
-                    <h3>주문 수량</h3>
-                        <input type="number" name="orderQuantity" class="countBox" id="orderQuantity" style="width: 50px;" value="1" min="1"/>
-                    <span><button id="orderBtn">주문하기</button></span>
-                    <span><button onclick="cartBtn()">장바구니 추가</button></span>
+                <div id="order-quantity-box">
+                    <h4>주문 수량</h4>
+                    <input type="number" name="orderQuantity" class="countBox" id="orderQuantity" value="1" min="1"/>
                 </div>
-                <a><div id="usable-coupon-box">
-                    <h3>사용가능한 쿠폰을 확인하세요</h3>
-                </div></a>
+                <div id="usable-coupon-box"><a>사용가능한 쿠폰을 확인하세요</a></div>
+                <div id="item-price-box" th:text="${'판매가격 : ' + #numbers.formatInteger(item.getPrice(), 3, 'COMMA') + '원'} "></div>
+                <div id="order-button-box">
+                    <button class="btn btn-outline-secondary" id="orderBtn">주문하기</button>
+                    <button class="btn btn-outline-secondary" id="cartBtn" onclick="cartBtn()">장바구니 추가</button>
+                </div>
             </div>
         </div>
-        <div id="item-detail-content">
-            아이템 세부 디테일 정보
-            <span>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fuga maiores, quis minima incidunt voluptatibus error consectetur et reprehenderit. Repellendus laudantium voluptates ad doloremque neque dolore error dolorum soluta temporibus suscipit.
-            </span>
-        </div>
         <div id="item-review-box">
-
             <div id="item-detail-review-wrapper">
-                <div id="buyer-satisfied-score-box" class="card text-center">
-                    <div class="card-header">
-          <span class="text-primary">99%</span
-          ><span>의 구매자가 만족했어요</span>
+                    <div id="buyer-satisfied-score-box" class="card">
+                    <div class="card-header text-center">
+                        <span id="satisfied-rate" class="text-primary"></span><span>의 구매자가 만족했어요</span>
                     </div>
-
                     <div class="card-body">
                         <div id="rating-container">
                             <div class="rating-score">
-                                <div class="satisfied-level">매우 만족해요</div>
+                                <div class="satisfied-level"><span>매우 만족해요</span></div>
                                 <div class="star-rating">
-                                    <span class="star counted-stars text-primary">★★★★</span>
+                                    <span class="star counted-stars text-primary">★★★★★</span>
                                 </div>
                                 <div class="graph-box">
                                     <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" id="5-star-progress-bar"></div>
                                     </div>
                                 </div>
-                                <div class="percentage text-warning">100%</div>
+                                <div class="percentage text-warning"></div>
+                            </div>
+                            <div class="rating-score">
+                                <div class="satisfied-level"><span>만족해요</span></div>
+                                <div class="star-rating">
+                                    <label class="star counted-stars text-primary">★★★★</label><label class="star non-count-star">★</label>
+                                </div>
+                                <div class="graph-box">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" id="4-star-progress-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="percentage text-warning"></div>
                             </div>
                             <div class="rating-score">
                                 <div class="satisfied-level">
-                                    만족해요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span>보통이에요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 </div>
                                 <div class="star-level">
-                                    <label class="star counted-stars text-primary">★★★</label>
-                                    <label class="star non-count-star">★</label>
+                                    <label class="star counted-stars text-primary">★★★</label><label class="star non-count-star">★★</label>
                                 </div>
                                 <div class="graph-box">
                                     <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" id="3-star-progress-bar"></div>
                                     </div>
                                 </div>
-                                <div class="percentage text-warning">75%</div>
+                                <div class="percentage text-warning"></div>
                             </div>
                             <div class="rating-score">
                                 <div class="satisfied-level">
                                     아쉬워요&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 </div>
                                 <div class="star-level">
-                                    <label class="star counted-stars text-primary">★★</label>
-                                    <label class="star non-count-star">★★</label>
+                                    <label class="star counted-stars text-primary">★★</label><label class="star non-count-star">★★★</label>
                                 </div>
                                 <div class="graph-box">
                                     <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" id="2-star-progress-bar"></div>
                                     </div>
                                 </div>
-                                <div class="percentage text-warning">50%</div>
+                                <div class="percentage text-warning"></div>
                             </div>
                             <div class="rating-score">
                                 <div class="satisfied-level">매우 아쉬워요</div>
                                 <div class="star-level">
-                                    <label class="star counted-stars text-primary">★</label>
-                                    <label class="star non-count-star">★★★</label>
+                                    <label class="star counted-stars text-primary">★</label><label class="star non-count-star">★★★★</label>
                                 </div>
                                 <div class="graph-box">
                                     <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="1-star-progress-bar"></div>
                                     </div>
                                 </div>
-                                <div class="percentage text-warning">25%</div>
+                                <div class="percentage text-warning"></div>
                             </div>
                         </div>
                     </div>
@@ -127,94 +126,86 @@
 
                 <div id="review-wrapper">
                     <div id="cards-wrapper">
-                        <div id="review-container">
+                        <div id="review-container" th:each="reviewList : ${reviewList}">
                             <div class="review-cards">
-                                <div class="review-header" style="justify-content: space-between; display: flex">
-                                    <span>회원명</span><span>10일전</span>
-                                </div>
-                                <div class="order-item-detail" style="display: flex">
-                                    <div class="item-img">
-                                        <!-- <img
-                                          src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg"
-                                        /> -->
-                                    </div>
-                                    <div class="item-name">스파오 파자마</div>
-                                </div>
-                                <div class="customer-star-rating-box">
-                                    <span class="star counted-stars text-primary">★★★★</span>
-                                </div>
-                                <div class="review-text">
-                                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Neque
-                                    repellat minima, doloribus officia quidem tempore ratione,
-                                    maxime velit ut, ipsa voluptatum molestiae consequuntur tempora?
-                                    Sit a beatae accusamus iste facere.
-                                </div>
-                                <div>
-                                    <div class="review-item-features text-secondary" style="
-                    border: 1px solid;
-                    border-radius: 10px;
-                    width: 130px;
-                    text-align: center;
-                  ">
-                                        <span class="feature-title">사이즈</span>
-                                        <span class="feature-evaluate text-dark" style="font-weight: 500">보통이에요</span>
-                                    </div>
-                                    <div class="customer-review-img-box"></div>
-                                    <div class="review-like-box">
-                                        <div class="review-thumbs-up"></div>
-                                        <div class="like-title">도움돼요</div>
-                                        <div class="like-counts">2</div>
-                                    </div>
-                                    <div class="review-reply-box">
-                                        <div class="review-reply-header">
-                                            <span>댓글&nbsp;</span>
-                                            <span class="reply-counts text-secondary">2</span>
-                                            <span class="text-secondary">개</span>
+                                <div class="review-top">회원 리뷰</div>
+                                <div class="review-contents">
+                                    <div class="review-left-box">
+                                        <div class="review-header" style="justify-content: space-between; display: flex">
+                                            <span th:text="${'작성자 : ' + reviewList.memberDto.name}"></span><span th:text="${#strings.substring(reviewList.createdTime, 0, 10)}"></span>
                                         </div>
-                                        <div id="reply-input-container">
-                                            <div id="reply-input-box">
-                                                <textarea type="textarea" class="form-control" id="reply-input-area" onfocus="replyAreaToggle()"></textarea>
-                                                <input type="button" class="btn btn-outline-secondary" value="작성"/>
+                                        <div class="order-item-detail" style="display: flex">
+                                            <div class="item-img" th:style="'background-image: url('+ ${reviewList.itemDto.thumbnailUrl} + ');'"></div>
+                                            <div class="item-name" th:text="${reviewList.itemDto.name}"></div>
+                                        </div>
+                                        <div class="customer-star-rating-box">
+                                    <span class="star counted-stars text-primary">
+                                        <span class="review-star-value"></span>
+                                        <input type="hidden" th:value="${reviewList.starValue}" />
+                                    </span>
+                                        </div>
+                                        <div class="review-text" th:text="${reviewList.content}"></div>
+                                        <div class="review-features-container">
+                                            <div class="review-item-features text-secondary review-item-price-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                                <span class="feature-title">상품 가격</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 1}">비싸요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 3}">저렴해요</span>
+                                            </div>
+                                            <div class="review-item-features text-secondary review-item-quality-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                                <span class="feature-title">상품 품질</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 1}">나빠요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 3}">좋아요</span>
+                                            </div>
+                                            <div class="review-item-features text-secondary review-item-delivery-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                                <span class="feature-title">상품 배송</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 1}">느려요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 3}">빨라요</span>
+                                            </div>
+                                            <div class="review-item-features text-secondary review-item-repurchase-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                                <span class="feature-title">재구매 의사</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 1}">없어요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 3}">있어요</span>
                                             </div>
                                         </div>
-                                        <div class="reply-output-container">
-                                            <div class="reply-cards">
-                                                <div class="customer-profile-img-box"></div>
-                                                <div class="reply-center-box">
-                                                    <div class="reply-writer-id">id</div>
-                                                    <div class="reply-context-box">
-                                                        댓글내용 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nece
-                                                    </div>
-                                                </div>
-                                                <div class="reply-like-box">
-                                                    <div class="reply-thumbs-up"></div>
-                                                    <div class="reply-like-counts">2</div>
-                                                </div>
+                                        <div class="review-like-box">
+                                            <div id="review-thumbs-up"></div>
+                                            <div class="like-title">도움돼요</div>
+                                            <input type="hidden" th:value="${reviewList.id}"/>
+                                            <div class="like-counts"></div>
+                                        </div>
+                                    </div>
+                                    <div class="review-right-box">
+                                        <div class="customer-review-img-box" th:style="'background-image: url('+ ${reviewList.thumbnail} + ');'"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="review-reply-box">
+                                <div class="review-reply-header">
+                                    <span>댓글&nbsp;</span>
+                                    <span class="reply-counts text-secondary">2</span>
+                                    <span class="text-secondary">개</span>
+                                </div>
+                                <div id="reply-input-container">
+                                    <div id="reply-input-box">
+                                        <textarea type="textarea" class="form-control" id="reply-input-area" onfocus="replyAreaToggle()"></textarea>
+                                        <input type="button" class="btn btn-outline-secondary" value="작성"/>
+                                    </div>
+                                </div>
+                                <div class="reply-output-container">
+                                    <div class="reply-cards">
+                                        <div class="reply-center-box">
+                                            <div class="reply-writer-id">id</div>
+                                            <div class="reply-context-box">
+                                                댓글내용 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nece
                                             </div>
-                                            <div class="reply-cards">
-                                                <div class="customer-profile-img-box"></div>
-                                                <div class="reply-center-box">
-                                                    <div class="reply-writer-id">id2</div>
-                                                    <div class="reply-context-box">
-                                                        댓글내용 Lorem ipsum dolor sit amet consectetur adi
-                                                    </div>
-                                                </div>
-                                                <div class="reply-like-box">
-                                                    <div class="reply-thumbs-up"></div>
-                                                    <div class="reply-like-counts">2</div>
-                                                </div>
-                                            </div>
-                                            <div class="reply-cards">
-                                                <div class="customer-profile-img-box"></div>
-                                                <div class="reply-center-box">
-                                                    <div class="reply-writer-id">작성자 아이디</div>
-                                                    <div class="reply-context-box">댓글3</div>
-                                                </div>
-                                                <div class="reply-like-box">
-                                                    <div class="reply-thumbs-up"></div>
-                                                    <div class="reply-like-counts">2</div>
-                                                </div>
-                                            </div>
+                                        </div>
+                                        <div class="reply-like-box">
+                                            <div class="reply-thumbs-up"></div>
+                                            <div class="reply-like-counts">2</div>
                                         </div>
                                     </div>
                                 </div>
@@ -224,6 +215,7 @@
                 </div>
             </div>
         </div>
+    </div>
         <div id="item-qna-box">
             문의란
             <span>
@@ -271,6 +263,9 @@
 <!--</div>-->
 
 <script th:inline="javascript">
+    /*<![CDATA[*/
+
+
     /* 구매수량 변화 감지, 남은 재고수량 이상으로 장바구니 혹은 결제 안되게 뷰단에서 처리 */
     // 페이지에 나와있는 상품 재고 초과하여 카운트 up 시 alert 출력
     $(".countBox").on('propertychange change keyup paste input', function() {
@@ -299,16 +294,9 @@
             quantity : document.getElementById('orderQuantity').value
         };
 
-        // let itemVo = [[${item}]];
-        // let quantity = document.getElementById('orderQuantity').value;
-
-        // 뷰단에서 상품 재고 이상으로 주문 안되게 처리
-
         $.ajax({
             url: '/cart',
             type: 'POST',
-            // async: false,
-            // async : false의 경우 동기식으로 작동.
             data: JSON.stringify(cartItem),
             contentType: 'application/json; charset=UTF-8',
             dataType: 'text',
@@ -347,6 +335,102 @@
     $("#reply-input-container").on("focus", function () {
         $("#reply-input-area").css("height", "100px");
     });
+
+    // 댓글란 토글
+    function replyAreaToggle() {
+        $("#reply-input-area").css("height", "100px");
+    }
+
+    // 상품 구매 후기 만족도 조사 이벤트
+    window.onload = function() {
+
+        // 리뷰 작성자의 별 점수 출력 이벤트
+        $('.review-star-value').each(function() {
+            $(this).html('★'.repeat($(this).next('input[type="hidden"]').val()));
+        })
+
+        let starMap = [[${starValMap}]];
+        let size = [[${starValMap[0]}]]
+        $('#satisfied-rate').html(getSatisfiedRate(starMap) + '%')
+
+        console.log("map : " + starMap);
+        console.log('mapSize = ' + size);
+        console.log(starMap[1])
+
+        // for (let i = 1; i <= 5; i++) {
+        //     size += starMap[i];
+        //     console.log("starMap["+i+"] : " + starMap[i])
+        // }
+
+        let sum = 0;
+        let originalPercentage;
+        let roundedPercentage;
+        let progressDomList = document.querySelectorAll('.progress-bar');
+        let percentageDomList = document.querySelectorAll('.percentage');
+
+        for(let i=1; i<=5; i++) {
+            originalPercentage = starMap[i] / size * 100.0;
+            progressDomList[5-i].style.width = originalPercentage + '%';
+            roundedPercentage = Math.round(originalPercentage);
+            percentageDomList[5-i].innerHTML = roundedPercentage + "%";
+            sum += roundedPercentage;
+
+        }
+        starMap = 0;
+        size = 0;
+    }
+
+    // 상품후기 긍정 평가 비율 계산 이벤트
+    function getSatisfiedRate(scoreMap) {
+        return Math.round((scoreMap[4] / scoreMap[0] * 100.0) + (scoreMap[5] / scoreMap[0] * 100.0))
+    }
+
+    // 리뷰 좋아요 이벤트
+    $('#review-thumbs-up').click(function() {
+
+        let clickedElement = $(this);
+
+        // 좋아요 이벤트 시 필요한 데이터
+        // 해당 리뷰 id
+        // 로그인 사용자 id
+        // 좋아요 타겟(리뷰)
+
+        let memberDto;
+        if ([[${session.loginMember}]] == null) {
+            alert('로그인을 해주세요');
+            location.reload();
+        }
+        memberDto = [[${session.loginMember}]]
+        console.log('memberId' + memberDto);
+        let targetId = $(this).parent().find('input[type="hidden"]').val();
+        let likeTargetType = 'REVIEW';
+
+        console.log('target' + likeTargetType);
+
+        let data = {
+            "targetId" : targetId,
+            "memberDto" : memberDto,
+            "likeTargetType" : likeTargetType
+        };
+
+        $.ajax({
+            url: '/test/like',
+            type: 'POST',
+            contentType: 'application/json; charset=UTF-8',
+            dataType : 'JSON',
+            data: JSON.stringify(data),
+            success(result) {
+                console.log(result);
+                clickedElement.parent().find('div.like-counts').html(result.count);
+                clickedElement.parent().css('background-color', result.backgroundColor);
+            },
+            error(result) {
+                console.log(result)
+            }
+        })
+    })
+
+    /*]]*/
 </script>
 </body>
 </html>

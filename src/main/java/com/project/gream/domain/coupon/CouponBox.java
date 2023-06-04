@@ -10,7 +10,6 @@ import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
-@Entity
 public class CouponBox extends BaseTimeEntity {
 
     @Id

@@ -5,12 +5,24 @@
     position: relative;
     padding-top: 120px;
 }
+#item-name-box {
+    border-bottom: 3px solid lightgray;
+    margin-bottom: 20px;
+}
 #item-detail {
     display: flex;
     justify-content: space-around;
     width: 100%;
     height: 600px;
     background: white;
+}
+#item-price-box {
+    font-size: 25px;
+    margin: 10px 0 10px;
+}
+#item-detail-box {
+    margin-left: 20px;
+    margin-bottom: 30px;
 }
 #item-img-box {
     width: 480px;
@@ -19,19 +31,46 @@
     background-repeat: no-repeat;
     background-position: center;
 }
+#item-stock-box {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+#order-quantity-box {
+    margin-bottom: 10px;
+    display: flex;
+}
+#orderQuantity {
+    height: 33px;
+    width: 50px;
+    margin-left: 30px;
+}
+
+#usable-coupon-box {
+    background: rgb(181, 237, 181);
+    display: inline-block;
+    height: 50px;
+    line-height: 50px;
+    font-size: 27px;
+}
+
 #item-information {
-    padding-top:10%;
+    padding-top: 45px;
     height: 90%;
     width: 40%;
     overflow: auto;
 }
-
+#order-button-box {
+    display: flex;
+    margin-top: 50px;
+}
 #item-detail-content {
-    width: 100%;
-    margin: 0 auto;
+    height: 200px;
+    margin-left: 30px;
     /* height 나중에 지우기. 내용 추가되면 자동으로 길이 늘어나게 */
 }
-
+#cartBtn {
+    margin-left: 30px;
+}
 #item-review-box {
     width: 100%;
     margin: 0 auto;
@@ -48,6 +87,7 @@
 .order-item-detail {
     display: flex;
     align-items: center;
+    margin-left: 30px;
 }
 #buyer-satisfied-score-box {
     margin: 0 auto;
@@ -75,10 +115,19 @@
     /* height: 40px;
     line-height: 40px; */
 }
+.satisfied-level {
+    width: 120px;
+}
+.review-top {
+    background: lightgray;
+    height: 60px;
+    line-height: 60px;
+    padding-left: 30px;
+}
 .event-label {
     height: 30px;
     width: 60px;
-    padding-left: 5px;
+    padding-left: 2.5px;
     border: 1px solid;
     border-radius: 2px;
 }
@@ -89,17 +138,44 @@
 #item-detail-review-wrapper {
     /*width: 800px;*/
 }
-#review-header {
+.percentage {
+    width: 50px;
+}
+.review-contents {
     display: flex;
-    margin: 20px 0 20px 20px;
+}
+#review-header {
+    height: 60px;
+    display: flex;
+    margin-left: 50px;
+    margin-top: 20px;
+    font-size: 18px;
+}
+.review-header {
+    height: 80px;
+    justify-content: space-between;
+    display: flex;
+    line-height: 80px;
+    margin-left: 30px;
 }
 .review-event-text {
     margin-left: 20px;
 }
+
 #review-wrapper {
-    border: 2px solid black;
-    height: 1000px;
+    /*border: 2px solid black;*/
+    /*height: 1000px;*/
 }
+
+.review-cards {
+    /*border : 1px solid lightgray;*/
+}
+
+.item-name {
+    margin-left: 30px;
+    font-size: 30px;
+}
+
 .item-img {
     height: 100px;
     width: 100px;
@@ -116,14 +192,14 @@
 }
 #review-container {
     margin: 0px 40px 40px 40px;
+    border: 1px solid lightgray;
 }
 .customer-review-img-box {
-    height: 130px;
-    width: 130px;
+    height: 250px;
+    width: 250px;
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/2_246947888372000.jpg");
 }
 .review-item-features {
     margin-top: 10px;
@@ -138,6 +214,21 @@
     background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/default-profile-image.jpg");
 }
 
+.customer-star-rating-box {
+    margin-left: 30px;
+    font-size: 20px;
+}
+.review-text {
+    margin: 30px 30px;
+    color: black;
+    font-size: 22px;
+}
+.review-features-container {
+    display: flex;
+}
+.review-features-container div {
+    margin-right: 15px;
+}
 .review-like-box {
     display: flex;
     justify-content: space-evenly;
@@ -146,14 +237,19 @@
     align-items: center;
     border-radius: 20px;
     border: 1px solid lightgray;
+    margin: 20px 30px;
+}
+.reply-output-container {
+    padding: 0 30px;
 }
 .review-reply-box {
     margin-top: 20px;
+    padding: 0 30px;
 }
 .review-reply-box div {
     margin-bottom: 20px;
 }
-.review-thumbs-up {
+#review-thumbs-up {
     background-color: steelblue;
     border-radius: 50%;
     height: 25px;
@@ -172,12 +268,15 @@
 #reply-input-box {
     display: flex;
     padding-top: 15px;
-    margin-left: 18px;
     cursor: pointer;
+    justify-content: space-evenly;
 }
 #reply-input-area {
     height: 38px;
     width: 90%;
+}
+.review-features-container {
+    margin-left: 30px;
 }
 .reply-thumbs-up {
     background-color: steelblue;
@@ -199,4 +298,13 @@
 }
 .reply-like-counts {
     text-align: center;
+}
+#item-detail-header {
+    height: 100px;
+    margin: 0 auto;
+}
+#item-detail-body {
+    width: 90%;
+    padding: 100px 100px;
+
 }

@@ -38,10 +38,9 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         String email = principal.getAttribute("email");
 
         resultRedirectStrategy(request, response, email);
-
     }
 
-    public void resultRedirectStrategy(HttpServletRequest request, HttpServletResponse response, String email) throws IOException, ServletException {
+    public void resultRedirectStrategy(HttpServletRequest request, HttpServletResponse response, String email) throws IOException {
 
         Member member = memberRepository.findById(email).orElseThrow();
         SavedRequest savedRequest = requestCache.getRequest(request, response);

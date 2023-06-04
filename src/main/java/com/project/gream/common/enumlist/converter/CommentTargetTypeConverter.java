@@ -9,7 +9,7 @@ import java.util.EnumSet;
 import java.util.NoSuchElementException;
 
 @Converter
-public class CommentTargetTypeConverter implements AttributeConverter<CommentTargetType, String>{
+public class CommentTargetTypeConverter implements AttributeConverter<CommentTargetType, String> {
     @Override
     public String convertToDatabaseColumn(CommentTargetType attribute) {
         return attribute == null ? null : attribute.getValue();

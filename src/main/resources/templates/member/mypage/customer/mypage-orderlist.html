@@ -10,6 +10,18 @@
         .reviewBtn {
             cursor: pointer;
         }
+        #paging-btn-box {
+            display: flex;
+            margin: 0 auto;
+        }
+        #paging-btn-box div {
+            display: flex;
+            width: 30px;
+            height: 30px;
+            border: 1px solid lightGray;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -76,6 +88,13 @@
                         </tr>
                         </tbody>
                     </table>
+                        <div id="paging-btn-box">
+                            <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
+                                <a th:if="${page != nowPage}" th:href="@{/orderlist/{memberId}(memberId=${session.loginMember.id}, page=${page - 1})}" th:text="${page}"></a>
+                                <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
+                            </div>
+                        </div>
+
                 </section>
             </div>
         </div>

@@ -19,7 +19,7 @@ public class Img extends BaseTimeEntity {
     @Column(name = "img_url")
     private String url;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemId", nullable = false)
+    @JoinColumn(name = "itemId", nullable = true)
     private Item item;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = true)

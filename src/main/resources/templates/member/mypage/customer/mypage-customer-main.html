@@ -93,65 +93,12 @@
                                 </div>
                                 <div id="like-items-body">
                                     <div class="like-item-container row row-cols-1 row-cols-md-3 g-4">
-                                        <div class="like-item-card">
-                                            <div class="like-item-img-box">
-                                                <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg" class="card-img-top" alt="..."/>
-                                            </div>
+                                        <div class="like-item-card" th:each="likeItems : ${likeItems}">
+                                            <div class="like-item-img-box"></div>
                                             <div class="like-item-detail">
-                                                <div class="item-name">샤넬 파자마</div>
-                                                <div class="item-price">43,900원</div>
+                                                <div class="item-name" th:text="${likeItems.name}"></div>
+                                                <div class="item-price" th:text="${likeItems.price}"></div>
                                                 <div class="item-like-box">
-                                                    <div class="thumbs-up-img-box">
-                                                        <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
-                                                    </div>
-                                                    <div class="thumbs-up-counts">2,189</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="like-item-card">
-                                            <div class="like-item-img-box">
-                                                <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg" class="card-img-top" alt="..."/>
-                                            </div>
-                                            <div class="like-item-detail">
-                                                <div class="item-name">
-                                                    COVERNAT X MONTBELL 19A/W REVERSIBLE
-                                                </div>
-                                                <div class="item-price">43,900원</div>
-                                                <div class="item-like-box">
-                                                    <div class="thumbs-up-img-box">
-                                                        <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
-                                                    </div>
-                                                    <div class="thumbs-up-counts">2,189</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="like-item-card">
-                                            <div class="like-item-img-box">
-                                                <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg" class="card-img-top" alt="..."/>
-                                            </div>
-                                            <div class="like-item-detail">
-                                                <div class="item-name">
-                                                    reversible quilted fleece jacket black
-                                                </div>
-                                                <div class="item-price">43,900원</div>
-                                                <div class="item-like-box align-items-end">
-                                                    <div class="thumbs-up-img-box">
-                                                        <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
-                                                    </div>
-                                                    <div class="thumbs-up-counts">2,189</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="like-item-card">
-                                            <div class="like-item-img-box">
-                                                <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/item/images/1_251007149821208.jpg" class="card-img-top" alt="..."/>
-                                            </div>
-                                            <div class="like-item-detail">
-                                                <div class="item-name col">
-                                                    리얼 와이드 히드 밴딩 슬랙스
-                                                </div>
-                                                <div class="item-price">43,900원</div>
-                                                <div class="item-like-box align-text-bottom">
                                                     <div class="thumbs-up-img-box">
                                                         <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
                                                     </div>
