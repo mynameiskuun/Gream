@@ -18,7 +18,7 @@
                     <a th:href="@{/inquiry}">Q & A</a>
                 </div>
                 <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_MEMBER')}">
-                    <div class="upper-header-btn"><a th:href="@{/like}">LIKE</a></div>
+                    <div class="upper-header-btn"><a th:href="@{/like/{memberId}(memberId=${session.loginMember.getId()})}">LIKE</a></div>
                     <div class="upper-header-btn"><a th:href="@{/cart}">CART</a></div>
                 </th:block>
                 <div class="upper-header-btn" th:if="${session.loginMember == null}">

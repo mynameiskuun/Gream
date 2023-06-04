@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
-@Entity
 public class Coupon extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,12 +24,9 @@ public class Coupon extends BaseTimeEntity {
     private int stock;
     private int minOrderPrice;
     private int validPeriod;
-    @ManyToOne
-    @JoinColumn(name = "coupon_box")
-    private CouponBox couponBox;
 
     @Builder
-    public Coupon(Long id, String type, String name, int discountRate, LocalDateTime expireDate, int stock, int minOrderPrice, int validPeriod, CouponBox couponBox) {
+    public Coupon(Long id, String type, String name, int discountRate, LocalDateTime expireDate, int stock, int minOrderPrice, int validPeriod) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -39,6 +35,5 @@ public class Coupon extends BaseTimeEntity {
         this.stock = stock;
         this.minOrderPrice = minOrderPrice;
         this.validPeriod = validPeriod;
-        this.couponBox = couponBox;
     }
 }

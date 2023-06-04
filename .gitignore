@@ -39,3 +39,5 @@ out/
 ### 설정파일 제외 ###
 *.properties
 
+### queryDsl ###
+/src/main/generated

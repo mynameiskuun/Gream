@@ -30,6 +30,8 @@ public class Review extends BaseTimeEntity {
     private int repurchaseScore;
     @Column(nullable = false, name = "review_content")
     private String content;
+    @Column(name = "review_thumbnail")
+    private String thumbnail;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
@@ -38,7 +40,7 @@ public class Review extends BaseTimeEntity {
     private Item item;
 
     @Builder
-    public Review(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore, String content, Member member, Item item) {
+    public Review(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore, String content, String thumbnail, Member member, Item item) {
         this.id = id;
         this.starValue = starValue;
         this.priceScore = priceScore;
@@ -46,6 +48,7 @@ public class Review extends BaseTimeEntity {
         this.deliveryScore = deliveryScore;
         this.repurchaseScore = repurchaseScore;
         this.content = content;
+        this.thumbnail = thumbnail;
         this.member = member;
         this.item = item;
     }

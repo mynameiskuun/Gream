@@ -3,6 +3,7 @@ package com.project.gream.domain.item.service;
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.Gender;
+import com.project.gream.common.enumlist.LikeTargetType;
 import com.project.gream.domain.item.dto.CartItemRequestDto;
 import com.project.gream.domain.item.dto.ImgDto;
 import com.project.gream.domain.item.dto.ItemDto;
@@ -17,16 +18,23 @@ import com.project.gream.domain.member.entity.CartItem;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.order.dto.KakaoPayDto;
 import com.project.gream.domain.order.entity.OrderHistory;
+import com.project.gream.domain.post.dto.LikesDto;
+import com.project.gream.domain.post.entity.Likes;
+import com.project.gream.domain.post.entity.QLikes;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.project.gream.domain.post.entity.QLikes.likes;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,6 +45,7 @@ public class ItemServiceImpl implements ItemService{
     private final ItemRepository itemRepository;
     private final ImgRepository imgRepository;
     private final CartItemRepository cartItemRepository;
+    private final EntityManager em;
 
     @Override
     public List<ItemDto> selectAllItems() {
@@ -68,13 +77,13 @@ public class ItemServiceImpl implements ItemService{
     @Override
     public void registerItemAndImgs(ItemRequestDto itemRequestDto) throws Exception {
         Item item = itemRepository.save(new ItemDto(itemRequestDto).toEntity());
-        List<String> imgPaths = s3Config.imgUpload(item, itemRequestDto.getImgFiles()); // S3 업로드
+        List<String> imgPaths = s3Config.imgUpload(itemRequestDto.getClass(), itemRequestDto.getImgFiles()); // S3 업로드
         saveEntities(item, imgPaths); // DB 업로드
     }
 
     @Override
     public void saveEntities(Item item, List<String> imgPaths) {
-//        item.getCreatedTime().
+
         String thumbnailImg = "";
         if (imgPaths.size() == 0) {
             thumbnailImg = "https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/default_item_img.jpg";
@@ -199,6 +208,29 @@ public class ItemServiceImpl implements ItemService{
             item.updateItemStock(item.getItemStock() - Integer.parseInt(qtyArray[i]));
             itemRepository.save(item); // 주문 수량만큼 재고 -
         }
+    }
+
+    @Override
+    public List<Long> getLikedItemIds(String memberId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QLikes likes = QLikes.likes;
+
+        return queryFactory
+                .select(likes.targetId)
+                .from(likes)
+                .where(likes.member.id.eq(memberId),
+                        likes.likeTargetType.eq(LikeTargetType.ITEM))
+                .fetch();
+    }
+
+    @Override
+    public List<ItemDto> getLikedItemList(List<Long> itemIds) {
+        return itemIds.stream()
+                .map(itemRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(ItemDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
 }
