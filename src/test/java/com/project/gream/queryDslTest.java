@@ -16,31 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-@Slf4j
 @SpringBootTest
-@Transactional
 public class queryDslTest {
 
-    @Autowired
-    EntityManager em;
-
-    @Autowired
-    JPAQueryFactory queryFactory;
-
-    @Autowired
-    MemberRepository memberRepository;
-    @Test
-    void querydsltest() {
-
-        QLikes likes = new QLikes("likes");
-        Member member = memberRepository.findById("namsge@naver.com").orElseThrow();
-
-        Integer fetchOne = queryFactory
-                .selectOne()
-                .from(likes)
-                .where(likes.member.eq(member), likes.targetId.eq(2L), likes.likeTargetType.eq(LikeTargetType.COMMENT))
-                .fetchFirst();
-
-        log.info("result : " + fetchOne);
-    }
 }

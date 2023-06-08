@@ -19,7 +19,8 @@ public class CustomSecurityUserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new UsernameNotFoundException(String.format("userId [%s]는 없는 아이디 입니다", memberId)));
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new UsernameNotFoundException(String.format("userId [%s]는 없는 아이디 입니다", memberId)));
         return CustomUserDetails.builder()
                 .id(member.getId())
                 .password(member.getPassword())

@@ -36,6 +36,7 @@ public class S3Config {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+
     @PostConstruct
     public void s3Client() {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
@@ -45,28 +46,6 @@ public class S3Config {
                 .build();
     }
 
-//    public List<String> imgUpload(Item item, List<MultipartFile> multipartFiles) throws Exception {
-//
-//        List<String> imgUrlList = new ArrayList<>();
-//
-//        for (MultipartFile file : multipartFiles) {
-//            String fileExtension = getFileExtension(Objects.requireNonNull(file.getOriginalFilename(), "이미지 파일이 존재하지 않습니다"));
-//            String fileName = createFileName(item.getId()) + fileExtension;
-//            ObjectMetadata objectMetadata = new ObjectMetadata();
-//            objectMetadata.setContentLength(file.getSize());
-//            objectMetadata.setContentType(file.getContentType());
-//
-//            try (InputStream inputStream = file.getInputStream()) {
-//                s3Client.putObject(new PutObjectRequest(bucket + "/item/images", fileName, inputStream, objectMetadata)
-//                        .withCannedAcl(CannedAccessControlList.PublicRead));
-//                imgUrlList.add(s3Client.getUrl(bucket + "/item/images", fileName).toString());
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        return imgUrlList;
-//    }
-
 
     public <T> List<String> imgUpload(Class<T> dto, List<MultipartFile> multipartFiles) throws Exception {
 
@@ -74,11 +53,11 @@ public class S3Config {
 
         List<String> imgUrlList = new ArrayList<>();
 
-        String imgDir = getImgDir(dto);
+        String imgDir = this.getImgDir(dto);
 
         for (MultipartFile file : multipartFiles) {
-            String fileExtension = getFileExtension(Objects.requireNonNull(file.getOriginalFilename(), "이미지 파일이 존재하지 않습니다"));
-            String fileName = createFileName(dto) + fileExtension;
+            String fileExtension = this.getFileExtension(Objects.requireNonNull(file.getOriginalFilename(), "이미지 파일이 존재하지 않습니다"));
+            String fileName = this.createFileName(dto) + fileExtension;
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());

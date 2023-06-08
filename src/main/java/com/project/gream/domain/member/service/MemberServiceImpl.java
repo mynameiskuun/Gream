@@ -34,6 +34,9 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public int userRegister(MemberDto memberDto) {
 
+        log.info("------------------------- Form 회원가입");
+
+
         if (memberRepository.existsById(memberDto.getId())) {
             return 1;
             // 아이디 중복
@@ -53,6 +56,9 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public void updateAddressAndGender(MemberRequestDto req, @LoginMember MemberDto memberDto) {
+
+        log.info("------------------------- OAuth 최초 로그인 시 추가입력");
+
         Member member = memberDto.toEntity();
         Gender gender = StringToEnumUtil.getEnumFromValue(Gender.class, req.getGender());
         member.updateAddressAndGender(req.getAddress(), gender);
@@ -69,24 +75,5 @@ public class MemberServiceImpl implements MemberService {
             cartItemRepository.deleteById(Long.parseLong(cartItemId));
         }
     }
-    @Override
-    public String checkQtyAndAddToCart(Map<String, Object> itemMap, MemberDto memberDto) {
-        return null;
-    }
-
-    @Override
-    public String addItemToCart(Map<String, Object> itemMap, MemberDto memberDto) {
-        return null;
-    }
-
-    @Override
-    public void deleteCartItemById(Long cartItemId) {
-
-    }
-
-    @Override
-    public void deleteAllCartItems(Long cartId) {
-
-    }
-
 }
+

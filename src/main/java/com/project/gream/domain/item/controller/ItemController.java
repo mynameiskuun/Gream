@@ -88,14 +88,7 @@ public class ItemController {
     public String updateCartItemQuantity(@RequestBody CartItemRequestDto req) {
 
         log.info("------------------------상품 수량 업데이트");
-
         return itemService.updateCartItemQuantity(req);
-
-//        if (quantity == 0) {
-//            return "실패";
-//        } else {
-//
-//        }
     }
 
 

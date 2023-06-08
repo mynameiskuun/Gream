@@ -11,7 +11,6 @@ import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.CartItem;
 import com.project.gream.domain.order.dto.KakaoPayDto;
 import com.project.gream.domain.order.entity.OrderHistory;
-import com.project.gream.domain.post.dto.LikesDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +33,6 @@ public interface ItemService {
     List<CartItemDto> getCartItems(Long cartId);
     List<CartItemDto> getOrderItemsFromCart(String cartItemIds);
     void updateItemStock(KakaoPayDto kakaoPayDto, OrderHistory orderHistory);
-
     List<Long> getLikedItemIds(String memberId);
-
     List<ItemDto> getLikedItemList(List<Long> itemIds);
 }

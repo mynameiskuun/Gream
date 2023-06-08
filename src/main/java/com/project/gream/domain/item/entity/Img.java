@@ -1,6 +1,7 @@
 package com.project.gream.domain.item.entity;
 
 import com.project.gream.common.util.BaseTimeEntity;
+import com.project.gream.domain.post.entity.Post;
 import com.project.gream.domain.post.entity.Review;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +25,9 @@ public class Img extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id", nullable = true)
     private Review review;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = true)
+    private Post post;
 
     // 이미지는 리뷰의 이미지 일수도, 상품의 이미지 일수도 있기 때문에 nullable = true
 
@@ -33,10 +37,11 @@ public class Img extends BaseTimeEntity {
     }
 
     @Builder
-    public Img(Long id, String url, Item item, Review review) {
+    public Img(Long id, String url, Item item, Review review, Post post) {
         this.id = id;
         this.url = url;
         this.item = item;
         this.review = review;
+        this.post = post;
     }
 }

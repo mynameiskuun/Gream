@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class LikesDto {
+public class LikesVO {
 
     private Long id;
     private Long targetId;
@@ -34,7 +34,7 @@ public class LikesDto {
     private LocalDateTime modifiedTime;
 
     @Builder
-    public LikesDto(Long id, Long targetId, LikeTargetType likeTargetType, MemberDto memberDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
+    public LikesVO(Long id, Long targetId, LikeTargetType likeTargetType, MemberDto memberDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.targetId = targetId;
         this.likeTargetType = likeTargetType;
@@ -52,8 +52,8 @@ public class LikesDto {
                 .build();
     }
 
-    public static LikesDto fromEntity(Likes likes) {
-        return LikesDto.builder()
+    public static LikesVO fromEntity(Likes likes) {
+        return LikesVO.builder()
                 .id(likes.getId())
                 .targetId(likes.getTargetId())
                 .likeTargetType(likes.getLikeTargetType())

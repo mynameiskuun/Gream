@@ -61,6 +61,7 @@
 }
 #order-button-box {
     display: flex;
+    align-items: center;
     margin-top: 50px;
 }
 #item-detail-content {
@@ -68,7 +69,11 @@
     margin-left: 30px;
     /* height 나중에 지우기. 내용 추가되면 자동으로 길이 늘어나게 */
 }
+#orderBtn {
+    height: 40px;
+}
 #cartBtn {
+    height: 40px;
     margin-left: 30px;
 }
 #item-review-box {
@@ -229,6 +234,17 @@
 .review-features-container div {
     margin-right: 15px;
 }
+#item-like-box {
+    display: flex;
+    justify-content: space-evenly;
+    width: 130px;
+    height: 35px;
+    align-items: center;
+    border-radius: 20px;
+    border: 1px solid lightgray;
+    margin: 20px 30px;
+}
+
 .review-like-box {
     display: flex;
     justify-content: space-evenly;
@@ -248,6 +264,17 @@
 }
 .review-reply-box div {
     margin-bottom: 20px;
+}
+#item-thumbs-up {
+    background-color: steelblue;
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-position-y: 0px;
+    background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png");
 }
 #review-thumbs-up {
     background-color: steelblue;

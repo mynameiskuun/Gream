@@ -9,8 +9,6 @@ import com.project.gream.domain.order.dto.OrderItemDto;
 import com.project.gream.domain.order.entity.OrderItem;
 import com.project.gream.domain.order.repository.OrderItemRepository;
 import com.project.gream.domain.order.service.OrderService;
-import com.project.gream.domain.post.dto.LikesDto;
-import com.project.gream.domain.post.repository.LikesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,7 +20,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor

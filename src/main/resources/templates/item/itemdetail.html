@@ -37,6 +37,13 @@
                 <div id="order-button-box">
                     <button class="btn btn-outline-secondary" id="orderBtn">주문하기</button>
                     <button class="btn btn-outline-secondary" id="cartBtn" onclick="cartBtn()">장바구니 추가</button>
+                    <div id="item-like-box">
+                        <div id="item-thumbs-up"></div>
+                        <div class="like-title">좋아요</div>
+                        <input type="hidden" th:value="${item.id}"/>
+                        <input type="hidden" class="target" value="ITEM" />
+                        <div class="like-counts"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -136,7 +143,7 @@
                                         </div>
                                         <div class="order-item-detail" style="display: flex">
                                             <div class="item-img" th:style="'background-image: url('+ ${reviewList.itemDto.thumbnailUrl} + ');'"></div>
-                                            <div class="item-name" th:text="${reviewList.itemDto.name}"></div>
+                                            <div class="like-item-name" th:text="${reviewList.itemDto.name}"></div>
                                         </div>
                                         <div class="customer-star-rating-box">
                                     <span class="star counted-stars text-primary">
@@ -176,6 +183,7 @@
                                             <div class="like-title">도움돼요</div>
                                             <input type="hidden" th:value="${reviewList.id}"/>
                                             <div class="like-counts"></div>
+                                            <input type="hidden" class="target" value="REVIEW" />
                                         </div>
                                     </div>
                                     <div class="review-right-box">
@@ -386,26 +394,23 @@
     }
 
     // 리뷰 좋아요 이벤트
-    $('#review-thumbs-up').click(function() {
-
-        let clickedElement = $(this);
+    function like() {
 
         // 좋아요 이벤트 시 필요한 데이터
-        // 해당 리뷰 id
+        // 해당 타겟 id(리뷰? 아이템?)
         // 로그인 사용자 id
-        // 좋아요 타겟(리뷰)
+        // 좋아요 타겟(리뷰? 아이템?)
 
+        let clickedElement = $(this);
         let memberDto;
+        let targetId = $(this).parent().find('input[type="hidden"]').val();
+        let likeTargetType = $(this).parent().find('input[class="target"]').val();
+
         if ([[${session.loginMember}]] == null) {
             alert('로그인을 해주세요');
             location.reload();
-        }
-        memberDto = [[${session.loginMember}]]
-        console.log('memberId' + memberDto);
-        let targetId = $(this).parent().find('input[type="hidden"]').val();
-        let likeTargetType = 'REVIEW';
-
-        console.log('target' + likeTargetType);
+        } else
+            memberDto = [[${session.loginMember}]]
 
         let data = {
             "targetId" : targetId,
@@ -428,7 +433,63 @@
                 console.log(result)
             }
         })
-    })
+    }
+
+    // 로그인, 리뷰 좋아요 유무에 따른 css 변경 이벤트
+    window.onload = function() {
+
+        let itemId = [[${item.id}]];
+        let reviewList = [[${reviewList}]] || [];
+        let commentList = [[${commentList}]] || [];
+
+        let reviewIdList = [];
+        let commentIdList = [];
+
+        reviewList.forEach((review) => {
+            reviewIdList.push(review.id);
+        });
+
+        commentList.forEach((comment) => {
+            commentIdList.push(comment.id)
+        })
+
+        console.log("itemId : " + itemId);
+        console.log("reviewList : " + reviewList);
+        console.log("reviewIdList : " + reviewIdList);
+        console.log("commentList : " + commentList);
+        console.log("commentIdList : " + commentIdList);
+
+        let data = {
+            "itemId" : itemId,
+            "reviewIdList": reviewIdList,
+            "commentIdList" : commentIdList
+        }
+
+        // 보내야 할 데이터
+        // item id, review id list, comment id list
+        // 로그인 유저 id
+
+        // 로그인 안했으면 좋아요 count 표시.
+        // 로그인 했고 좋아요 안눌렀으면 count 표시.
+        // 로그인 했고 좋아요 눌렀으면 배경색 바꾸고 count 표시.
+
+        $.ajax({
+            url: '/test/likecheck',
+            method: 'GET',
+            contentType: 'application/JSON; charset=UTF-8',
+            dataType: 'JSON',
+            data: JSON.stringify(data),
+            success: function (result) {
+                console.log(JSON.parse(result))
+            },
+            error: function (error) {
+                console.log(error)
+            },
+        })
+    }
+
+    $('#item-thumbs-up').click(like);
+    $('#review-thumbs-up').click(like);
 
     /*]]*/
 </script>

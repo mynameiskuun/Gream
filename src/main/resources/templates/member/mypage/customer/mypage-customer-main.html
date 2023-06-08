@@ -68,9 +68,9 @@
                                     <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
                                         <th scope="row">
                                             <div class="item-information">
-                                                <div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div>
+                                                <a th:href="@{/item/{id}(id=${orderItemList.itemDto.id})}"><div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div></a>
                                                 <div class="order-item-detail">
-                                                    <div class="item-name" th:text="${orderItemList.itemDto.name}"></div>
+                                                    <a th:href="@{/item/{id}(id=${orderItemList.itemDto.id})}"><div class="item-name" th:text="${orderItemList.itemDto.name}"></div></a>
                                                 </div>
                                             </div>
                                         </th>
@@ -94,16 +94,10 @@
                                 <div id="like-items-body">
                                     <div class="like-item-container row row-cols-1 row-cols-md-3 g-4">
                                         <div class="like-item-card" th:each="likeItems : ${likeItems}">
-                                            <div class="like-item-img-box"></div>
+                                            <div class="like-item-img-box" th:style="'background-image: url('+ ${likeItems.thumbnailUrl} + ');'"></div>
                                             <div class="like-item-detail">
-                                                <div class="item-name" th:text="${likeItems.name}"></div>
-                                                <div class="item-price" th:text="${likeItems.price}"></div>
-                                                <div class="item-like-box">
-                                                    <div class="thumbs-up-img-box">
-                                                        <img src="https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png" class="thumbs-up-img"/>
-                                                    </div>
-                                                    <div class="thumbs-up-counts">2,189</div>
-                                                </div>
+                                                <div class="like-item-name" th:text="${likeItems.name}"></div>
+                                                <div class="like-item-price" th:text="${#numbers.formatInteger(likeItems.price, 3, 'COMMA') + '원'}"></div>
                                             </div>
                                         </div>
                                     </div>

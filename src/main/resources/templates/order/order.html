@@ -41,12 +41,12 @@
             <h5 id="buyer-name" th:text="'주문자 : ' + ${session.loginMember.getName()}"></h5>
           </div>
           <div class="delivery-address">
-            <h3 id="buyer-address" th:text="'배송지 주소 : ' + ${session.loginMember.getAddress()}"></h3>
+            <h5 id="buyer-address" th:text="'배송지 주소 : ' + ${session.loginMember.getAddress()}"></h5>
           </div>
         </div>
         <div id="order-item-box">
           <div class="order-list-header underline align-middle">
-            <h2> 주문 상품 </h2> 상품수량 및 옵션변경은 상품 상세페이지 또는 장바구니에서 가능합니다.
+            <p>상품수량 및 옵션변경은 상품 상세페이지 또는 장바구니에서 가능합니다.</p>
           </div>
           <div class="order-item-list">
             <table class="table align-middle table-hover">
@@ -92,11 +92,11 @@
       <div id="order-side-bar">
         <div id="order-sbar-wrapper">
           <div id="side-bar-header" class="underline">
-            <span><h2>적립예정</h2></span><span id="point-reward"></span>
+            <span><h4>적립예정</h4></span><span id="point-reward"></span>
           </div>
           <div id="side-bar-body">
             <div class="sbar-body-header">
-              <h2>결제 예정금액</h2>
+              <h4>결제 예정금액</h4>
             </div>
             <div>
               <div class="order-detail-box"><span>상품금액</span><span id="total-item-price"></span></div>

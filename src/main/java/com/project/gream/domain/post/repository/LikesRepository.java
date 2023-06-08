@@ -8,7 +8,6 @@ import java.util.Optional;
 
 public interface LikesRepository extends JpaRepository<Likes, Long> {
 
-    boolean existsByTargetIdAndLikeTargetType(Long targetId, LikeTargetType likeTargetType);
-    Optional<Likes> getByTargetIdAndLikeTargetType(Long targetId, LikeTargetType likeTargetType);
+    Integer countByTargetIdAndLikeTargetType(Long targetId, LikeTargetType type);
 
 }
