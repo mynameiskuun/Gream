@@ -16,6 +16,7 @@
     display: flex;
 }
 #order-info-box {
+    top: 100px;
     position: relative;
     width:70%;
 }
@@ -26,7 +27,11 @@
 .underline {
     border-bottom: 1px solid #999;
 }
+.delivery-title {
+    margin-bottom: 30px;
+}
 #order-side-bar {
+    top: 350px;
     position: fixed;
     right: 25px;
     width: 30%;

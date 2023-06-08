@@ -14,9 +14,12 @@
     list-style: none;
     margin-bottom: 20px;
 }
+.item-header {
+    margin-left: 50px;
+}
 .item-body {
     flex-wrap: wrap;
-    width: 1000px;
+    width: 1300px;
     display: flex;
     float: left;
 }
@@ -33,4 +36,11 @@
     background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/carousel.jpg");
     width: 300px;
     height: 400px;
+}
+.item-detail-box {
+    padding-left: 30px;
+    width: 300px;
+}
+.item-detail-box div {
+    margin-top: 17px;
 }

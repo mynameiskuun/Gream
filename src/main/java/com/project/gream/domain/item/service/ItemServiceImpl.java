@@ -18,8 +18,6 @@ import com.project.gream.domain.member.entity.CartItem;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.order.dto.KakaoPayDto;
 import com.project.gream.domain.order.entity.OrderHistory;
-import com.project.gream.domain.post.dto.LikesDto;
-import com.project.gream.domain.post.entity.Likes;
 import com.project.gream.domain.post.entity.QLikes;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +31,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.project.gream.domain.post.entity.QLikes.likes;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -78,7 +74,7 @@ public class ItemServiceImpl implements ItemService{
     public void registerItemAndImgs(ItemRequestDto itemRequestDto) throws Exception {
         Item item = itemRepository.save(new ItemDto(itemRequestDto).toEntity());
         List<String> imgPaths = s3Config.imgUpload(itemRequestDto.getClass(), itemRequestDto.getImgFiles()); // S3 업로드
-        saveEntities(item, imgPaths); // DB 업로드
+        this.saveEntities(item, imgPaths); // DB 업로드
     }
 
     @Override
@@ -230,6 +226,7 @@ public class ItemServiceImpl implements ItemService{
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(ItemDto::fromEntity)
+                .limit(6)
                 .collect(Collectors.toList());
     }
 

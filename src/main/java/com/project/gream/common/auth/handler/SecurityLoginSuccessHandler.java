@@ -47,12 +47,5 @@ public class SecurityLoginSuccessHandler extends SimpleUrlAuthenticationSuccessH
         String targetUrl = savedRequest == null ? "/" : savedRequest.getRedirectUrl();
         redirectStratgy.sendRedirect(request, response, targetUrl);
 
-//        if(savedRequest != null) {
-//            String targetUrl = savedRequest.getRedirectUrl();
-//            redirectStratgy.sendRedirect(request, response, targetUrl); // targetUrl이 있다면 해당 Url로 이동
-//        } else {
-//            redirectStratgy.sendRedirect(request, response, "/"); // 없다면 default 메인화면으로
-//        }
-
     }
 }

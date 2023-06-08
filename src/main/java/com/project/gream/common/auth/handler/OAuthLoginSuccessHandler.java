@@ -37,7 +37,7 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         DefaultOAuth2User principal = (DefaultOAuth2User) authentication.getPrincipal();
         String email = principal.getAttribute("email");
 
-        resultRedirectStrategy(request, response, email);
+        this.resultRedirectStrategy(request, response, email);
     }
 
     public void resultRedirectStrategy(HttpServletRequest request, HttpServletResponse response, String email) throws IOException {
@@ -46,7 +46,7 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         String targetUrl;
 
-        if (checkBothNotNull(member)) {
+        if (this.checkBothNotNull(member)) {
             session.setAttribute("loginMember", MemberDto.fromEntity(member));
             targetUrl = savedRequest == null ? "/" : savedRequest.getRedirectUrl();
         } else

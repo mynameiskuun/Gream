@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService{
         session.setAttribute("size", request.getSize());
         session.setAttribute("itemName", request.getItemName());
 
-        String orderId = getItemName(request);
+        String orderId = this.getItemName(request);
 
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
@@ -84,10 +84,9 @@ public class OrderServiceImpl implements OrderService{
 
         String requestUrl = "https://kapi.kakao.com/v1/payment/ready";
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, getHeaders());
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
         KakaoPayRequestVO requestVO = new RestTemplate().postForObject(requestUrl, requestEntity, KakaoPayRequestVO.class);
 
-        log.info(String.valueOf(requestEntity));
         log.info("-------------------------- 결제준비 응답객체: " + requestVO);
         // 받아온 값 return
         return requestVO;
@@ -114,7 +113,7 @@ public class OrderServiceImpl implements OrderService{
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
         parameters.add("cid", cid);
         parameters.add("tid", tid);
-        parameters.add("partner_order_id", getItemName(request)); // 주문명
+        parameters.add("partner_order_id", this.getItemName(request)); // 주문명
         parameters.add("partner_user_id", "Gream");
         parameters.add("pg_token", pgToken);
 
@@ -136,8 +135,8 @@ public class OrderServiceImpl implements OrderService{
 
         log.info("---------------------- DB 업데이트 시작");
 
-        OrderHistory orderHistory = saveOrderhistory(kakaoPayDto, memberDto);
-        saveOrderItems(kakaoPayDto, orderHistory);
+        OrderHistory orderHistory = this.saveOrderhistory(kakaoPayDto, memberDto);
+        this.saveOrderItems(kakaoPayDto, orderHistory);
 
         itemService.updateItemStock(kakaoPayDto, orderHistory);
         memberService.updateCartItems(kakaoPayDto);
@@ -186,12 +185,8 @@ public class OrderServiceImpl implements OrderService{
     public void sendPaymentReceiptEmail(KakaoPayApprovedResultVO result, MemberDto memberDto) throws Exception {
 
         log.info("----------------------- 결제내역 이메일 발송");
-        MimeMessage message = createOrderHistoryMessage(result, memberDto);
+        MimeMessage message = this.createOrderHistoryMessage(result, memberDto);
         emailSender.send(message);
-    }
-
-    public static String createKey() {
-        return String.valueOf(System.nanoTime());
     }
 
     private MimeMessage createOrderHistoryMessage(KakaoPayApprovedResultVO result, MemberDto memberDto) throws Exception {
@@ -252,6 +247,10 @@ public class OrderServiceImpl implements OrderService{
                 .createdTime(OrderItem.getCreatedTime())
                 .modifiedTime(OrderItem.getModifiedTime()).build());
 
+    }
+
+    public static String createKey() {
+        return String.valueOf(System.nanoTime());
     }
 
 }

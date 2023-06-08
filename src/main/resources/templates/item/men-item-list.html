@@ -37,9 +37,10 @@
                 <a th:href="@{/item/{itemId}(itemId=${item.getId()})}"><div class="item-cards">
                     <div class="item-cards-body">
                         <div class="item-cards-img-box" th:style="'background-image: url('+ ${item.getThumbnailUrl()} + ');'"></div>
-                        <div class="item-name" th:text="${item.getName()}">
+                        <div class="item-detail-box">
+                            <div class="item-name" th:text="${item.getName()}" style="font-size: 20px; margin-left: 0;"></div>
+                            <div class="item-price" th:text="${#numbers.formatInteger(item.getPrice(), 3, 'COMMA') + '원'} ">
                         </div>
-                        <div class="item-price" th:text="${#numbers.formatInteger(item.getPrice(), 3, 'COMMA') + '원'} ">
                         </div>
                     </div>
                 </div></a></th:block>

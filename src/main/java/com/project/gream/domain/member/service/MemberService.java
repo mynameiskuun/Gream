@@ -11,13 +11,7 @@ import java.util.Map;
 public interface MemberService {
 
     int userRegister(MemberDto memberDto);
-
     void updateCartItems(KakaoPayDto kakaoPayDto);
-
-    String checkQtyAndAddToCart(Map<String, Object> itemMap, MemberDto memberDto);
-    String addItemToCart(Map<String, Object> itemMap, MemberDto memberDto);
-    void deleteCartItemById(Long cartItemId);
-    void deleteAllCartItems(Long cartId);
     void updateAddressAndGender(MemberRequestDto req, @LoginMember MemberDto memberDto);
 
 }

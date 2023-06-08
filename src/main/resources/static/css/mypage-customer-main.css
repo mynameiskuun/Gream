@@ -48,6 +48,14 @@
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: center;
+    cursor: pointer;
+
+}
+.like-item-name {
+    cursor: pointer;
+}
+.item-name {
+    cursor: pointer;
 }
 .purchased-date div {
     text-align: center;
@@ -75,11 +83,16 @@
 }
 .like-item-detail {
     position: relative;
+    padding-left: 30px;
+    margin-top: 15px;
     width: 100%;
 }
 .like-item-img-box {
     height: 100%;
     width: 60%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 .card-img-top {
     height: 80%;
@@ -89,7 +102,8 @@
     background-repeat: no-repeat;
     background-position: center;
 }
-.item-price {
+.like-item-price {
+    margin-top: 30px;
     font-size: 14px;
 }
 .thumbs-up-img {

@@ -1,5 +1,6 @@
 package com.project.gream.common.enumlist.converter;
 
+import com.project.gream.common.enumlist.Category;
 import com.project.gream.common.enumlist.LikeTargetType;
 import com.project.gream.common.enumlist.Role;
 

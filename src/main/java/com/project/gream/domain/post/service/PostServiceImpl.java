@@ -1,11 +1,9 @@
 package com.project.gream.domain.post.service;
 
-import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.entity.Img;
-import com.project.gream.domain.item.entity.QItem;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;
-import com.project.gream.domain.post.dto.LikesDto;
+import com.project.gream.domain.post.dto.LikesVO;
 import com.project.gream.domain.post.dto.LikesResponseDto;
 import com.project.gream.domain.post.dto.ReviewDto;
 import com.project.gream.domain.post.entity.Likes;
@@ -49,6 +47,7 @@ public class PostServiceImpl implements PostService{
         for(String imgPath : imgPaths) {
             imgRepository.save(Img.builder()
                     .url(imgPath)
+                    .item(review.getItem())
                     .review(review)
                     .build());
         }
@@ -90,68 +89,8 @@ public class PostServiceImpl implements PostService{
                 .collect(Collectors.toList());
     }
 
-//    @Override
-//    public void saveReviewsForTest(@LoginMember MemberDto memberDto) {
-//
-//        Item item = itemRepository.findById(1L).orElseThrow();
-//        for (int i = 0; i < 4; i++) {
-//            Review review = Review.builder()
-//                    .starValue(4)
-//                    .priceScore(2)
-//                    .qualityScore(2)
-//                    .deliveryScore(2)
-//                    .repurchaseScore(2)
-//                    .content("content")
-//                    .thumbnail("none")
-//                    .member(memberDto.toEntity())
-//                    .item(item)
-//                    .build();
-//            reviewRepository.save(review);
-//        }
-//        for (int i = 0; i < 4; i++) {
-//            Review review = Review.builder()
-//                    .starValue(5)
-//                    .priceScore(2)
-//                    .qualityScore(2)
-//                    .deliveryScore(2)
-//                    .repurchaseScore(2)
-//                    .content("content")
-//                    .thumbnail("none")
-//                    .member(memberDto.toEntity())
-//                    .item(item)
-//                    .build();
-//            reviewRepository.save(review);
-//        }
-//        for (int i = 0; i < 10; i++) {
-//            int starValue = (int) (Math.random() * 5) + 1;
-//
-//            Review review = Review.builder()
-//                    .starValue(starValue)
-//                    .priceScore(2)
-//                    .qualityScore(2)
-//                    .deliveryScore(2)
-//                    .repurchaseScore(2)
-//                    .content("content")
-//                    .thumbnail("none")
-//                    .member(memberDto.toEntity())
-//                    .item(item)
-//                    .build();
-//            reviewRepository.save(review);
-//        }
-//    }
-
     @Override
-    public String validateLike(LikesDto likesDto) {
-        Optional<Likes> existingLikes = likesRepository.getByTargetIdAndLikeTargetType(
-                likesDto.getTargetId(), likesDto.getLikeTargetType());
-
-        existingLikes.ifPresent(likes -> likesRepository.deleteById(likes.getId()));
-        existingLikes.orElseGet(() -> likesRepository.save(new Likes()));
-        return "성공";
-    }
-
-    @Override
-    public Likes isAlreadyLiked(LikesDto likesDto) {
+    public Likes isAlreadyLiked(LikesVO likesVO) {
 
         log.info("-------------------------- 회원이 이미 좋아한 게시물인지 확인");
 
@@ -159,30 +98,45 @@ public class PostServiceImpl implements PostService{
 
         return queryFactory
                 .selectFrom(likes)
-                .where(likes.member.id.eq(likesDto.getMemberDto().getId()),
-                        likes.targetId.eq(likesDto.getTargetId()),
-                        likes.likeTargetType.eq(likesDto.getLikeTargetType()))
+                .where(likes.member.id.eq(likesVO.getMemberDto().getId()),
+                        likes.targetId.eq(likesVO.getTargetId()),
+                        likes.likeTargetType.eq(likesVO.getLikeTargetType()))
                 .fetchOne();
     }
 
     @Transactional
     @Override
-    public LikesResponseDto saveOrDeleteLike(LikesDto likesDto) {
+    public LikesResponseDto saveOrDeleteLike(LikesVO likesVO) {
 
         log.info("-------------------------- 좋아요 db 저장 or 삭제");
 
-        Likes likes = isAlreadyLiked(likesDto);
+        Likes likes = this.isAlreadyLiked(likesVO);
         String backgroundColor;
 
         if (likes == null) {
-            likesRepository.save(likesDto.toEntity());
+            likesRepository.save(likesVO.toEntity());
             backgroundColor = "lightcoral";
         } else {
             likesRepository.delete(likes);
             backgroundColor = "white";
         }
 
-        return new LikesResponseDto(likesRepository.count(), backgroundColor);
+        int likeCount = likesRepository.countByTargetIdAndLikeTargetType(
+                likesVO.getTargetId(), likesVO.getLikeTargetType());
+
+        return new LikesResponseDto(likeCount, backgroundColor);
     }
+
+//    @Override
+//    public LikesResponseDto checkLike(LikesRequestDto req, @LoginMember MemberDto memberDto) {
+//
+//        // 로그인 안했다면 -> 해당 아이템, 리뷰, 댓글의 좋아요 count 수 만 검색해서 반환.
+//        if (memberDto == null) {
+//
+//        }
+//        // 로그인 했다면 -> 아이디 & itemId, reviewId, commentId 검색해서 결과 조회하고, count수 & bgcolor 반환.
+//
+//        likesRepository.
+//    }
 
 }

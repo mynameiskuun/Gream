@@ -1,7 +1,10 @@
 package com.project.gream.domain.post.controller;
 
+import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.config.S3Config;
-import com.project.gream.domain.post.dto.LikesDto;
+import com.project.gream.domain.member.dto.MemberDto;
+import com.project.gream.domain.post.dto.LikesRequestDto;
+import com.project.gream.domain.post.dto.LikesVO;
 import com.project.gream.domain.post.dto.LikesResponseDto;
 import com.project.gream.domain.post.dto.ReviewDto;
 import com.project.gream.domain.post.service.PostService;
@@ -19,6 +22,7 @@ public class PostController {
 
     private final PostService postService;
     private final S3Config s3Config;
+
     @PostMapping("/review")
     public String saveReview(@RequestPart("reviewDto") ReviewDto reviewDto,
                              @RequestPart("imgFiles") List<MultipartFile> imgFiles) throws Exception {
@@ -32,10 +36,14 @@ public class PostController {
     }
 
     @PostMapping("/test/like")
-    public LikesResponseDto like(@RequestBody LikesDto likesDto) {
-
-        return postService.saveOrDeleteLike(likesDto);
+    public LikesResponseDto like(@RequestBody LikesVO likesVO) {
+        return postService.saveOrDeleteLike(likesVO);
     }
 
+    @GetMapping("/test/likecheck")
+    public String likeCheck(@RequestBody LikesRequestDto req, @LoginMember MemberDto memberDto) {
 
+//        postService.checkLike(req, memberDto);
+        return "";
+    }
 }
