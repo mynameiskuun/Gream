@@ -76,9 +76,9 @@ public class OrderServiceImpl implements OrderService{
         parameters.add("quantity", String.valueOf(request.getSize()));
         parameters.add("total_amount", String.valueOf(request.getFinalPaymentAmount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", "http://localhost:9999/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
-        parameters.add("cancel_url", "http://localhost:9999/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
-        parameters.add("fail_url", "http://localhost:9999/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
+        parameters.add("approval_url", "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com:8080/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
+        parameters.add("cancel_url", "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com:8080/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
+        parameters.add("fail_url", "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com:8080/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
 
         log.info("--------------------- 결제준비 parameters : " + parameters);
 
