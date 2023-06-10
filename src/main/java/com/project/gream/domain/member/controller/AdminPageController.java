@@ -28,7 +28,7 @@ public class AdminPageController {
         ModelAndView mav = new ModelAndView();
         List<ItemDto> itemList = itemService.selectAllItems();
         mav.addObject("itemList", itemList);
-        mav.setViewName("/member/mypage/admin/admin-main");
+        mav.setViewName("member/mypage/admin/admin-main");
         return mav;
     }
 
@@ -36,7 +36,7 @@ public class AdminPageController {
     public ModelAndView toOrderList() {
         ModelAndView mav = new ModelAndView();
 
-        mav.setViewName("/member/mypage/admin/admin-orderlist");
+        mav.setViewName("member/mypage/admin/admin-orderlist");
         return mav;
     }
 
