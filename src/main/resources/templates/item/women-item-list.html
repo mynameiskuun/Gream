@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <th:block th:replace="/main/config :: config"></th:block>
+    <th:block th:replace="main/config :: config"></th:block>
     <link rel="stylesheet" href="/css/item-list.css" />
 </head>
 <body>
-<th:block th:replace="/main/header :: header"></th:block>
+<th:block th:replace="main/header :: header"></th:block>
 <section id="item-wrapper">
     <div id="item-container">
         <div id="item-sidebar">
@@ -52,6 +52,6 @@
         </div>
     </div>
 </section>
-<th:block th:replace="/main/footer :: footer"></th:block>
+<th:block th:replace="main/footer :: footer"></th:block>
 </body>
 </html>

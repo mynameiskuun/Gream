@@ -2,11 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <th:block th:replace="/main/config :: config"></th:block>
+    <th:block th:replace="main/config :: config"></th:block>
     <link rel="stylesheet" href="/css/mypageadmin.css" />
 </head>
 <body>
-<th:block th:replace="/main/header :: header"></th:block>
+<th:block th:replace="main/header :: header"></th:block>
 
 <nav id="navbar-example2" class="navbar bg-light px-3 mb-3">
     <a class="nav-bar-title" href="#">관리자 페이지</a>
@@ -83,7 +83,7 @@
         </div>
     </div>
 
-<th:block th:replace="/main/footer :: footer"></th:block>
+<th:block th:replace="main/footer :: footer"></th:block>
 </body>
 </div>
 </html>
