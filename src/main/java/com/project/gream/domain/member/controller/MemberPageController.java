@@ -101,7 +101,7 @@ public class MemberPageController {
                                     @RequestParam(value = "exception", required = false) String exception) {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/member/login");
+        mav.setViewName("member/login");
         mav.addObject("error", error);
         mav.addObject("exception", exception);
         return mav;
@@ -125,7 +125,7 @@ public class MemberPageController {
 //    @GetMapping("/admin/item/registration")
 //    public ModelAndView toRegitem() {
 //        ModelAndView mav = new ModelAndView();
-//        mav.setViewName("/member/mypage/admin/admin-registration");
+//        mav.setViewName("member/mypage/admin/admin-registration");
 //        return mav;
 //    }
 
@@ -134,7 +134,7 @@ public class MemberPageController {
 //        ModelAndView mav = new ModelAndView();
 //        List<ItemDto> itemList = itemService.selectAllItems();
 //        mav.addObject("itemList", itemList);
-//        mav.setViewName("/member/mypage/admin/admin-main");
+//        mav.setViewName("member/mypage/admin/admin-main");
 //        return mav;
 //    }
 
@@ -149,7 +149,7 @@ public class MemberPageController {
         } else {
             cartItemList = itemService.getCartItems(memberDto.getCartDto().getId());
         }
-        mav.setViewName("/item/cart");
+        mav.setViewName("item/cart");
         mav.addObject("cartItem", cartItemList);
         // 장바구니에 담긴 상품 검색
         // List<Dto>로 mav에 저장 후 리턴

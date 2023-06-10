@@ -50,7 +50,7 @@ public class ItemController {
         mav.addObject("reviewList", reviewList);
         mav.addObject("starValMap", starValMap);
         mav.addObject("item", itemDto);
-        mav.setViewName("/item/itemdetail");
+        mav.setViewName("item/itemdetail");
         return mav;
     }
 
