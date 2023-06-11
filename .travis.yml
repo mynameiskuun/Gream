@@ -38,8 +38,8 @@ deploy:
     bucket: mynameiskuun-img-bucket
     key: Gream.zip
     bundle_type: zip #압축 확장자
-    application: gream-2
-    deployment_group: gream-group-2
+    application: gream
+    deployment_group: gream-group
     region: ap-northeast-2
     wait-until-deployed: true
     on:
