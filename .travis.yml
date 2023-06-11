@@ -32,6 +32,17 @@ deploy:
     on:
       branch: main #main branch 허용
 
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY #Travis repo settings에 설정된 값
+    secret_access_key: $AWS_SECRET_KEY #Travis repo settings에 설정된 값
+    bucket: mynameiskuun-img-bucket
+    key: Gream.zip
+    bundle_type: zip #압축 확장자
+    application: gream
+    deployment_group: gream
+    region: ap-northeast-2
+    wait-until-deployed: true
+
 # CI 실행 완료 시 메일로 알람
 notifications:
   email:
