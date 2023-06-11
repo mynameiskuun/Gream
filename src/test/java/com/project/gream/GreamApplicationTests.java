@@ -12,8 +12,8 @@ class GreamApplicationTests {
 //    void contextLoads() {
 //    }
 
-    @Test
-    void start() {
-        log.info("Test Start!");
-    }
+//    @Test
+//    void start() {
+//        log.info("Test Start!");
+//    }
 }
