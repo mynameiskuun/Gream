@@ -39,7 +39,7 @@ deploy:
     key: Gream.zip
     bundle_type: zip #압축 확장자
     application: gream
-    deployment_group: gream
+    deployment_group: gream-group
     region: ap-northeast-2
     wait-until-deployed: true
 
