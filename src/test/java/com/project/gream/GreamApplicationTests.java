@@ -14,6 +14,6 @@ class GreamApplicationTests {
 
     @Test
     void start() {
-        log.info("Test Start");
+        log.info("Test Start!");
     }
 }
