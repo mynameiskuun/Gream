@@ -3,6 +3,7 @@ package com.project.gream.domain.post.entity;
 import com.project.gream.common.enumlist.LikeTargetType;
 import com.project.gream.common.enumlist.converter.LikeTargetTypeConverter;
 import com.project.gream.common.util.BaseTimeEntity;
+import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,20 +20,30 @@ public class Likes extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "like_id")
     private Long id;
-    @Column(nullable = false)
-    private Long targetId;
-    @Convert(converter = LikeTargetTypeConverter.class)
-    private LikeTargetType likeTargetType;
 
+    @ManyToOne
+    @JoinColumn(nullable = true)
+    public Item item;
+    @ManyToOne
+    @JoinColumn(nullable = true)
+    public Review review;
+    @ManyToOne
+    @JoinColumn(nullable = true)
+    public Comment comment;
+    @ManyToOne
+    @JoinColumn(nullable = true)
+    public Post post;
     @ManyToOne
     @JoinColumn(name = "member_id")
     public Member member;
 
     @Builder
-    public Likes(Long id, Long targetId, LikeTargetType likeTargetType, Member member) {
+    public Likes(Long id, Item item, Review review, Comment comment, Post post, Member member) {
         this.id = id;
-        this.targetId = targetId;
-        this.likeTargetType = likeTargetType;
+        this.item = item;
+        this.review = review;
+        this.comment = comment;
+        this.post = post;
         this.member = member;
     }
 }

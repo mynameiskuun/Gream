@@ -10,6 +10,7 @@ import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.CartItem;
 import com.project.gream.domain.order.dto.KakaoPayDto;
+import com.project.gream.domain.order.dto.OrderRequestDto;
 import com.project.gream.domain.order.entity.OrderHistory;
 
 import java.util.List;
@@ -35,4 +36,5 @@ public interface ItemService {
     void updateItemStock(KakaoPayDto kakaoPayDto, OrderHistory orderHistory);
     List<Long> getLikedItemIds(String memberId);
     List<ItemDto> getLikedItemList(List<Long> itemIds);
+    boolean itemStockCheck(OrderRequestDto requestDto);
 }

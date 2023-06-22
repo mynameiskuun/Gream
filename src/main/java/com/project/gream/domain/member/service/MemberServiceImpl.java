@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -70,9 +71,15 @@ public class MemberServiceImpl implements MemberService {
 
         log.info("------------------------- 결제 완료된 장바구니 상품 삭제");
 
-        String[] cartItemArray = kakaoPayDto.getCartItemIds().split("/");
-        for (String cartItemId : cartItemArray) {
-            cartItemRepository.deleteById(Long.parseLong(cartItemId));
+//        String[] cartItemArray = kakaoPayDto.getCartItemIds().split("/");
+
+//        for (String cartItemId : cartItemArray) {
+//            cartItemRepository.deleteById(Long.parseLong(cartItemId));
+//        }
+
+        List<Long> cartItemArray = kakaoPayDto.getCartItemIds();
+        for (Long cartItemId : cartItemArray) {
+            cartItemRepository.deleteById(cartItemId);
         }
     }
 }

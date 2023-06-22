@@ -21,11 +21,6 @@ public class Comment extends BaseTimeEntity {
     private String content;
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int depth;
-    @Column(nullable = false)
-    private Long targetId;
-    @Convert(converter = CommentTargetTypeConverter.class)
-    private CommentTargetType commentTargetType;
-
     @ManyToOne
     @JoinColumn(name = "member_id")
     public Member member;

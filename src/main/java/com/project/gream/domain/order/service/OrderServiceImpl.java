@@ -49,6 +49,10 @@ public class OrderServiceImpl implements OrderService{
     private String cid;
     @Value("${kakaopay.adminKey}")
     private String adminKey;
+    @Value("${forLocalUrl}")
+    private String localUrl;
+    @Value("${forRealUrl}")
+    private String realUrl;
     public static final String ePw = createKey(); // 회원가입 인증, 비밀번호 변경 등 기능 추가시 사용
     private final JavaMailSender emailSender;
     private final HttpSession session;
@@ -76,9 +80,9 @@ public class OrderServiceImpl implements OrderService{
         parameters.add("quantity", String.valueOf(request.getSize()));
         parameters.add("total_amount", String.valueOf(request.getFinalPaymentAmount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com:8080/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
-        parameters.add("cancel_url", "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com:8080/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
-        parameters.add("fail_url", "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com:8080/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
+        parameters.add("approval_url", localUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
+        parameters.add("cancel_url", localUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
+        parameters.add("fail_url", localUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
 
         log.info("--------------------- 결제준비 parameters : " + parameters);
 
@@ -161,18 +165,37 @@ public class OrderServiceImpl implements OrderService{
     public void saveOrderItems(KakaoPayDto kakaoPayDto, OrderHistory orderHistory) {
 
         log.info("------------------------ 주문상품 저장");
-        String[] itemArray = kakaoPayDto.getItemIds().split("/");
-        String[] qtyArray = kakaoPayDto.getItemQtys().split("/");
 
-        for (int i = 0; i<itemArray.length; i++) {
-            Item item = itemRepository.findById(Long.valueOf(itemArray[i]))
+//        String[] itemArray = kakaoPayDto.getItemIds().split("/");
+//        String[] qtyArray = kakaoPayDto.getItemQtys().split("/");
+
+//        for (int i = 0; i<itemArray.length; i++) {
+//            Item item = itemRepository.findById(Long.valueOf(itemArray[i]))
+//                    .orElseThrow(() -> new NoSuchElementException());
+//
+//            OrderItem orderItem = OrderItem.builder()
+//                    .orderHistory(orderHistory)
+//                    .quantity(Integer.parseInt(qtyArray[i]))
+//                    .state("배송 준비중")
+//                    .totalPrice(item.getPrice() * Integer.parseInt(qtyArray[i]))
+//                    .item(item)
+//                    .build();
+//
+//            orderItemRepository.save(orderItem);
+//        }
+
+        List<Long> itemIdArray = kakaoPayDto.getItemIds();
+        List<Integer> qtyArray = kakaoPayDto.getItemQtys();
+
+        for (int i = 0; i<itemIdArray.size(); i++) {
+            Item item = itemRepository.findById(itemIdArray.get(i))
                     .orElseThrow(() -> new NoSuchElementException());
 
             OrderItem orderItem = OrderItem.builder()
                     .orderHistory(orderHistory)
-                    .quantity(Integer.parseInt(qtyArray[i]))
+                    .quantity(qtyArray.get(i))
                     .state("배송 준비중")
-                    .totalPrice(item.getPrice() * Integer.parseInt(qtyArray[i]))
+                    .totalPrice(item.getPrice() * qtyArray.get(i))
                     .item(item)
                     .build();
 
@@ -224,7 +247,7 @@ public class OrderServiceImpl implements OrderService{
     public List<OrderItemDto> findOrderItemForMypage(String memberId) {
 
         log.info("------------------------------ 회원 아이디로 주문한 상품 출력 - 마이페이지");
-        List<OrderItem> orderItems = orderItemRepository.findTop4ByOrderHistory_Member_Id(memberId);
+        List<OrderItem> orderItems = orderItemRepository.findTop4ByOrderHistory_Member_IdOrderByCreatedTimeDesc(memberId);
 
         return orderItems.stream()
                 .map(OrderItemDto::fromEntity)

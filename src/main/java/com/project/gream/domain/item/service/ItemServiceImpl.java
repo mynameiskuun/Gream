@@ -17,6 +17,7 @@ import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.CartItem;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.order.dto.KakaoPayDto;
+import com.project.gream.domain.order.dto.OrderRequestDto;
 import com.project.gream.domain.order.entity.OrderHistory;
 import com.project.gream.domain.post.entity.QLikes;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -195,13 +196,23 @@ public class ItemServiceImpl implements ItemService{
 
         log.info("--------------------------- 주문 완료 후 상품 재고 변경");
 
-        String[] itemArray = kakaoPayDto.getItemIds().split("/");
-        String[] qtyArray = kakaoPayDto.getItemQtys().split("/");
+//        String[] itemArray = kakaoPayDto.getItemIds().split("/");
+//        String[] qtyArray = kakaoPayDto.getItemQtys().split("/");
 
-        for (int i = 0; i < itemArray.length; i++) {
-            Item item = itemRepository.findById(Long.valueOf(itemArray[i]))
+        List<Long> itemArray = kakaoPayDto.getItemIds();
+        List<Integer> qtyArray = kakaoPayDto.getItemQtys();
+
+//        for (int i = 0; i < itemArray.length; i++) {
+//            Item item = itemRepository.findById(Long.valueOf(itemArray[i]))
+//                    .orElseThrow(() -> new NoSuchElementException("상품 재고 갱신 중 오류가 발생 했습니다."));
+//            item.updateItemStock(item.getItemStock() - Integer.parseInt(qtyArray[i]));
+//            itemRepository.save(item); // 주문 수량만큼 재고 -
+//        }
+
+        for (int i = 0; i < itemArray.size(); i++) {
+            Item item = itemRepository.findById(itemArray.get(i))
                     .orElseThrow(() -> new NoSuchElementException("상품 재고 갱신 중 오류가 발생 했습니다."));
-            item.updateItemStock(item.getItemStock() - Integer.parseInt(qtyArray[i]));
+            item.updateItemStock(item.getItemStock() - qtyArray.get(i));
             itemRepository.save(item); // 주문 수량만큼 재고 -
         }
     }
@@ -212,10 +223,9 @@ public class ItemServiceImpl implements ItemService{
         QLikes likes = QLikes.likes;
 
         return queryFactory
-                .select(likes.targetId)
+                .select(likes.item.id)
                 .from(likes)
-                .where(likes.member.id.eq(memberId),
-                        likes.likeTargetType.eq(LikeTargetType.ITEM))
+                .where(likes.member.id.eq(memberId))
                 .fetch();
     }
 
@@ -228,6 +238,12 @@ public class ItemServiceImpl implements ItemService{
                 .map(ItemDto::fromEntity)
                 .limit(6)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean itemStockCheck(OrderRequestDto requestDto) {
+        Item item = itemRepository.findById(requestDto.getItemDto().getId()).orElseThrow();
+        return item.getItemStock() > 0;
     }
 
 }

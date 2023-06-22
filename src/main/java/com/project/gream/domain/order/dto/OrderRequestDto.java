@@ -15,5 +15,6 @@ public class OrderRequestDto {
 
     private List<CartItemDto> cartItemDtoList;
     private ItemDto itemDto;
+    private int quantity;
 
 }

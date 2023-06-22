@@ -13,6 +13,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "FROM Review r " +
             "WHERE r.item.id = :itemId")
     List<Integer> getReviewScore(@Param("itemId") Long itemId);
-
     List<Review> findAllById(Long itemId);
+    List<Review> findAllByItem_Id(Long itemId);
 }

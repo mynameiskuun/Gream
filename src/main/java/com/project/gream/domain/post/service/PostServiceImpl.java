@@ -1,8 +1,11 @@
 package com.project.gream.domain.post.service;
 
+import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.common.enumlist.LikeTargetType;
 import com.project.gream.domain.item.entity.Img;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;
+import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.dto.LikesVO;
 import com.project.gream.domain.post.dto.LikesResponseDto;
 import com.project.gream.domain.post.dto.ReviewDto;
@@ -21,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.project.gream.domain.post.entity.QLikes.likes;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -92,51 +94,169 @@ public class PostServiceImpl implements PostService{
     @Override
     public Likes isAlreadyLiked(LikesVO likesVO) {
 
+        // 어떤 fk가 들어있는지 확인하고, 해당 fk에 따라 다른 repository에서 탐색
+
         log.info("-------------------------- 회원이 이미 좋아한 게시물인지 확인");
 
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
-        return queryFactory
-                .selectFrom(likes)
-                .where(likes.member.id.eq(likesVO.getMemberDto().getId()),
-                        likes.targetId.eq(likesVO.getTargetId()),
-                        likes.likeTargetType.eq(likesVO.getLikeTargetType()))
-                .fetchOne();
+        Likes like = new Likes();
+
+        if (likesVO.getItemDto() != null) {
+            like = queryFactory
+                    .selectFrom(likes)
+                    .where(likes.member.id.eq(likesVO.getMemberDto().getId()).and(likes.item.id.eq(likesVO.getItemDto().getId())))
+                    .fetchOne();
+        } else if (likesVO.getReviewDto() != null) {
+            like =  queryFactory
+                    .selectFrom(likes)
+                    .where(likes.member.id.eq(likesVO.getMemberDto().getId()).and(likes.review.id.eq(likesVO.getReviewDto().getId())))
+                    .fetchOne();
+        } else if (likesVO.getCommentDto() != null) {
+            like =  queryFactory
+                    .selectFrom(likes)
+                    .where(likes.member.id.eq(likesVO.getMemberDto().getId()).and(likes.comment.id.eq(likesVO.getCommentDto().getId())))
+                    .fetchOne();
+        } else if (likesVO.getPostDto() != null) {
+            like =  queryFactory
+                    .selectFrom(likes)
+                    .where(likes.member.id.eq(likesVO.getMemberDto().getId()).and(likes.post.id.eq(likesVO.getPostDto().getId())))
+                    .fetchOne();
+        }
+        return like;
     }
 
     @Transactional
     @Override
-    public LikesResponseDto saveOrDeleteLike(LikesVO likesVO) {
+    public LikesResponseDto saveOrDeleteItemLike(LikesVO likesVO) {
 
         log.info("-------------------------- 좋아요 db 저장 or 삭제");
-
         Likes likes = this.isAlreadyLiked(likesVO);
         String backgroundColor;
 
         if (likes == null) {
-            likesRepository.save(likesVO.toEntity());
+            if (likesVO.getItemDto() != null) {
+                likesRepository.save(Likes.builder()
+                        .item(likesVO.getItemDto().toEntity())
+                        .member(likesVO.getMemberDto().toEntity())
+                        .build());
+            } else if (likesVO.getReviewDto() != null) {
+                likesRepository.save(Likes.builder()
+                        .review(likesVO.getReviewDto().toEntity())
+                        .member(likesVO.getMemberDto().toEntity())
+                        .build());
+            } else if (likesVO.getCommentDto() != null) {
+                likesRepository.save(Likes.builder()
+//                        .comment(likesVO.getCommentDto().toEntity())
+                        .member(likesVO.getMemberDto().toEntity())
+                        .build());
+            } else if (likesVO.getPostDto() != null) {
+                likesRepository.save(Likes.builder()
+//                        .post(likesVO.getPostDto().toEntity())
+                        .member(likesVO.getMemberDto().toEntity())
+                        .build());
+            }
             backgroundColor = "lightcoral";
         } else {
             likesRepository.delete(likes);
             backgroundColor = "white";
         }
 
-        int likeCount = likesRepository.countByTargetIdAndLikeTargetType(
-                likesVO.getTargetId(), likesVO.getLikeTargetType());
-
+        Long likeCount = this.getLikeCount(likesVO);
         return new LikesResponseDto(likeCount, backgroundColor);
     }
 
-//    @Override
-//    public LikesResponseDto checkLike(LikesRequestDto req, @LoginMember MemberDto memberDto) {
-//
-//        // 로그인 안했다면 -> 해당 아이템, 리뷰, 댓글의 좋아요 count 수 만 검색해서 반환.
-//        if (memberDto == null) {
-//
-//        }
-//        // 로그인 했다면 -> 아이디 & itemId, reviewId, commentId 검색해서 결과 조회하고, count수 & bgcolor 반환.
-//
-//        likesRepository.
-//    }
+    @Override
+    public LikesResponseDto checkLike(Long itemId, @LoginMember MemberDto memberDto) {
+
+        log.info("------------------------- 상품 상세페이지의 좋아요 갯수 반환");
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        Map<String, String> itemLikeBackgroundColorMap = new HashMap<>();
+        Map<Long, Long> reviewLikeCountsMap = new HashMap<>();
+        Map<String, String> reviewLikeBackgroundColorMap = new HashMap<>();
+
+        // 상품 좋아요 갯수
+        Long itemLikesCount = queryFactory.select(likes.count())
+                                .from(likes)
+                                .where(likes.item.id.eq(itemId))
+                                .fetchOne();
+
+        if (memberDto == null) {
+            List<Long> reviewIdList = reviewRepository.findAllByItem_Id(itemId).stream()
+                    .map(Review::getId)
+                    .collect(Collectors.toList());
+
+            Map<Long, Long> reviewLikesMap = new HashMap<>();
+
+            for (Long reviewId : reviewIdList) {
+            Long reviewLikeCount = queryFactory.select(likes.count())
+                    .from(likes)
+                    .where(likes.review.id.eq(reviewId))
+                    .fetchOne();
+
+            reviewLikesMap.put(reviewId, reviewLikeCount);
+            }
+
+            return LikesResponseDto.builder()
+                    .itemLikesCount(itemLikesCount)
+                    .reviewLikesMap(reviewLikesMap)
+                    .build();
+        } else {
+            // ------------------ 상품 좋아요 map 구성
+
+            if (likesRepository.existsByItem_IdAndMember_Id(itemId, memberDto.getId())) {
+                itemLikeBackgroundColorMap.put(memberDto.getId(), "lightcoral");
+            } else {
+                itemLikeBackgroundColorMap.put(memberDto.getId(), "white");
+            }
+
+            // 리뷰 좋아요 갯수
+            // 리뷰 아이디 / 좋아요 갯수 map으로 담아서 반환 후 출력.
+            List<Long> reviewIdList = reviewRepository.findAllByItem_Id(itemId).stream()
+                    .map(Review::getId)
+                    .collect(Collectors.toList());
+
+            for (Long reviewId : reviewIdList) {
+//                Map<Long, Map<Long, String>> reviewLikesMap = new HashMap<>();
+//                Map<Long, String> reviewDetailMap = new HashMap<>();
+
+                Long reviewLikeCount = queryFactory.select(likes.count())
+                        .from(likes)
+                        .where(likes.review.id.eq(reviewId))
+                        .fetchOne();
+
+                reviewLikeCountsMap.put(reviewId, reviewLikeCount);
+
+                if (likesRepository.existsByReview_IdAndMember_Id(reviewId, memberDto.getId())) {
+                    reviewLikeBackgroundColorMap.put(memberDto.getId(), "lightcoral");
+                } else {
+                    reviewLikeBackgroundColorMap.put(memberDto.getId(), "white");
+                }
+            }
+        }
+        return LikesResponseDto.builder()
+                .itemLikeBackgroundColorMap(itemLikeBackgroundColorMap)
+                .itemLikesCount(itemLikesCount)
+                .reviewLikeCountsMap(reviewLikeCountsMap)
+                .reviewLikeBackgroundColorMap(reviewLikeBackgroundColorMap)
+                .build();
+    }
+
+    private Long getLikeCount(LikesVO likesVO) {
+
+        Long likeCount = 0L;
+
+        if (likesVO.getItemDto() != null) {
+            likeCount = likesRepository.countByItem_Id(likesVO.getItemDto().getId());
+        } else if (likesVO.getReviewDto() != null) {
+            likeCount = likesRepository.countByReview_Id(likesVO.getReviewDto().getId());
+        } else if (likesVO.getCommentDto() != null) {
+            likeCount = likesRepository.countByComment_Id(likesVO.getCommentDto().getId());
+        } else if (likesVO.getPostDto() != null) {
+            likeCount = likesRepository.countByPost_Id(likesVO.getPostDto().getId());
+        }
+        return likeCount;
+    }
 
 }

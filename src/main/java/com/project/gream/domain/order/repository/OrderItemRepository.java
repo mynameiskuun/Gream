@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
-    List<OrderItem> findTop4ByOrderHistory_Member_Id(String memberId);
+    List<OrderItem> findTop4ByOrderHistory_Member_IdOrderByCreatedTimeDesc(String memberId);
     Page<OrderItem> findAllByOrderHistory_Member_Id(String memberId, Pageable pageable);
 
 }

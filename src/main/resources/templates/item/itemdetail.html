@@ -37,12 +37,19 @@
                 <div id="order-button-box">
                     <button class="btn btn-outline-secondary" id="orderBtn">주문하기</button>
                     <button class="btn btn-outline-secondary" id="cartBtn" onclick="cartBtn()">장바구니 추가</button>
-                    <div id="item-like-box">
-                        <div id="item-thumbs-up"></div>
+                    <div class="item-like-box" th:if="${session.loginMember eq null}" style="background: white">
+                        <div class="item-thumbs-up"></div>
                         <div class="like-title">좋아요</div>
                         <input type="hidden" th:value="${item.id}"/>
                         <input type="hidden" class="target" value="ITEM" />
-                        <div class="like-counts"></div>
+                        <div class="like-counts" th:text="${likes.itemLikesCount}"></div>
+                    </div>
+                    <div class="item-like-box" th:style="'background: ' + ${likes.itemLikeBackgroundColorMap.get(session.loginMember.id)}" th:unless="${session.loginMember eq null} ">
+                        <div class="item-thumbs-up"></div>
+                        <div class="like-title">좋아요</div>
+                        <input type="hidden" th:value="${item.id}"/>
+                        <input type="hidden" class="target" value="ITEM" />
+                        <div class="like-counts" th:text="${likes.itemLikesCount}"></div>
                     </div>
                 </div>
             </div>
@@ -179,7 +186,7 @@
                                             </div>
                                         </div>
                                         <div class="review-like-box">
-                                            <div id="review-thumbs-up"></div>
+                                            <div class="review-thumbs-up"></div>
                                             <div class="like-title">도움돼요</div>
                                             <input type="hidden" th:value="${reviewList.id}"/>
                                             <div class="like-counts"></div>
@@ -322,16 +329,32 @@
         if([[${session.loginMember}]] == null) {
             alert('로그인을 해주세요')
             location.href = '/login';
-        } else {
-            let orderQuantity = $('#orderQuantity').val();
-            let itemDto = [[${item}]];
-
-            localStorage.setItem("itemDto", JSON.stringify(itemDto));
-            localStorage.setItem("orderQuantity", orderQuantity);
-            localStorage.setItem('itemImg', imgList[0].modImgName);
-
-            location.href='/detail/order/' + itemDto.getItemId();
         }
+
+        let data = {
+            quantity : $('#orderQuantity').val(),
+            itemDto : [[${item}]]
+        }
+
+        $.ajax({
+            url : "/order",
+            type: "POST",
+            contentType: "application/JSON; charset=UTF-8;",
+            data: JSON.stringify(data),
+            dataType: "text",
+            success: function (itemStockFlag) {
+                if (itemStockFlag) {
+                    location.href="/order?itemId=" + data.itemDto.id + "&quantity=" + data.quantity;
+                } else {
+                    alert("상품이 품절 되었습니다.");
+                }
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        })
+
+
     })
 
     // 모달창 장바구니 버튼 이벤트 메소드
@@ -350,7 +373,8 @@
     }
 
     // 상품 구매 후기 만족도 조사 이벤트
-    window.onload = function() {
+    // window.onload = function() {
+    $(document).ready(function() {
 
         // 리뷰 작성자의 별 점수 출력 이벤트
         $('.review-star-value').each(function() {
@@ -359,42 +383,53 @@
 
         let starMap = [[${starValMap}]];
         let size = [[${starValMap[0]}]]
-        $('#satisfied-rate').html(getSatisfiedRate(starMap) + '%')
-
-        console.log("map : " + starMap);
-        console.log('mapSize = ' + size);
-        console.log(starMap[1])
-
-        // for (let i = 1; i <= 5; i++) {
-        //     size += starMap[i];
-        //     console.log("starMap["+i+"] : " + starMap[i])
-        // }
-
         let sum = 0;
         let originalPercentage;
         let roundedPercentage;
         let progressDomList = document.querySelectorAll('.progress-bar');
         let percentageDomList = document.querySelectorAll('.percentage');
 
-        for(let i=1; i<=5; i++) {
-            originalPercentage = starMap[i] / size * 100.0;
-            progressDomList[5-i].style.width = originalPercentage + '%';
-            roundedPercentage = Math.round(originalPercentage);
-            percentageDomList[5-i].innerHTML = roundedPercentage + "%";
-            sum += roundedPercentage;
+        console.log("starMap" + starMap);
 
+        if (size === 0) {
+            $('#satisfied-rate').html("아직 리뷰가 등록되지 않은 상품입니다.");
+            $('#satisfied-rate').next().html("");
+            for (let i = 0; i <= 4; i++) {
+                percentageDomList[i].innerHTML = "0%";
+            }
+        } else {
+            $('#satisfied-rate').html(getSatisfiedRate(starMap) + '%');
+            for(let i=1; i<=5; i++) {
+                originalPercentage = starMap[i] / size * 100.0;
+                progressDomList[5-i].style.width = originalPercentage + '%';
+                roundedPercentage = Math.round(originalPercentage);
+                percentageDomList[5-i].innerHTML = roundedPercentage + "%";
+                sum += roundedPercentage;
+            }
         }
+
+        console.log("map : " + starMap);
+        console.log('mapSize = ' + size);
+        console.log(starMap[1])
+        console.log("git test")
+
+        // for (let i = 1; i <= 5; i++) {
+        //     size += starMap[i];
+        //     console.log("starMap["+i+"] : " + starMap[i])
+        // }
+
         starMap = 0;
         size = 0;
-    }
+    })
 
     // 상품후기 긍정 평가 비율 계산 이벤트
     function getSatisfiedRate(scoreMap) {
         return Math.round((scoreMap[4] / scoreMap[0] * 100.0) + (scoreMap[5] / scoreMap[0] * 100.0))
     }
 
-    // 리뷰 좋아요 이벤트
-    function like() {
+
+    // 상품 좋아요 click 이벤트
+    function itemLike() {
 
         // 좋아요 이벤트 시 필요한 데이터
         // 해당 타겟 id(리뷰? 아이템?)
@@ -403,23 +438,21 @@
 
         let clickedElement = $(this);
         let memberDto;
-        let targetId = $(this).parent().find('input[type="hidden"]').val();
-        let likeTargetType = $(this).parent().find('input[class="target"]').val();
+        // let itemId = $(this).parent().find('input[type="hidden"]').val();
 
         if ([[${session.loginMember}]] == null) {
             alert('로그인을 해주세요');
-            location.reload();
+            location.href = '/login';
         } else
             memberDto = [[${session.loginMember}]]
 
         let data = {
-            "targetId" : targetId,
+            "itemDto" : [[${item}]],
             "memberDto" : memberDto,
-            "likeTargetType" : likeTargetType
         };
 
         $.ajax({
-            url: '/test/like',
+            url: '/item/like',
             type: 'POST',
             contentType: 'application/json; charset=UTF-8',
             dataType : 'JSON',
@@ -436,60 +469,60 @@
     }
 
     // 로그인, 리뷰 좋아요 유무에 따른 css 변경 이벤트
-    window.onload = function() {
+    // window.onload = function() {
+    //
+    //     let itemId = [[${item.id}]];
+    //     let reviewList = [[${reviewList}]] || [];
+    //     let commentList = [[${commentList}]] || [];
+    //
+    //     let reviewIdList = [];
+    //     let commentIdList = [];
+    //
+    //     reviewList.forEach((review) => {
+    //         reviewIdList.push(review.id);
+    //     });
+    //
+    //     commentList.forEach((comment) => {
+    //         commentIdList.push(comment.id)
+    //     })
+    //
+    //     console.log("itemId : " + itemId);
+    //     console.log("reviewList : " + reviewList);
+    //     console.log("reviewIdList : " + reviewIdList);
+    //     console.log("commentList : " + commentList);
+    //     console.log("commentIdList : " + commentIdList);
+    //
+    //     let data = {
+    //         "itemId" : itemId,
+    //         "reviewIdList": reviewIdList,
+    //         "commentIdList" : commentIdList
+    //     }
+    //
+    //     // 보내야 할 데이터
+    //     // item id, review id list, comment id list
+    //     // 로그인 유저 id
+    //
+    //     // 로그인 안했으면 좋아요 count 표시.
+    //     // 로그인 했고 좋아요 안눌렀으면 count 표시.
+    //     // 로그인 했고 좋아요 눌렀으면 배경색 바꾸고 count 표시.
+    //
+    //     $.ajax({
+    //         url: '/test/likecheck',
+    //         method: 'POST',
+    //         contentType: 'application/JSON; charset=UTF-8',
+    //         dataType: 'JSON',
+    //         data: JSON.stringify(data),
+    //         success: function (result) {
+    //             console.log(JSON.parse(result))
+    //         },
+    //         error: function (error) {
+    //             console.log(error)
+    //         },
+    //     })
+    // }
 
-        let itemId = [[${item.id}]];
-        let reviewList = [[${reviewList}]] || [];
-        let commentList = [[${commentList}]] || [];
-
-        let reviewIdList = [];
-        let commentIdList = [];
-
-        reviewList.forEach((review) => {
-            reviewIdList.push(review.id);
-        });
-
-        commentList.forEach((comment) => {
-            commentIdList.push(comment.id)
-        })
-
-        console.log("itemId : " + itemId);
-        console.log("reviewList : " + reviewList);
-        console.log("reviewIdList : " + reviewIdList);
-        console.log("commentList : " + commentList);
-        console.log("commentIdList : " + commentIdList);
-
-        let data = {
-            "itemId" : itemId,
-            "reviewIdList": reviewIdList,
-            "commentIdList" : commentIdList
-        }
-
-        // 보내야 할 데이터
-        // item id, review id list, comment id list
-        // 로그인 유저 id
-
-        // 로그인 안했으면 좋아요 count 표시.
-        // 로그인 했고 좋아요 안눌렀으면 count 표시.
-        // 로그인 했고 좋아요 눌렀으면 배경색 바꾸고 count 표시.
-
-        $.ajax({
-            url: '/test/likecheck',
-            method: 'GET',
-            contentType: 'application/JSON; charset=UTF-8',
-            dataType: 'JSON',
-            data: JSON.stringify(data),
-            success: function (result) {
-                console.log(JSON.parse(result))
-            },
-            error: function (error) {
-                console.log(error)
-            },
-        })
-    }
-
-    $('#item-thumbs-up').click(like);
-    $('#review-thumbs-up').click(like);
+    $('.item-thumbs-up').click(itemLike);
+    // $('.review-thumbs-up').click(like);
 
     /*]]*/
 </script>
