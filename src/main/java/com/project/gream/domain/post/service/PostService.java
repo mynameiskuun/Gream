@@ -17,6 +17,7 @@ public interface PostService {
     Map<Integer, Integer> getReviewScoreByItemId(Long itemId);
     List<ReviewDto> getReviewDtoById(Long itemId);
     Likes isAlreadyLiked(LikesVO likesVO);
-    LikesResponseDto saveOrDeleteLike(LikesVO likesVO);
+    LikesResponseDto saveOrDeleteItemLike(LikesVO likesVO);
+    LikesResponseDto checkLike(Long itemId, @LoginMember MemberDto memberDto);
 //    LikesResponseDto checkLike(LikesRequestDto req, @LoginMember MemberDto memberDto, );
 }

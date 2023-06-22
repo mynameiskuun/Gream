@@ -170,6 +170,11 @@
       setPrice();
     })
 
+    function toValueArray(domList) {
+      return domList.map(function() {
+        return parseInt($(this).val());
+      }).get();
+    }
 
     $('#btn-kakao-pay').on('click', function(){
 
@@ -181,28 +186,36 @@
       let size = $('.order-items').length;
       let itemName = $('.item-name').first().html();
       let finalPaymentAmount = removeComma($('#payment-amount').html());
-      let itemCodeArray = $('.order-item-id');
-      let itemQtyArray = $('.item-qty');
-      let cartIdArray = $('.cart-item-id');
+      // let itemIds = $('.order-item-id');
+      // let itemQtys = $('.item-qty');
+      // let cartItemIds = $('.cart-item-id');
+      let itemIds = toValueArray($('.order-item-id'));
+      let cartItemIds = toValueArray($('.cart-item-id'));
+      let itemQtys = $('.item-qty').map(function() {
+        return parseInt($(this).html());
+      }).get();
 
-      let itemQtys = "";
-      let itemIds = "";
-      let cartItemIds = "";
+      // let itemQtys = "";
+      // let itemIds = "";
+      // let cartItemIds = "";
+    //
+    // if(itemCodeArray.length === 1) {
+    //   itemIds += itemCodeArray[0].value;
+    //   cartItemIds += cartIdArray[0].value;
+    //   itemQtys += itemQtyArray[0].innerText;
+    // } else {
+    //   for(let i=0; i<itemCodeArray.length-1; i++) {
+    //     cartItemIds += cartIdArray[i].value + "/"
+    //     itemIds += itemCodeArray[i].value + "/"
+    //     itemQtys += itemQtyArray[i].innerText + "/"
+    //   }
+    //   itemIds += itemCodeArray[itemCodeArray.length-1].value;
+    //   cartItemIds += cartIdArray[cartIdArray.length-1].value;
+    //   itemQtys += itemQtyArray[itemQtyArray.length-1].innerText;
+    // }
 
-    if(itemCodeArray.length === 1) {
-      itemIds += itemCodeArray[0].value;
-      cartItemIds += cartIdArray[0].value;
-      itemQtys += itemQtyArray[0].innerText;
-    } else {
-      for(let i=0; i<itemCodeArray.length-1; i++) {
-        cartItemIds += cartIdArray[i].value + "/"
-        itemIds += itemCodeArray[i].value + "/"
-        itemQtys += itemQtyArray[i].innerText + "/"
-      }
-      itemIds += itemCodeArray[itemCodeArray.length-1].value;
-      cartItemIds += cartIdArray[cartIdArray.length-1].value;
-      itemQtys += itemQtyArray[itemQtyArray.length-1].innerText;
-    }
+
+
     // 각 구매 품목의 상품 id를 담을 list
 
     console.log("totalPayPrice : " + finalPaymentAmount);
@@ -217,18 +230,31 @@
     console.log("cartItemIds : " + cartItemIds);
     console.log("itemQtys : " + itemQtys);
 
-    let data = {
-        name,
-        size,
-        itemName,
-        finalPaymentAmount,
-        tel,
-        email,
-        usePoint,
-        itemIds,
-        itemQtys,
-        cartItemIds
-    }
+    // let data = {
+    //     name,
+    //     size,
+    //     itemName,
+    //     finalPaymentAmount,
+    //     tel,
+    //     email,
+    //     usePoint,
+    //     itemIds,
+    //     itemQtys,
+    //     cartItemIds
+    // }
+
+      let data = {
+        name : name,
+        size : size,
+        itemName : itemName,
+        finalPaymentAmount : finalPaymentAmount,
+        tel : tel,
+        email : email,
+        usePoint : usePoint,
+        itemIds : itemIds,
+        itemQtys : itemQtys,
+        cartItemIds : cartItemIds
+      }
 
     // 카카오페이 결제전송
       $.ajax({

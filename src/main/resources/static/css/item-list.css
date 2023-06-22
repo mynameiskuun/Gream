@@ -16,6 +16,7 @@
 }
 .item-header {
     margin-left: 50px;
+    margin-bottom: 100px;
 }
 .item-body {
     flex-wrap: wrap;

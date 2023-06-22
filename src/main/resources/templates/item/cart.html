@@ -73,9 +73,6 @@
                                         </td>
                                     </tr>
                                 </th:block>
-                                <th:block th:unless="${cartItem ne null}">
-                                    <h3>장바구니에 담은 상품이 없습니다</h3>
-                                </th:block>
                             </tbody>
                         </table>
                     </div>
@@ -262,7 +259,6 @@
             }
         })
     })
-
 
     // // 주문하기 버튼 이벤트 메소드
     // $('#orderBtn').click(function() {

@@ -29,7 +29,6 @@ public class OrderController {
     private final MemberService memberService;
     private final OrderService orderService;
 
-
     @PostMapping("/cart/order")
     public ModelAndView toOrderFromCart(String cartItemIds) {
         ModelAndView mav = new ModelAndView();
@@ -44,10 +43,17 @@ public class OrderController {
     }
 
     @PostMapping("/order")
-    public ModelAndView toOrderFromDetail(ItemDto itemDto, int orderQuantity) {
+    public boolean itemStockCheck(@RequestBody OrderRequestDto req) {
+        return itemService.itemStockCheck(req);
+    }
+
+    @GetMapping("/order")
+    public ModelAndView toOrderFromDetail(int quantity, Long itemId) {
         ModelAndView mav = new ModelAndView();
+
+        ItemDto itemDto = itemService.getItemById(itemId);
+        mav.addObject("orderQuantity", quantity);
         mav.addObject("itemDto", itemDto);
-        mav.addObject("orderQuantity", orderQuantity);
         mav.setViewName("order/order");
         return mav;
     }
@@ -56,6 +62,10 @@ public class OrderController {
     public KakaoPayRequestVO requestKakaoPay(@RequestBody KakaoPayDto request, Model model) {
 
         KakaoPayRequestVO response = orderService.kakaoPayReady(request);
+
+        log.info("itemIdArray : " + request.getItemIds().toString());
+        log.info("itemQtyArrays : " + request.getItemQtys().toString());
+        log.info("cartItemIdArrays : " + request.getCartItemIds().toString());
 
         model.addAttribute("kakaoPayDto", request);
         model.addAttribute("tid", response.getTid());

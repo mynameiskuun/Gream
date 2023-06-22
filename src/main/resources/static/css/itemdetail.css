@@ -234,7 +234,7 @@
 .review-features-container div {
     margin-right: 15px;
 }
-#item-like-box {
+.item-like-box {
     display: flex;
     justify-content: space-evenly;
     width: 130px;
@@ -265,7 +265,7 @@
 .review-reply-box div {
     margin-bottom: 20px;
 }
-#item-thumbs-up {
+.item-thumbs-up {
     background-color: steelblue;
     border-radius: 50%;
     height: 25px;
@@ -276,7 +276,7 @@
     background-position-y: 0px;
     background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png");
 }
-#review-thumbs-up {
+.review-thumbs-up {
     background-color: steelblue;
     border-radius: 50%;
     height: 25px;
@@ -333,5 +333,7 @@
 #item-detail-body {
     width: 90%;
     padding: 100px 100px;
-
+}
+.like-item-name {
+    margin-left: 25px;
 }

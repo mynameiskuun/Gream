@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -16,7 +18,12 @@ public class KakaoPayDto {
     private int size;
     private String itemName;
     private long finalPaymentAmount;
-    private String itemIds;
-    private String itemQtys;
-    private String cartItemIds;
+//    private String itemIds;
+//    private String itemQtys;
+//    private String cartItemIds;
+
+    private List<Long> itemIds;
+    private List<Integer> itemQtys;
+    private List<Long> cartItemIds;
+
 }

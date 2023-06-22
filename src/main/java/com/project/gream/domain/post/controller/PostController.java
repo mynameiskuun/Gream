@@ -35,12 +35,12 @@ public class PostController {
         return "";
     }
 
-    @PostMapping("/test/like")
-    public LikesResponseDto like(@RequestBody LikesVO likesVO) {
-        return postService.saveOrDeleteLike(likesVO);
+    @PostMapping("/item/like")
+    public LikesResponseDto itemLike(@RequestBody LikesVO likesVO) {
+        return postService.saveOrDeleteItemLike(likesVO);
     }
 
-    @GetMapping("/test/likecheck")
+    @PostMapping("/test/likecheck")
     public String likeCheck(@RequestBody LikesRequestDto req, @LoginMember MemberDto memberDto) {
 
 //        postService.checkLike(req, memberDto);
