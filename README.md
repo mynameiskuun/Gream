@@ -1,7 +1,7 @@
 # Gream
 의류 전문 온라인 쇼핑몰.
 
-### ⭐️ [프로젝트 바로가기](ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com)
+### ⭐️ [프로젝트 바로가기](http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com)
 
 ### ⭐️ 프로젝트 기간
 2023/04/15 ~ 진행중
