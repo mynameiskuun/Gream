@@ -1,6 +1,8 @@
 package com.project.gream.domain.order.service;
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.common.enumlist.OrderState;
+import com.project.gream.common.util.StringToEnumUtil;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.item.repository.ItemRepository;
@@ -16,8 +18,6 @@ import com.project.gream.domain.order.repository.OrderHistoryRepository;
 import com.project.gream.domain.order.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Or;
-import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +35,7 @@ import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -43,14 +44,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
 
     @Value("${kakaopay.cid}")
     private String cid;
     @Value("${kakaopay.adminKey}")
     private String adminKey;
     private final String kakaoPayLocalUrl = "http://localhost:9999";
-    private final String kakaoPayRealUrl = "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com";
     public static final String ePw = createKey(); // 회원가입 인증, 비밀번호 변경 등 기능 추가시 사용
     private final JavaMailSender emailSender;
     private final HttpSession session;
@@ -78,9 +78,9 @@ public class OrderServiceImpl implements OrderService{
         parameters.add("quantity", String.valueOf(request.getSize()));
         parameters.add("total_amount", String.valueOf(request.getFinalPaymentAmount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", kakaoPayRealUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
-        parameters.add("cancel_url", kakaoPayRealUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
-        parameters.add("fail_url", kakaoPayRealUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
+        parameters.add("approval_url", kakaoPayLocalUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
+        parameters.add("cancel_url", kakaoPayLocalUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
+        parameters.add("fail_url", kakaoPayLocalUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
 
         log.info("--------------------- 결제준비 parameters : " + parameters);
 
@@ -150,10 +150,10 @@ public class OrderServiceImpl implements OrderService{
         Member member = memberRepository.findById(memberDto.getId()).orElseThrow();
 
         OrderHistory orderHistory = OrderHistory.builder()
-                                    .member(member)
-                                    .usePoint(kakaoPayDto.getUsePoint())
-                                    .totalOrderPrice(kakaoPayDto.getFinalPaymentAmount())
-                                    .build();
+                .member(member)
+                .usePoint(kakaoPayDto.getUsePoint())
+                .totalOrderPrice(kakaoPayDto.getFinalPaymentAmount())
+                .build();
 
         orderHistoryRepository.save(orderHistory);
 
@@ -185,7 +185,7 @@ public class OrderServiceImpl implements OrderService{
         List<Long> itemIdArray = kakaoPayDto.getItemIds();
         List<Integer> qtyArray = kakaoPayDto.getItemQtys();
 
-        for (int i = 0; i<itemIdArray.size(); i++) {
+        for (int i = 0; i < itemIdArray.size(); i++) {
             Item item = itemRepository.findById(itemIdArray.get(i))
                     .orElseThrow(() -> new NoSuchElementException());
 
@@ -219,24 +219,24 @@ public class OrderServiceImpl implements OrderService{
         message.addRecipients(Message.RecipientType.TO, memberDto.getEmail()); // 보내는 대상
         message.setSubject(memberDto.getName() + " 님의 결제 내역"); // 제목
 
-        String msgg="";
-        msgg+= "<div style='margin:20px;'>";
-        msgg+= "<h1>" + memberDto.getName() +  " 님의 구매 내역입니다. </h1>";
-        msgg+= "<br>";
-        msgg+= "<div align='center' style='border:1px solid black; font-family:verdana';>";
-        msgg+= "<div><span><h4>상품명</h4></span><span> " + result.getItem_name() + "</span></div>";
-        msgg+= "<br>";
-        msgg+= "<div><span><h4>결제 수단</h4></span><span> " + result.getPayment_method_type() + "</span></div>";
-        msgg+= "<br>";
-        msgg+= "<div><span><h4>결제 금액</h4></span><span> " + result.getAmount().getTotal() + "</span></div>";
-        msgg+= "<br>";
-        msgg+= "<div><span><h4>할인 금액</h4></span><span> " + result.getAmount().getDiscount() + "</span></div>";
-        msgg+= "<br>";
-        msgg+= "<div><span><h4>결제 승인 시각</h4></span><span> " + result.getApproved_at() + "</span></div>";
-        msgg+= "<br>";
-        msgg+= "</div>";
+        String msgg = "";
+        msgg += "<div style='margin:20px;'>";
+        msgg += "<h1>" + memberDto.getName() + " 님의 구매 내역입니다. </h1>";
+        msgg += "<br>";
+        msgg += "<div align='center' style='border:1px solid black; font-family:verdana';>";
+        msgg += "<div><span><h4>상품명</h4></span><span> " + result.getItem_name() + "</span></div>";
+        msgg += "<br>";
+        msgg += "<div><span><h4>결제 수단</h4></span><span> " + result.getPayment_method_type() + "</span></div>";
+        msgg += "<br>";
+        msgg += "<div><span><h4>결제 금액</h4></span><span> " + result.getAmount().getTotal() + "</span></div>";
+        msgg += "<br>";
+        msgg += "<div><span><h4>할인 금액</h4></span><span> " + result.getAmount().getDiscount() + "</span></div>";
+        msgg += "<br>";
+        msgg += "<div><span><h4>결제 승인 시각</h4></span><span> " + result.getApproved_at() + "</span></div>";
+        msgg += "<br>";
+        msgg += "</div>";
         message.setText(msgg, "utf-8", "html");//내용
-        message.setFrom(new InternetAddress("accformanager99@gmail.com","ADMIN"));//보내는 사람
+        message.setFrom(new InternetAddress("accformanager99@gmail.com", "ADMIN"));//보내는 사람
 
         return message;
     }
@@ -274,4 +274,16 @@ public class OrderServiceImpl implements OrderService{
         return String.valueOf(System.nanoTime());
     }
 
+    @Override
+    public List<OrderItemDto> sortByOrderState(String sortBy, MemberDto memberDto) {
+        String state = EnumSet.allOf(OrderState.class).stream()
+                .filter(c -> c.name().equals(sortBy))
+                .findAny()
+                .get()
+                .getValue();
+
+        return orderItemRepository.findAllByStateAndOrderHistory_Member(state, memberDto.toEntity()).stream()
+                .map(OrderItemDto::fromEntity)
+                .collect(Collectors.toList());
+    }
 }

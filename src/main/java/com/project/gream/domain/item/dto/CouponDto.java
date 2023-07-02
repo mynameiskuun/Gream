@@ -1,11 +1,19 @@
-package com.project.gream.domain.coupon;
+package com.project.gream.domain.item.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.project.gream.domain.item.entity.Coupon;
+import com.project.gream.domain.member.dto.MemberDto;
+import com.project.gream.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Setter
@@ -19,11 +27,19 @@ public class CouponDto {
     private LocalDateTime expireDate;
     private int stock;
     private int minOrderPrice;
-    private int validPeriod;
+    private String discountFor;
+    private MemberDto memberDto;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime createdTime;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime modifiedTime;
 
     @Builder
-    public CouponDto(Long id, String type, String name, int discountRate, LocalDateTime expireDate, int stock, int minOrderPrice, int validPeriod) {
+    public CouponDto(Long id, String type, String name, int discountRate, LocalDateTime expireDate, int stock, int minOrderPrice,
+                     String discountFor, MemberDto memberDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -31,7 +47,10 @@ public class CouponDto {
         this.expireDate = expireDate;
         this.stock = stock;
         this.minOrderPrice = minOrderPrice;
-        this.validPeriod = validPeriod;
+        this.discountFor = discountFor;
+        this.memberDto = memberDto;
+        this.createdTime = createdTime;
+        this.modifiedTime = modifiedTime;
     }
 
     public Coupon toEntity() {
@@ -43,7 +62,7 @@ public class CouponDto {
                 .expireDate(expireDate)
                 .stock(stock)
                 .minOrderPrice(minOrderPrice)
-                .validPeriod(validPeriod)
+                .discountFor(discountFor)
                 .build();
     }
 
@@ -56,7 +75,10 @@ public class CouponDto {
                 .expireDate(coupon.getExpireDate())
                 .stock(coupon.getStock())
                 .minOrderPrice(coupon.getMinOrderPrice())
-                .validPeriod(coupon.getValidPeriod())
+                .discountFor(coupon.getDiscountFor())
+                .createdTime(coupon.getCreatedTime())
+                .modifiedTime(coupon.getModifiedTime())
                 .build();
     }
+
 }

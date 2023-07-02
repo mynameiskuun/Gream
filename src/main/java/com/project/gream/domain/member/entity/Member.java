@@ -5,7 +5,7 @@ import com.project.gream.common.enumlist.Role;
 import com.project.gream.common.enumlist.converter.GenderConverter;
 import com.project.gream.common.enumlist.converter.RoleConverter;
 import com.project.gream.common.util.BaseTimeEntity;
-import com.project.gream.domain.coupon.CouponBox;
+import com.project.gream.domain.item.entity.UserCoupon;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,13 +41,10 @@ public class Member extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "cart_id")
     private Cart cart;
-//    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-//    @JoinColumn(name = "couponbox_id")
-//    private CouponBox couponBox;
 
     @Builder
     public Member(String id, String password, String name, String address, String email,
-                  int point, Role role, Gender gender, Cart cart, CouponBox couponBox) {
+                  int point, Role role, Gender gender, Cart cart) {
         this.id = id;
         this.password = password;
         this.name = name;
@@ -57,7 +54,6 @@ public class Member extends BaseTimeEntity {
         this.role = role;
         this.gender = gender;
         this.cart = cart;
-//        this.couponBox = couponBox;
     }
 
     public void setCart(Cart cart) {

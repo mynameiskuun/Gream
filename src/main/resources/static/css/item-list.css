@@ -3,6 +3,7 @@
 }
 #item-sidebar {
     width: 300px;
+    margin-right: 50px;
 }
 #item-container {
     display: flex;
@@ -44,4 +45,22 @@
 }
 .item-detail-box div {
     margin-top: 17px;
+}
+.sort-btn {
+    cursor: pointer;
+    text-align: center;
+}
+.sidebar-header h3 {
+    text-align: center;
+}
+.sidebar-body ul {
+    padding: 0;
+}
+.sidebar-body ul li {
+    text-align: center;
+}
+.sort-btn:hover {
+    background: lightgray;
+    color: black;
+    transition: 0.4s;
 }

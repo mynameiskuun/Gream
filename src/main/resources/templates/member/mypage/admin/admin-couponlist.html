@@ -16,20 +16,76 @@
 </head>
 <body>
 <div layout:fragment="content">
-
     <div id="admin-couponlist-wrapper">
         <div id="admin-couponlist-container">
             <div class="admin-couponlist-header">
                 <h3>쿠폰 관리</h3>
             </div>
             <div class="admin-couponlist-body">
-                <h3>쿠폰 목록</h3>
-                <h3>이름, 적용대상, 할인율, 발급일, 만료일, 삭제버튼</h3>
+                <table id="order-history-table" class="table align-middle text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">쿠폰명</th>
+                            <th scope="col">적용 대상</th>
+                            <th scope="col">할인율(금액)</th>
+                            <th scope="col">발급일</th>
+                            <th scope="col">만료일</th>
+                            <th scope="col">삭제</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="coupon : ${couponList}">
+                            <td th:text="${coupon.name}"></td>
+                            <td th:text="${coupon.discountFor}"></td>
+                            <th:block th:if="${coupon.discountRate < 100}">
+                                <td th:text="${coupon.discountRate + '% 할인'}"></td>
+                            </th:block>
+                            <th:block th:unless="${coupon.discountRate < 100}">
+                                <td th:text="${coupon.discountRate + '원 할인'}"></td>
+                            </th:block>
+                            <td th:text="${#strings.substring(coupon.createdTime, 0, 10)}"></td>
+                            <td th:text="${#strings.replace(coupon.expireDate, 'T', ' ')}"></td>
+                            <td>
+                                <button class="deleteBtn btn btn-secondary">삭제</button>
+                                <input type="hidden" class="couponId" th:value="${coupon.id}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="paging-btn-box">
+                    <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
+                        <a th:if="${page != nowPage}" th:href="@{/coupon/{memberId}(memberId=${session.loginMember.id}, page=${page - 1})}" th:text="${page}"></a>
+                        <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+<script>
 
+    $('.deleteBtn').on('click', function() {
+
+        let couponId = $(this).next().val();
+        let targetDom = $(this).parent().parent();
+        console.log(couponId);
+
+        $.ajax({
+            url: "/admin/coupon/" + couponId,
+            type: "DELETE",
+            data: couponId,
+            contentType: "text",
+            dataType: "text",
+            success: function(result) {
+                alert(result);
+                targetDom.remove();
+            },
+            error: function(error) {
+                alert(error);
+                console.log(error);
+            }
+        })
+    })
+</script>
 </div>
 </body>
-</div>
 </html>

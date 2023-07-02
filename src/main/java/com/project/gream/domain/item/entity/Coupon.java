@@ -1,12 +1,16 @@
-package com.project.gream.domain.coupon;
+package com.project.gream.domain.item.entity;
 
+import com.project.gream.common.enumlist.converter.CouponDiscountForConverter;
 import com.project.gream.common.util.BaseTimeEntity;
+import com.project.gream.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
 @NoArgsConstructor
 @Getter
 @Entity
@@ -24,10 +28,11 @@ public class Coupon extends BaseTimeEntity {
     @Column(name = "coupon_stock")
     private int stock;
     private int minOrderPrice;
-//    private int validPeriod;
+    private String discountFor;
 
     @Builder
-    public Coupon(Long id, String type, String name, int discountRate, LocalDateTime expireDate, int stock, int minOrderPrice) {
+    public Coupon(Long id, String type, String name, int discountRate, LocalDateTime expireDate,
+                  int stock, int minOrderPrice, String discountFor) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -35,6 +40,6 @@ public class Coupon extends BaseTimeEntity {
         this.expireDate = expireDate;
         this.stock = stock;
         this.minOrderPrice = minOrderPrice;
-//        this.validPeriod = validPeriod;
+        this.discountFor = discountFor;
     }
 }

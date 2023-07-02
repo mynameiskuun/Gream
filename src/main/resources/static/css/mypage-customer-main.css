@@ -75,7 +75,7 @@
     margin-top: 30px;
 }
 .like-item-container {
-    /* display: flex; */
+     display: flex;
 }
 .like-item-card {
     display: flex;
@@ -88,11 +88,13 @@
     width: 100%;
 }
 .like-item-img-box {
-    height: 100%;
-    width: 60%;
+    height: 130px;
+    width: 130px;
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: center;
+    cursor: pointer;
+
 }
 .card-img-top {
     height: 80%;

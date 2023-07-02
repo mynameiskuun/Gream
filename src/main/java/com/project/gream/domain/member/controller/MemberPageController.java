@@ -1,10 +1,13 @@
 package com.project.gream.domain.member.controller;
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.domain.item.dto.CouponDto;
 import com.project.gream.domain.item.dto.ItemDto;
+import com.project.gream.domain.item.dto.UserCouponResponseDto;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
+import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.order.dto.OrderItemDto;
 import com.project.gream.domain.order.entity.OrderItem;
 import com.project.gream.domain.order.repository.OrderItemRepository;
@@ -33,9 +36,11 @@ public class MemberPageController {
     @GetMapping("/mypage/{memberId}")
     public ModelAndView toBuyer(@PathVariable("memberId") String memberId) {
         List<OrderItemDto> orderItemList = orderService.findOrderItemForMypage(memberId);
-        List<ItemDto> likeItems = itemService.getLikedItemList(itemService.getLikedItemIds(memberId));
+        List<ItemDto> likeItems = itemService.getLikedItemListForMypage(itemService.getLikedItemIds(memberId));
+        List<UserCouponResponseDto> userCouponList = itemService.getMemberCouponForMypage(memberId);
 
         ModelAndView mav = new ModelAndView();
+        mav.addObject("couponList", userCouponList);
         mav.addObject("likeItems", likeItems);
         mav.addObject("orderItemList", orderItemList);
         mav.setViewName("member/mypage/customer/mypage-customer-main");
@@ -49,7 +54,7 @@ public class MemberPageController {
 
         ModelAndView mav = new ModelAndView();
         int nowPage = orderItemList.getPageable().getPageNumber() + 1;
-        int startPage =  Math.max(nowPage - 4, 1);
+        int startPage = Math.max(nowPage - 4, 1);
         int endPage = Math.min(nowPage + 9, orderItemList.getTotalPages());
 
         mav.addObject("nowPage", nowPage);
@@ -63,6 +68,9 @@ public class MemberPageController {
     @GetMapping("/like/{memberId}")
     public ModelAndView toMemberLikeList(@PathVariable("memberId") String memberId) {
         ModelAndView mav = new ModelAndView();
+
+        List<ItemDto> likedItemList = itemService.getLikedItemListByMemberId(memberId);
+        mav.addObject("likedItemList", likedItemList);
         mav.setViewName("member/mypage/customer/mypage-like-list");
         return mav;
 
@@ -167,4 +175,16 @@ public class MemberPageController {
 
     }
 
+    @GetMapping("/member/coupon")
+    public ModelAndView getMemberCoupon(@LoginMember MemberDto memberDto) {
+
+        log.info("------------------------------ 유저가 가지고 있는 쿠폰 조회");
+        ModelAndView mav = new ModelAndView();
+        List<UserCouponResponseDto> userCouponList = itemService.getMemberCoupon(memberDto.toEntity());
+
+        log.info("userCouponList : " + userCouponList);
+        mav.addObject("userCouponList", userCouponList);
+        mav.setViewName("/member/mypage/customer/mypage-customer-coupon");
+        return mav;
+    }
 }

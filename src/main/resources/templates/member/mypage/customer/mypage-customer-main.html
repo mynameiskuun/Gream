@@ -29,6 +29,10 @@
                     <a th:href="@{/like/{memberId}(memberId=${session.loginMember.getId()})}"><h3>좋아요</h3></a>
                         <!--  좋아요 상품 출력  -->
                 </div>
+                <div>
+                    <a th:href="@{/member/coupon}"><h3>쿠폰 목록</h3></a>
+                    <!--  좋아요 상품 출력  -->
+                </div>
 <!--                <div>-->
 <!--                    <a href="/review"><h3>리뷰 작성</h3></a>-->
 <!--                    &lt;!&ndash; 리뷰 혹은 qna 글 출력 &ndash;&gt;-->
@@ -55,109 +59,106 @@
                             </div>
                         </section>
                         <section id="mypage-main-body">
-                            <table id="order-history-table" class="table align-middle text-center">
-                                <thead>
-                                <tr>
-                                    <th scope="col">상품 정보</th>
-                                    <th scope="col">구매 / 구매확정일</th>
-                                    <th scope="col">주문 금액(수량)</th>
-                                    <th scope="col">주문 상태</th>
-                                </tr>
-                                </thead>
-                                <tbody class="table-group-divider">
-                                    <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
-                                        <th scope="row">
-                                            <div class="item-information">
-                                                <a th:href="@{/item/{id}(id=${orderItemList.itemDto.id})}"><div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div></a>
-                                                <div class="order-item-detail">
-                                                    <a th:href="@{/item/{id}(id=${orderItemList.itemDto.id})}"><div class="item-name" th:text="${orderItemList.itemDto.name}"></div></a>
-                                                </div>
-                                            </div>
-                                        </th>
-                                        <td class="purchased-date">
-                                            <div th:text="${#strings.replace(orderItemList.createdTime, 'T', ' ')}"></div>
-                                        </td>
-                                        <td>
-                                            <div th:text="${#numbers.formatInteger(orderItemList.totalPrice, 3, 'COMMA') + '원'}"></div>
-                                            <div th:text="${orderItemList.quantity + ' 개'}"></div>
-                                        </td>
-                                        <td>
-                                            <div th:text="${orderItemList.state}"></div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <section id="order-history-wrapper">
+                                <table id="order-history-table" class="table align-middle text-center">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">상품 정보</th>
+                                            <th scope="col">구매 / 구매확정일</th>
+                                            <th scope="col">주문 금액(수량)</th>
+                                            <th scope="col">주문 상태</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        <th:block th:if="${orderItemList.size() == 0}">
+                                            <tr><td colspan="4">첫 구매를 시작 해 보세요!</td></tr>
+                                        </th:block>
+                                        <th:block th:unless="${orderItemList.size() == 0}">
+                                            <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
+                                                <th scope="row">
+                                                    <div class="item-information">
+                                                        <a th:href="@{/item/{id}(id=${orderItemList.itemDto.id})}"><div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div></a>
+                                                        <div class="order-item-detail">
+                                                            <a th:href="@{/item/{id}(id=${orderItemList.itemDto.id})}"><div class="item-name" th:text="${orderItemList.itemDto.name}"></div></a>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                                <td class="purchased-date">
+                                                    <div th:text="${#strings.replace(orderItemList.createdTime, 'T', ' ')}"></div>
+                                                </td>
+                                                <td>
+                                                    <div th:text="${#numbers.formatInteger(orderItemList.totalPrice, 3, 'COMMA') + ' 원'}"></div>
+                                                    <div th:text="${orderItemList.quantity + ' 개'}"></div>
+                                                </td>
+                                                <td>
+                                                    <div th:text="${orderItemList.state}"></div>
+                                                </td>
+                                            </tr>
+                                        </th:block>
+                                    </tbody>
+                                </table>
+                            </section>
                             <section id="like-items-wrapper">
                                 <div id="like-item-header" class="align-middle">
-                                    <div><h3>좋아요 한 상품</h3></div>
+                                    <div><h3>좋아요</h3></div>
                                 </div>
                                 <div id="like-items-body">
                                     <div class="like-item-container row row-cols-1 row-cols-md-3 g-4">
-                                        <div class="like-item-card" th:each="likeItems : ${likeItems}">
-                                            <div class="like-item-img-box" th:style="'background-image: url('+ ${likeItems.thumbnailUrl} + ');'"></div>
-                                            <div class="like-item-detail">
-                                                <div class="like-item-name" th:text="${likeItems.name}"></div>
-                                                <div class="like-item-price" th:text="${#numbers.formatInteger(likeItems.price, 3, 'COMMA') + '원'}"></div>
-                                            </div>
+                                        <div th:if="${likeItems.size() == 0}">
+                                            <h5>좋아요 한 상품이 없습니다</h5>
                                         </div>
+                                        <th:block th:unless="${likeItems.size() == 0}">
+                                            <div class="like-item-card" th:each="likeItems : ${likeItems}">
+                                                <a th:href="@{/item/{id}(id=${likeItems.id})}"><div class="like-item-img-box" th:style="'background-image: url('+ ${likeItems.thumbnailUrl} + ');'"></div></a>
+                                                <div class="like-item-detail">
+                                                    <a th:href="@{/item/{id}(id=${likeItems.id})}"><div class="like-item-name" th:text="${likeItems.name}"></div></a>
+                                                    <div class="like-item-price" th:text="${#numbers.formatInteger(likeItems.price, 3, 'COMMA') + ' 원'}"></div>
+                                                </div>
+                                            </div>
+                                        </th:block>
                                     </div>
                                 </div>
                             </section>
                             <section id="coupon-wrapper">
                                 <div class="coupon-box-header">
                                     <div><h3>쿠폰</h3></div>
-                                    <div class="coupon-qty">151장</div>
                                 </div>
                                 <div class="coupon-box-body">
                                     <table id="coupon-box-table" class="table align-middle text-center">
                                         <thead>
-                                        <tr>
-                                            <th scope="col">쿠폰명</th>
-                                            <th scope="col">할인 금액</th>
-                                            <th scope="col">적용 범위</th>
-                                            <th scope="col">유효 기간</th>
-                                        </tr>
+                                            <tr>
+                                                <th scope="col">쿠폰명</th>
+                                                <th scope="col">할인 금액</th>
+                                                <th scope="col">적용 범위</th>
+                                                <th scope="col">유효 기간</th>
+                                                <th scope="col">적용 가능 상품</th>
+                                            </tr>
                                         </thead>
-                                        <tbody class="table-group-divider">
-                                        <tr class="coupon-rows">
-                                            <th scope="row">
-                                                <div class="coupon-information">
-                                                    <div class="coupon-name">
-                                                        자바 ORM 표준 JPA 프로그래밍
-                                                    </div>
-                                                </div>
-                                            </th>
-                                            <td>
-                                                <div class="discount-rate">30%</div>
-                                            </td>
-                                            <td>
-                                                <div class="usable-area">식품</div>
-                                            </td>
-                                            <td>
-                                                <div class="valid-date">23.04.01 ~ 23.04.31</div>
-                                            </td>
-                                        </tr>
-                                        <tr class="coupon-rows">
-                                            <th scope="row">
-                                                <div class="coupon-information">
+                                        <th:block th:if="${couponList.size() == 0}">
+                                            <h5>쿠폰함이 비어있습니다</h5>
+                                        </th:block>
+                                        <th:block th:unless="${couponList.size() == 0}">
+                                            <tbody class="table-group-divider" th:each="coupon : ${couponList}">
+                                            <tr class="coupon-rows">
+                                                <th scope="row">
                                                     <div class="coupon-information">
-                                                        <div class="coupon-name">
-                                                            자바 ORM 표준 JPA 프로그래밍
+                                                        <div class="coupon-name" th:text="${coupon.couponDto.name}">
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </th>
-                                            <td>
-                                                <div>2,000원</div>
-                                            </td>
-                                            <td>
-                                                <div>일부 상품</div>
-                                            </td>
-                                            <td>
-                                                <div>23.01.01 ~ 23.12.31</div>
-                                            </td>
-                                        </tr>
-                                        </tbody>
+                                                </th>
+                                                <td>
+                                                    <div class="discount-rate" th:if="${coupon.couponDto.discountRate > 100}" th:text="${#numbers.formatInteger(coupon.couponDto.discountRate, 3, 'COMMA') + ' 원'}"></div>
+                                                    <div class="discount-rate" th:unless="${coupon.couponDto.discountRate > 100}" th:text="${coupon.couponDto.discountRate + '%'}"></div>
+                                                </td>
+                                                <td>
+                                                    <div class="usable-area" th:text="${coupon.couponDto.discountFor}"></div>
+                                                </td>
+                                                <td>
+                                                    <div class="valid-date" th:text="${#strings.substring(coupon.getCouponDto().createdTime, 0, 10) + ' ~ ' + #strings.substring(coupon.getCouponDto().expireDate, 0, 10)}"></div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </th:block>
                                     </table>
                                 </div>
                             </section>
