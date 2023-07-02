@@ -42,7 +42,7 @@
                     <span>결제 수단</span><span th:text="${orderResult.payment_method_type}"></span>
                 </div>
                 <div id="total-price-box">
-                    <span>결제 금액</span><span th:text="${orderResult.amount.total + ' 원 '}"></span>
+                    <span>결제 금액</span><span th:text="${#numbers.formatInteger(orderResult.amount.total, 3, 'COMMA') + ' 원 '}"></span>
                 </div>
                 <div id="discount-box">
                     <span>할인 금액</span><span th:text="${orderResult.amount.discount + ' 원 '}"></span>
@@ -52,6 +52,7 @@
                     <span>결제 승인 시각</span><span th:text="${#strings.replace(orderResult.approved_at, 'T', ' ')}"></span>
                 </div>
             </div>
+            <button th:href="@{/}">홈으로</button>
         </div>
     </section>
 </div>

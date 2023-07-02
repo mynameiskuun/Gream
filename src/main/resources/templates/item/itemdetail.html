@@ -33,7 +33,7 @@
                     <input type="number" name="orderQuantity" class="countBox" id="orderQuantity" value="1" min="1"/>
                 </div>
                 <div id="usable-coupon-box"><a>사용가능한 쿠폰을 확인하세요</a></div>
-                <div id="item-price-box" th:text="${'판매가격 : ' + #numbers.formatInteger(item.getPrice(), 3, 'COMMA') + '원'} "></div>
+                <div id="item-price-box" th:text="${'판매가격 : ' + #numbers.formatInteger(item.getPrice(), 3, 'COMMA') + ' 원'} "></div>
                 <div id="order-button-box">
                     <button class="btn btn-outline-secondary" id="orderBtn">주문하기</button>
                     <button class="btn btn-outline-secondary" id="cartBtn" onclick="cartBtn()">장바구니 추가</button>
@@ -247,13 +247,13 @@
 
 
     <!--  modal start  -->
-        <div class="modal" tabindex="-1">
+        <div class="modal cart-modal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Modal title</h5>
-                        <button type="button" class="btn-close"
-                                data-bs-dismiss="modal"></button>
+                        <h5 class="modal-title">장바구</h5>
+                        <bu니ton type="button" class="btn-close"
+                                data-bs-dismiss="modal"></bu니ton>
                     </div>
                     <div class="modal-body">
                         <p id="cartText">장바구니에 추가 되었습니다.</p>
@@ -270,13 +270,37 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal coupon-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">쿠폰 받기</h4>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body usable-coupon-list">
+                            <div class="usable-coupon" th:if="${couponList.size != 0}" th:each="coupon : ${couponList}">
+                                <input type="hidden" class="couponId" th:value="${coupon.id}" />
+                                <div class="discount-rate-box" th:if="${coupon.discountRate < 100}" th:text="${coupon.discountRate} + '%'"></div>
+                                <div class="discount-rate-box" th:unless="${coupon.discountRate < 100}" th:text="${#numbers.formatInteger(coupon.discountRate, 3, 'COMMA') } + ' 원'"></div>
+                                <div class="coupon-name" th:text="${coupon.name}"></div>
+                                <div class="coupon-condition" th:text="${#numbers.formatInteger(coupon.minOrderPrice, 3, 'COMMA')} + '원 이상 구매시' + '(~' + ${#strings.substring(coupon.expireDate, 0, 10)} + ')'"></div>
+                            </div>
+                            <div th:unless="${couponList.size != 0}">
+                                <p>사용 가능한 쿠폰이 없습니다.</p>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button th:if="${couponList.size != 0}" type="button" class="btn-primary" id="get-coupon-btn">모두 받기</button>
+                        <button type="button" class="btn-primary" data-bs-dismiss="modal">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     <!--  modal end  -->
 
-    <!-- Bootstrap core JS-->
-    <!--  모달 사용을 위해  -->
-    <script src="/js/itemdetail.js"></script>
-<!--</div>-->
-
+<script src="/js/itemdetail.js"></script>
 <script th:inline="javascript">
     /*<![CDATA[*/
 
@@ -317,7 +341,7 @@
             dataType: 'text',
             success: function(result) {
                 document.getElementById("cartText").innerText = result;
-                const modal = new bootstrap.Modal(document.querySelector('.modal'));
+                const modal = new bootstrap.Modal(document.querySelector('.cart-modal'));
                 modal.show();
             }
         })
@@ -357,11 +381,14 @@
 
     })
 
+    $('#usable-coupon-box').click(function() {
+        const modal = new bootstrap.Modal(document.querySelector('.coupon-modal'));
+        modal.show();
+    })
     // 모달창 장바구니 버튼 이벤트 메소드
     $('.tocart-btn').click(function() {
         location.href='/cart';
     })
-
 
     $("#reply-input-container").on("focus", function () {
         $("#reply-input-area").css("height", "100px");
@@ -411,7 +438,6 @@
         console.log("map : " + starMap);
         console.log('mapSize = ' + size);
         console.log(starMap[1])
-        console.log("git test")
 
         // for (let i = 1; i <= 5; i++) {
         //     size += starMap[i];
@@ -427,6 +453,39 @@
         return Math.round((scoreMap[4] / scoreMap[0] * 100.0) + (scoreMap[5] / scoreMap[0] * 100.0))
     }
 
+    // 사용 가능한 쿠폰 받기 이벤트
+    $('#get-coupon-btn').on('click', function() {
+
+        if ([[${session.loginMember}]] == null) {
+            alert('로그인을 해주세요')
+            location.href='/login';
+        }
+
+        let couponIdList = $('.usable-coupon-list').find('input[type="hidden"]').map(function() {
+            return this.value;
+        }).get();
+
+        let data = {
+            "memberId" : [[${session.loginMember}]].id,
+            "couponIdList" : couponIdList
+        }
+
+        $.ajax({
+            url: '/member/coupon',
+            type: 'POST',
+            contentType: 'application/json; charset=UTF-8;',
+            data: JSON.stringify(data),
+            dataType: 'text',
+            success(data) {
+                console.log(data);
+                alert(data);
+            },
+            error(error) {
+                console.log(error);
+                alert(error);
+            }
+        })
+    })
 
     // 상품 좋아요 click 이벤트
     function itemLike() {
@@ -467,59 +526,6 @@
             }
         })
     }
-
-    // 로그인, 리뷰 좋아요 유무에 따른 css 변경 이벤트
-    // window.onload = function() {
-    //
-    //     let itemId = [[${item.id}]];
-    //     let reviewList = [[${reviewList}]] || [];
-    //     let commentList = [[${commentList}]] || [];
-    //
-    //     let reviewIdList = [];
-    //     let commentIdList = [];
-    //
-    //     reviewList.forEach((review) => {
-    //         reviewIdList.push(review.id);
-    //     });
-    //
-    //     commentList.forEach((comment) => {
-    //         commentIdList.push(comment.id)
-    //     })
-    //
-    //     console.log("itemId : " + itemId);
-    //     console.log("reviewList : " + reviewList);
-    //     console.log("reviewIdList : " + reviewIdList);
-    //     console.log("commentList : " + commentList);
-    //     console.log("commentIdList : " + commentIdList);
-    //
-    //     let data = {
-    //         "itemId" : itemId,
-    //         "reviewIdList": reviewIdList,
-    //         "commentIdList" : commentIdList
-    //     }
-    //
-    //     // 보내야 할 데이터
-    //     // item id, review id list, comment id list
-    //     // 로그인 유저 id
-    //
-    //     // 로그인 안했으면 좋아요 count 표시.
-    //     // 로그인 했고 좋아요 안눌렀으면 count 표시.
-    //     // 로그인 했고 좋아요 눌렀으면 배경색 바꾸고 count 표시.
-    //
-    //     $.ajax({
-    //         url: '/test/likecheck',
-    //         method: 'POST',
-    //         contentType: 'application/JSON; charset=UTF-8',
-    //         dataType: 'JSON',
-    //         data: JSON.stringify(data),
-    //         success: function (result) {
-    //             console.log(JSON.parse(result))
-    //         },
-    //         error: function (error) {
-    //             console.log(error)
-    //         },
-    //     })
-    // }
 
     $('.item-thumbs-up').click(itemLike);
     // $('.review-thumbs-up').click(like);

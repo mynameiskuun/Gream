@@ -23,7 +23,13 @@
 #mypage-admin-content {
     position: relative;
 }
-
+.item-img-box {
+    width: 150px;
+    height: 150px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
 #mypage-admin-upper-box {
     height: 45%;
     width: 100%;

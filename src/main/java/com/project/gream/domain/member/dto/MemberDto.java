@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.project.gream.common.enumlist.Gender;
 import com.project.gream.common.enumlist.Role;
-import com.project.gream.domain.coupon.CouponBoxDto;
 import com.project.gream.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +28,6 @@ public class MemberDto {
     private Role role;
     private Gender gender;
     private CartDto cartDto;
-    private CouponBoxDto couponBoxDto;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -49,7 +47,7 @@ public class MemberDto {
 
     @Builder
     public MemberDto(String id, String password, String name, String address, String email, int point,
-                     Role role, Gender gender, CartDto cartDto, CouponBoxDto couponBoxDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
+                     Role role, Gender gender, CartDto cartDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.password = password;
         this.name = name;
@@ -59,7 +57,6 @@ public class MemberDto {
         this.role = role;
         this.gender = gender;
         this.cartDto = cartDto;
-        this.couponBoxDto = couponBoxDto;
         this.createdTime = createdTime;
         this.modifiedTime = modifiedTime;
     }

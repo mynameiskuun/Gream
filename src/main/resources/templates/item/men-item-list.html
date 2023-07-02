@@ -6,8 +6,6 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="/css/item-list.css" />
-    <style>
-    </style>
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -19,35 +17,134 @@
             </div>
             <div class="sidebar-body">
                 <ul>
-                    <a><li>아우터</li></a>
-                    <a><li>티셔츠</li></a>
-                    <a><li>스웨트셔츠</li></a>
-                    <a><li>셔츠</li></a>
-                    <a><li>니트</li></a>
-                    <a><li>원피스</li></a>
-                    <a><li>신발</li></a>
-                    <a><li>악세사리</li></a>
+                    <li class="sort-btn">모든 상품
+                        <input type="hidden" value="ALL" />
+                    </li>
+                    <li class="sort-btn">아우터
+                        <input type="hidden" value="OUTER" />
+                    </li>
+                    <li class="sort-btn">티셔츠
+                        <input type="hidden" value="TSHIRTS" />
+                    </li>
+                    <li class="sort-btn">스웨트셔츠
+                        <input type="hidden" value="SWEATSHIRTS" />
+                    </li>
+                    <li class="sort-btn">셔츠
+                        <input type="hidden" value="SHIRTS" />
+                    </li>
+                    <li class="sort-btn">니트
+                        <input type="hidden" value="KNIT" />
+                    </li>
+                    <li class="sort-btn">원피스
+                        <input type="hidden" value="DRESS" />
+                    </li>
+                    <li class="sort-btn">하의
+                        <input type="hidden" value="BOTTOM" />
+                    </li>
+                    <li class="sort-btn">신발
+                        <input type="hidden" value="SHOES" />
+                    </li>
+                    <li class="sort-btn">악세사리
+                        <input type="hidden" value="ACCESSORIES" />
+                    </li>
                 </ul>
             </div>
         </div>
         <div id="item-main">
-            <div class="item-header">MENS</div>
+            <div class="item-header">MEN</div>
             <div class="item-body">
                 <th:block th:each="item : ${items}">
-                <a th:href="@{/item/{itemId}(itemId=${item.getId()})}"><div class="item-cards">
-                    <div class="item-cards-body">
-                        <div class="item-cards-img-box" th:style="'background-image: url('+ ${item.getThumbnailUrl()} + ');'"></div>
-                        <div class="item-detail-box">
-                            <div class="item-name" th:text="${item.getName()}" style="font-size: 20px; margin-left: 0;"></div>
-                            <div class="item-price" th:text="${#numbers.formatInteger(item.getPrice(), 3, 'COMMA') + '원'} ">
+                    <a th:href="@{/item/{itemId}(itemId=${item.getId()})}">
+                        <div class="item-cards">
+                            <div class="item-cards-body">
+                                <div class="item-cards-img-box" th:style="'background-image: url('+ ${item.getThumbnailUrl()} + ');'"></div>
+                                <div class="item-detail-box">
+                                    <div class="item-name" th:text="${item.getName()}" style="font-size: 20px; margin-left: 0;"></div>
+                                    <div class="item-price" th:text="${#numbers.formatInteger(item.getPrice(), 3, 'COMMA') + ' 원'} "></div>
+                                </div>
+                            </div>
                         </div>
-                        </div>
-                    </div>
-                </div></a></th:block>
+                    </a>
+                </th:block>
             </div>
         </div>
     </div>
 </section>
+
+<script th:inline="javascript">
+
+    $('.sort-btn').on('click', function() {
+        let sortBy = $(this).find('input[type="hidden"]').val();
+        console.log('sortBy : ', sortBy);
+
+        $.ajax({
+            url: '/item/men/' + sortBy,
+            type: 'GET',
+            data: sortBy,
+            contentType: 'TEXT',
+            dataType: 'json',
+            success(sortedItems) {
+                console.log('ajax success')
+                console.log('sortedItems : ', sortedItems);
+                sort(sortedItems);
+            },
+            error(error) {
+                console.log(error);
+            }
+        })
+    })
+
+    function sort(sortedItems) {
+
+        $('.item-body').empty();
+        console.log('---------- itemSort start');
+
+        if (sortedItems.length === 0) {
+            let row = $('<h3></h3>').html('등록된 상품이 없습니다.');
+            $('.item-body').append(row);
+            return;
+        }
+
+        sortedItems.forEach(function(sortedItem) {
+            $('.item-body').append(createRow(sortedItem))
+        });
+
+    }
+
+    function createRow(sortedItem) {
+        console.log('----------------- createRow function start')
+
+        let row = $('<a></a>').attr('href', '/item/' + sortedItem.id)
+        let div1 = $('<div class="item-cards">');
+        let div2 = $('<div class="item-cards-body">');
+        let div3 = $('<div class="item-cards-img-box"></div>').css('background-image', 'url(' + sortedItem.thumbnailUrl + ')');
+        let div4 = $('<div class="item-detail-box">');
+        let div5 = $('<div class="item-name"></div>')
+            .html(sortedItem.name)
+            .css({
+                'font-size' : '20px',
+                'margin-left' : '0px'
+            })
+        let div6 = $('<div class="item-price"></div>')
+            .html(new Intl.NumberFormat('ko-KR', {
+                style: 'currency',
+                currency: 'KRW',
+                currencyDisplay: 'name'}).format(sortedItem.price).split('대한민국 '));
+
+        div4.append(div5);
+        div4.append(div6);
+
+        div2.append(div3);
+        div2.append(div4);
+
+        div1.append(div2);
+        row.append(div1);
+
+        return row;
+    }
+    // <a th:href="@{/item/{itemId}(itemId=${item.getId()})}">
+
+</script>
 </th:block>
 </body>
 </html>

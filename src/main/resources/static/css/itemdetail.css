@@ -46,11 +46,14 @@
 }
 
 #usable-coupon-box {
-    background: rgb(181, 237, 181);
+    border: 2px solid lightgreen;
+    border-radius: 5px;
+    padding: 0px 5px;
     display: inline-block;
-    height: 50px;
-    line-height: 50px;
+    height: 70px;
+    width: 400px;
     font-size: 27px;
+    line-height: 70px;
 }
 
 #item-information {
@@ -336,4 +339,18 @@
 }
 .like-item-name {
     margin-left: 25px;
+}
+.usable-coupon {
+    border: 2px solid darkgreen;
+    border-radius: 10px;
+    padding: 20px 20px 20px 20px;
+    margin-bottom: 20px;
+}
+.usable-coupon div {
+    margin-bottom: 5px;
+}
+.discount-rate-box {
+    color: darkgreen;
+    font-size: 25px;
+    font-weight: bold;
 }

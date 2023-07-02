@@ -2,6 +2,7 @@ package com.project.gream.domain.post.service;
 
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.enumlist.LikeTargetType;
+import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.entity.Img;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;

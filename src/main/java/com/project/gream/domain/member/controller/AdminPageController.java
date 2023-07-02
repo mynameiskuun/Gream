@@ -1,15 +1,19 @@
 package com.project.gream.domain.member.controller;
 
+import com.project.gream.domain.item.dto.CouponDto;
 import com.project.gream.domain.item.dto.ItemDto;
+import com.project.gream.domain.item.repository.CouponRepository;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
@@ -63,16 +67,29 @@ public class AdminPageController {
         return mav;
     }
 
-    @GetMapping("/coupon")
+    @GetMapping("/coupon/create")
     public ModelAndView toCouponCreate() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("member/mypage/admin/create-coupon");
         return mav;
     }
 
-    @GetMapping("/coupon-management")
-    public ModelAndView toCouponManage() {
+    @GetMapping("/coupon")
+    public ModelAndView toCouponManage(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Page<CouponDto> couponList = itemService.getCouponList(pageable);
         ModelAndView mav = new ModelAndView();
+        int nowPage = couponList.getPageable().getPageNumber() + 1;
+        int startPage =  Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, couponList.getTotalPages());
+
+        for (CouponDto c : couponList) {
+            log.info(String.valueOf(c.getCreatedTime()));
+        }
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
+        mav.addObject("couponList", couponList);
         mav.setViewName("member/mypage/admin/admin-couponlist");
         return mav;
     }
@@ -82,6 +99,12 @@ public class AdminPageController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("member/mypage/admin/admin-inquiry");
         return mav;
+    }
+
+    @DeleteMapping("/coupon/{couponId}")
+    public String deleteCoupon(@PathVariable Long couponId) {
+        log.info("couponId : " + couponId);
+        return itemService.deleteCoupon(couponId);
     }
 
 }

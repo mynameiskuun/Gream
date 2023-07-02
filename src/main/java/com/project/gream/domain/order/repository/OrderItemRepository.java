@@ -1,5 +1,6 @@
 package com.project.gream.domain.order.repository;
 
+import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.order.entity.OrderHistory;
 import com.project.gream.domain.order.entity.OrderItem;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     List<OrderItem> findTop4ByOrderHistory_Member_IdOrderByCreatedTimeDesc(String memberId);
     Page<OrderItem> findAllByOrderHistory_Member_Id(String memberId, Pageable pageable);
-
+    List<OrderItem> findAllByStateAndOrderHistory_Member(String state, Member member);
 }
 

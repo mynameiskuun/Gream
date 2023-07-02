@@ -1,13 +1,13 @@
 package com.project.gream.domain.item.controller;
 
 import com.project.gream.common.annotation.LoginMember;
-import com.project.gream.domain.item.dto.CartItemRequestDto;
-import com.project.gream.domain.item.dto.ItemRequestDto;
-import com.project.gream.domain.item.dto.ItemDto;
+import com.project.gream.domain.item.dto.*;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.repository.CartItemRepository;
+import com.project.gream.domain.order.dto.OrderItemDto;
+import com.project.gream.domain.order.service.OrderService;
 import com.project.gream.domain.post.dto.LikesResponseDto;
 import com.project.gream.domain.post.dto.ReviewDto;
 import com.project.gream.domain.post.repository.ReviewRepository;
@@ -27,17 +27,17 @@ public class ItemController {
 
     private final ItemService itemService;
     private final PostService postService;
+    private final OrderService orderService;
 
     @PostMapping("/cart")
     public String addItemToCart(@RequestBody CartItemDto cartItemDto, @LoginMember MemberDto memberDto) {
-        log.info("------------------------------- 남성용 상품 페이지 진입");
+        log.info("------------------------------- 장바구니 저장");
 
         return itemService.addItemToCart(cartItemDto, memberDto);
     }
 
     @DeleteMapping("/cart/{cartItemId}")
     public Long deleteCartItem(@PathVariable Long cartItemId) {
-//        cartItemRepository.deleteById(cartItemId);
         return cartItemId;
     }
 
@@ -52,7 +52,9 @@ public class ItemController {
         Map<Integer, Integer> starValMap = postService.getReviewScoreByItemId(itemId);
         List<ReviewDto> reviewList = postService.getReviewDtoById(itemId);
         LikesResponseDto likes = postService.checkLike(itemId, memberDto);
+        List<CouponDto> couponList = itemService.getUsableCouponList(itemId);
 
+        mav.addObject("couponList", couponList);
         mav.addObject("reviewList", reviewList);
         mav.addObject("starValMap", starValMap);
         mav.addObject("item", itemDto);
@@ -102,5 +104,34 @@ public class ItemController {
         return itemService.updateCartItemQuantity(req);
     }
 
+    @PostMapping("/coupon")
+    public String createCoupon(@RequestBody CouponRequestDto requestDto) {
 
+        log.info(requestDto.getDiscountFor().toString());
+        log.info(String.valueOf(requestDto.getDiscountFor().getClass()));
+
+        return itemService.createCoupon(requestDto);
+    }
+
+    @PostMapping("/member/coupon")
+    public String saveUsableCoupon(@RequestBody CouponRequestDto requestDto) {
+        return itemService.saveUsableCoupon(requestDto);
+    }
+
+    @GetMapping("/mypage/order/{sortBy}")
+    public List<OrderItemDto> sortOrderItems(@PathVariable("sortBy") String sortBy, @LoginMember MemberDto memberDto) {
+        log.info("----------------- sortBy : " + sortBy);
+        List<OrderItemDto> itemList = orderService.sortByOrderState(sortBy, memberDto);
+        log.info("itemList : " + itemList);
+        return itemList;
+    }
+
+    @GetMapping("/item/men/{sortBy}")
+    public List<ItemDto> sortMenItemsByCategory(@PathVariable String sortBy) {
+
+        log.info("------------------------------ 카테고리 별 상품 요청");
+
+        log.info(itemService.sortItemByCategory(sortBy).toString());
+        return itemService.sortItemByCategory(sortBy);
+    }
 }

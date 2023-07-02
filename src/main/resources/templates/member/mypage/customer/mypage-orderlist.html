@@ -22,6 +22,9 @@
             justify-content: center;
             align-items: center;
         }
+        .sort-btn {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -37,16 +40,20 @@
                     <div class="main-header-upper">
                         <div class="main-header-btn">
                             <div class="order-status-btn">
-                                <a class="text-secondary">입금 / 결제</a>
+                                <a class="text-secondary sort-btn">배송 준비중</a>
+                                <input type="hidden" value="PREPARE"/>
                             </div>
                             <div class="order-status-btn">
-                                <a class="text-secondary">배송중</a>
+                                <a class="text-secondary sort-btn">배송중</a>
+                                <input type="hidden" value="ONPROGRESS"/>
                             </div>
                             <div class="order-status-btn">
-                                <a class="text-secondary">배송완료</a>
+                                <a class="text-secondary sort-btn">배송 완료</a>
+                                <input type="hidden" value="ARRIVED"/>
                             </div>
                             <div class="order-status-btn">
-                                <a class="text-secondary">구매확정</a>
+                                <a class="text-secondary sort-btn">구매 확정</a>
+                                <input type="hidden" value="CONFIRMED"/>
                             </div>
                         </div>
                     </div>
@@ -54,38 +61,38 @@
                 <section id="orderlist-container">
                     <table id="order-history-table" class="table align-middle text-center">
                         <thead>
-                        <tr>
-                            <th scope="col">상품 정보</th>
-                            <th scope="col">구매 / 구매확정일</th>
-                            <th scope="col">주문 금액(수량)</th>
-                            <th scope="col">주문 상태</th>
-                            <th scope="col">리뷰 작성</th>
-                        </tr>
+                            <tr>
+                                <th scope="col">상품 정보</th>
+                                <th scope="col">구매 / 구매확정일</th>
+                                <th scope="col">주문 금액(수량)</th>
+                                <th scope="col">주문 상태</th>
+                                <th scope="col">리뷰 작성</th>
+                            </tr>
                         </thead>
                         <tbody class="table-group-divider">
-                        <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
-                            <th scope="row">
-                                <div class="item-information">
-                                    <div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div>
-                                    <div class="order-item-detail">
-                                        <div class="item-name" th:text="${orderItemList.itemDto.name}"></div>
+                            <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
+                                <th scope="row">
+                                    <div class="item-information">
+                                        <div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div>
+                                        <div class="order-item-detail">
+                                            <div class="item-name" th:text="${orderItemList.itemDto.name}"></div>
+                                        </div>
                                     </div>
-                                </div>
-                            </th>
-                            <td class="purchased-date">
-                                <div th:text="${#strings.replace(orderItemList.createdTime, 'T', ' ')}"></div>
-                            </td>
-                            <td>
-                                <div th:text="${#numbers.formatInteger(orderItemList.totalPrice, 3, 'COMMA') + '원'}"></div>
-                                <div th:text="${orderItemList.quantity + ' 개'}"></div>
-                            </td>
-                            <td>
-                                <div th:text="${orderItemList.state}"></div>
-                            </td>
-                            <td>
-                                <div th:if="${orderItemList.state.equals('배송 완료')}"><a class="reviewBtn btn-secondary button" th:href="@{/review/{orderItemId}(orderItemId=${orderItemList.id})}">작성</a></div>
-                            </td>
-                        </tr>
+                                </th>
+                                <td class="purchased-date">
+                                    <div th:text="${#strings.replace(orderItemList.createdTime, 'T', ' ')}"></div>
+                                </td>
+                                <td>
+                                    <div th:text="${#numbers.formatInteger(orderItemList.totalPrice, 3, 'COMMA') + ' 원'}"></div>
+                                    <div th:text="${orderItemList.quantity + ' 개'}"></div>
+                                </td>
+                                <td>
+                                    <div th:text="${orderItemList.state}"></div>
+                                </td>
+                                <td>
+                                    <div th:if="${orderItemList.state.equals('배송 완료') || orderItemList.state.equals('구매 확정')}"><a class="reviewBtn btn-secondary button" th:href="@{/review/{orderItemId}(orderItemId=${orderItemList.id})}">리뷰 작성</a></div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                         <div id="paging-btn-box">
@@ -94,13 +101,96 @@
                                 <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
                             </div>
                         </div>
-
                 </section>
             </div>
         </div>
     </div>
 
+<script th:inline="javascript">
+
+    $('.sort-btn').on('click', function(event) {
+        let hiddenVal = $(event.target).parent().find('input[type="hidden"]').val();
+
+        $.ajax({
+            url: '/mypage/order/' + hiddenVal,
+            type: 'GET',
+            data: hiddenVal,
+            contentType: 'TEXT',
+            dataType: 'json',
+            success(orderItems) {
+                sort(orderItems);
+                console.log('success after')
+            },
+            error(error) {
+                console.log(error);
+            }
+        })
+    })
+
+    function sort(orderItems) {
+        $('.table-group-divider').empty();
+
+        console.log('---------- sort function start')
+        console.log('orderItems : ', orderItems);
+
+        orderItems.forEach(function(orderItem) {
+            console.log('forEach function start')
+            console.log('orderItem : ', orderItem);
+
+            $('.table-group-divider').append(createRows(orderItem));
+        })
+    }
+
+    function createRows(sortedItem) {
+
+        console.log('------------ createRows function start')
+
+        // var row = $('<tr class="purchased-item-rows"></tr>');
+        var row = $('<tr class="purchased-item-rows"></tr>');
+        var th = $('<th></th>').attr('scope', 'row');
+        var div1 = $('<div class="item-information"></div>');
+        var div2 = $('<div class="order-item-image"></div>').css('background-image', 'url(' + sortedItem.itemDto.thumbnailUrl + ')');
+        var div3 = $('<div class="order-item-detail"></div>');
+        var div4 = $('<div class="item-name"></div>').html(sortedItem.itemDto.name);
+
+        div1.append(div2);
+        div1.append(div3);
+        div3.append(div4);
+        th.append(div1);
+        row.append(th);
+
+        var td1 = $('<td class="purchased-date"></td>');
+        var dateDiv = $('<div></div>').html(sortedItem.createdTime.replace('T', ' '));
+        td1.append(dateDiv);
+        row.append(td1);
+
+        var td2 = $('<td></td>');
+        var priceDiv = $('<div></div>').html(new Intl.NumberFormat('ko-KR', {
+            style: 'currency',
+            currency: 'KRW',
+            currencyDisplay: 'name'}).format(sortedItem.totalPrice).split('대한민국 '));
+
+
+        var quantityDiv = $('<div></div>').html(sortedItem.quantity + ' 개');
+        td2.append(priceDiv);
+        td2.append(quantityDiv);
+        row.append(td2);
+
+        var td3 = $('<td></td>');
+        var stateDiv = $('<div></div>').html(sortedItem.state);
+        td3.append(stateDiv);
+        row.append(td3);
+
+        var td4 = $('<td></td>');
+        if (sortedItem.state === '배송 완료' || sortedItem.state === '구매 확정') {
+            var anchor = $('<a></a>').addClass('reviewBtn btn-secondary button').attr('href', '/review/' + sortedItem.id).text('리뷰 작성');
+            td4.append(anchor);
+        }
+        row.append(td4);
+
+        return row;
+    }
+</script>
 </div>
 </body>
-</div>
 </html>

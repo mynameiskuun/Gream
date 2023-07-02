@@ -44,6 +44,8 @@
                       할인율 100 이상 -> 금액할인
                     -->
                     <input type="number" class="coupon-inputs" id="discountRate" name="discountRate"/>
+                    <h6>1~99 : 비율 할인. 예) 20 -> 20% 할인.</h6>
+                    <h6>101 ~ : 금액 할인. 예) 5000 -> 5000원 할인.</h6>
                 </td>
             </tr>
             <tr>
@@ -64,13 +66,13 @@
                     <input type="number" class="coupon-inputs" id="minOrderPrice" name="minOrderPrice" />
                 </td>
             </tr>
-            <tr>
-                <td>유효기간</td>
-                <td>
-                    <input type="number" class="coupon-inputs" id="validPeriod" name="validPeriod"/>
-                    <!-- 발급일로부터 몇일후 까지 사용 가능한지 -->
-                </td>
-            </tr>
+<!--            <tr>-->
+<!--                <td>유효기간</td>-->
+<!--                <td>-->
+<!--                    <input type="number" class="coupon-inputs" id="validPeriod" name="validPeriod"/>-->
+<!--                    &lt;!&ndash; 발급일로부터 몇일후 까지 사용 가능한지 &ndash;&gt;-->
+<!--                </td>-->
+<!--            </tr>-->
             <tr>
                 <td>할인 적용 대상</td>
                 <td>
@@ -112,23 +114,29 @@
         let expireDate = $('#expireDate').val();
         let couponStock = $('#couponStock').val();
         let minOrderPrice = $('#minOrderPrice').val();
-        let validPeriod = $('#validPeriod').val();
+        // let validPeriod = $('#validPeriod').val();
         let discountFor = $('input:checkbox[name=discountFor]:checked').map(function() {
             return this.value;
         }).get();
 
         let data = {
-            couponType,
-            couponName,
-            discountRate,
-            expireDate,
-            couponStock,
-            minOrderPrice,
-            validPeriod,
-            discountFor
+            "type" : couponType,
+            "name" : couponName,
+            "discountRate" : discountRate,
+            "expireDate" : expireDate,
+            "stock" : couponStock,
+            "minOrderPrice" : minOrderPrice,
+            "discountFor" : discountFor
+            // validPeriod
         }
 
         console.log(data);
+
+        if (couponType == null || couponName == null || discountRate == null || expireDate == null || couponStock == null
+            || minOrderPrice == null || discountFor == null) {
+            alert("모든 항목을 입력 해 주세요")
+            location.reload();
+        }
 
         $.ajax({
             url : '/coupon',
@@ -138,12 +146,12 @@
             data: JSON.stringify(data),
             success : function(result) {
                 console.log(result);
-                location.href = '/toCouponCreate';
+                // location.href = '/admin/coupon';
             },
             error: function (error) {
                 console.log('통신 실패' + error);
             },
-        })
+        });
     })
 </script>
 </th:block>

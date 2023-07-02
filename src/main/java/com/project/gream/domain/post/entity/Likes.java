@@ -1,7 +1,5 @@
 package com.project.gream.domain.post.entity;
 
-import com.project.gream.common.enumlist.LikeTargetType;
-import com.project.gream.common.enumlist.converter.LikeTargetTypeConverter;
 import com.project.gream.common.util.BaseTimeEntity;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.member.entity.Member;
