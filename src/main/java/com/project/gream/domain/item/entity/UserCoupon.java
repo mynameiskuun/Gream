@@ -1,7 +1,7 @@
-package com.project.gream.domain.coupon;
+package com.project.gream.domain.item.entity;
 
 import com.project.gream.common.util.BaseTimeEntity;
-import com.project.gream.domain.coupon.Coupon;
+import com.project.gream.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +10,7 @@ import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
+@Entity
 public class CouponBox extends BaseTimeEntity {
 
     @Id
@@ -18,10 +19,13 @@ public class CouponBox extends BaseTimeEntity {
     private Long id;
     @Column(name = "coupon_quantity")
     private int quantity;
+    @OneToOne(mappedBy = "couponbox_id")
+    private Member member;
 
     @Builder
-    public CouponBox(Long id, int quantity) {
+    public CouponBox(Long id, int quantity, Member member) {
         this.id = id;
         this.quantity = quantity;
+        this.member = member;
     }
 }
