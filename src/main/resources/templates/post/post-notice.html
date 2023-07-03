@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="main/mainpage">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        #post-title {
+            margin-bottom: 100px;
+        }
+        #post-notice-wrapper {
+            margin: 100px 100px;
+        }
+        #buttons {
+            display: flex;
+            justify-content: end;
+        }
+    </style>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div id="post-notice-wrapper">
+            <div id="post-notice-container">
+                <section id="post-notice-header">
+                    <div id="post-title">
+                        <h3>공지사항</h3>
+                    </div>
+                </section>
+                <section id="post-notice-body">
+                    <table class="table align-middle text-center">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>제목</th>
+                            <th>작성자</th>
+                            <th>작성일</th>
+                            <th>조회</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="post : ${posts}">
+                            <td><input type="hidden" value="${post.id}" /></td>
+                            <td th:text="${post.title}"></td>
+                            <td th:text="${post.member.name}"></td>
+                            <td th:text="${post.createTime}"></td>
+                            <td th:text="${post.hits}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section id="post-notice-footer">
+                    <div id="buttons">
+                        <button id="write-btn">작성</button>
+                    </div>
+                    <div id="paging-area">
+                        <div id="paging-btn-box">
+                            <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
+                                <a th:if="${page != nowPage}" th:href="@{/orderlist/{memberId}(memberId=${session.loginMember.id}, page=${page - 1})}" th:text="${page}"></a>
+                                <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="search-area">
+                        <form id="search-form">
+                            <select name="period" id="set-search-period">
+                                <option value="all">전체 기간</option>
+                                <option value="last-six-months">최근 6개월</option>
+                                <option value="last-one-year">최근 1년</option>
+                            </select>
+                            <select name="target" id="set-search-target">
+                                <option value="title-and-content">제목 + 내용</option>
+                                <option value="comment-content">댓글</option>
+                                <option value="post-writer">글 작성자</option>
+                                <option value="comment-writer">댓글 작성자</option>
+                            </select>
+                            <input type="search" name="post-search" id="post-search" placeholder="검색어를 입력 해 주세요"/>
+                            <a id="search-btn">검색</a>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    <script th:inline="javascript">
+        $('#search-btn').on('click', function() {
+
+            let period = $('#set-search-period').val();
+            let target = $('#set-search-target').val();
+            let searchKeyWords = $('#post-search').val();
+
+            let data = {
+                "period" : $('#set-search-period').val(),
+                "target" : $('#set-search-target').val(),
+                "searchKeyWords" : $('#post-search').val()
+            }
+
+            console.log("period : ", period);
+            console.log("target : ", target);
+            console.log("searchKeyWords : ", searchKeyWords);
+
+            $.ajax({
+                url: '/post/notice/search',
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'text',
+                success: function(result) {
+                    console.log("success");
+                    console.log("result : ", result)
+                },
+                error: function (error) {
+                    console.log('error');
+                    console.log('error : ', error);
+                },
+            })
+        })
+    </script>
+    </th:block>
+</body>
+</html>

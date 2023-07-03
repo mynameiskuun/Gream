@@ -16,14 +16,16 @@ public class PostDto {
     private String title;
     private String content;
     private int hits;
+    private String thumbnailUrl;
     private MemberDto memberDto;
 
     @Builder
-    public PostDto(Long id, String title, String content, int hits, MemberDto memberDto) {
+    public PostDto(Long id, String title, String content, int hits, String thumbnailUrl, MemberDto memberDto) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.hits = hits;
+        this.thumbnailUrl = thumbnailUrl;
         this.memberDto = memberDto;
     }
 
@@ -33,6 +35,7 @@ public class PostDto {
                 .title(title)
                 .content(content)
                 .hits(hits)
+                .thumbnailUrl(thumbnailUrl)
                 .member(memberDto.toEntity())
                 .build();
     }
@@ -43,6 +46,7 @@ public class PostDto {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .hits(post.getHits())
+                .thumbnailUrl(post.getThumbnailUrl())
                 .memberDto(MemberDto.fromEntity(post.getMember()))
                 .build();
     }
