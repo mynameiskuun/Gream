@@ -15,7 +15,7 @@
         <div id="header-container">
             <div id="upper-header">
                 <div class="upper-header-btn">
-                    <a th:href="@{/inquiry}">Q & A</a>
+                    <a th:href="@{/post/notice}">NOTICE</a>
                 </div>
                 <th:block th:if="${session.loginMember ne null && session.loginMember.role.getValue().equals('ROLE_MEMBER')}">
                     <div class="upper-header-btn"><a th:href="@{/like/{memberId}(memberId=${session.loginMember.getId()})}">LIKE</a></div>

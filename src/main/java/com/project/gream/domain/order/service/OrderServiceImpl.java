@@ -267,7 +267,6 @@ public class OrderServiceImpl implements OrderService {
                 .orderHistoryDto(OrderHistoryDto.fromEntity(OrderItem.getOrderHistory()))
                 .createdTime(OrderItem.getCreatedTime())
                 .modifiedTime(OrderItem.getModifiedTime()).build());
-
     }
 
     public static String createKey() {

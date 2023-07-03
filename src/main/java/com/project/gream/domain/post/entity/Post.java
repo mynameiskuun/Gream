@@ -22,17 +22,19 @@ public class Post extends BaseTimeEntity {
     private String content;
     private int hits;
     private PostType postType;
+    private String thumbnailUrl;
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
-    public Post(Long id, String title, String content, int hits, PostType postType, Member member) {
+    public Post(Long id, String title, String content, int hits, PostType postType, String thumbnailUrl, Member member) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.hits = hits;
         this.postType = postType;
+        this.thumbnailUrl = thumbnailUrl;
         this.member = member;
     }
 }

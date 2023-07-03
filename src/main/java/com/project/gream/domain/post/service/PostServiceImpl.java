@@ -17,6 +17,8 @@ import com.project.gream.domain.post.repository.ReviewRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -262,10 +264,16 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<PostDto> getAllQnaPosts() {
-        return postRepository.findAll().stream()
-                .map(PostDto::fromEntity)
-                .collect(Collectors.toList());
+    public Page<PostDto> getAllQnaPosts(Pageable pageable) {
+        return postRepository.findAll(pageable)
+                .map(Post -> PostDto.builder()
+                        .id(Post.getId())
+                        .title(Post.getTitle())
+                        .content(Post.getContent())
+                        .hits(Post.getHits())
+                        .thumbnailUrl(Post.getThumbnailUrl())
+                        .memberDto(MemberDto.fromEntity(Post.getMember()))
+                        .build());
     }
 
 }
