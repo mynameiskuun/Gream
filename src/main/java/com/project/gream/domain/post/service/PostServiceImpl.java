@@ -1,18 +1,18 @@
 package com.project.gream.domain.post.service;
 
 import com.project.gream.common.annotation.LoginMember;
-import com.project.gream.common.enumlist.LikeTargetType;
-import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.entity.Img;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.dto.LikesVO;
 import com.project.gream.domain.post.dto.LikesResponseDto;
+import com.project.gream.domain.post.dto.PostDto;
 import com.project.gream.domain.post.dto.ReviewDto;
 import com.project.gream.domain.post.entity.Likes;
 import com.project.gream.domain.post.entity.Review;
 import com.project.gream.domain.post.repository.LikesRepository;
+import com.project.gream.domain.post.repository.PostRepository;
 import com.project.gream.domain.post.repository.ReviewRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +34,7 @@ public class PostServiceImpl implements PostService{
     private final ReviewRepository reviewRepository;
     private final ItemRepository itemRepository;
     private final LikesRepository likesRepository;
+    private final PostRepository postRepository;
     private final EntityManager em;
 
     @Transactional
@@ -258,6 +259,13 @@ public class PostServiceImpl implements PostService{
             likeCount = likesRepository.countByPost_Id(likesVO.getPostDto().getId());
         }
         return likeCount;
+    }
+
+    @Override
+    public List<PostDto> getAllQnaPosts() {
+        return postRepository.findAll().stream()
+                .map(PostDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
 }

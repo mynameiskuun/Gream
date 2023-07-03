@@ -2,10 +2,7 @@ package com.project.gream.domain.post.service;
 
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.domain.member.dto.MemberDto;
-import com.project.gream.domain.post.dto.LikesRequestDto;
-import com.project.gream.domain.post.dto.LikesVO;
-import com.project.gream.domain.post.dto.LikesResponseDto;
-import com.project.gream.domain.post.dto.ReviewDto;
+import com.project.gream.domain.post.dto.*;
 import com.project.gream.domain.post.entity.Likes;
 
 import java.util.List;
@@ -19,5 +16,7 @@ public interface PostService {
     Likes isAlreadyLiked(LikesVO likesVO);
     LikesResponseDto saveOrDeleteItemLike(LikesVO likesVO);
     LikesResponseDto checkLike(Long itemId, @LoginMember MemberDto memberDto);
+
+    List<PostDto> getAllQnaPosts();
 //    LikesResponseDto checkLike(LikesRequestDto req, @LoginMember MemberDto memberDto, );
 }

@@ -3,15 +3,13 @@ package com.project.gream.domain.post.controller;
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.domain.member.dto.MemberDto;
-import com.project.gream.domain.post.dto.LikesRequestDto;
-import com.project.gream.domain.post.dto.LikesVO;
-import com.project.gream.domain.post.dto.LikesResponseDto;
-import com.project.gream.domain.post.dto.ReviewDto;
+import com.project.gream.domain.post.dto.*;
 import com.project.gream.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -40,10 +38,13 @@ public class PostController {
         return postService.saveOrDeleteItemLike(likesVO);
     }
 
-    @PostMapping("/test/likecheck")
-    public String likeCheck(@RequestBody LikesRequestDto req, @LoginMember MemberDto memberDto) {
+    @GetMapping("/post/qna")
+    public ModelAndView toQnaBoard() {
+        ModelAndView mav = new ModelAndView();
+        List<PostDto> postsList = postService.getAllQnaPosts();
 
-//        postService.checkLike(req, memberDto);
-        return "";
+        mav.addObject("postslist", postsList);
+        mav.setViewName("/post/post-qna");
+        return mav;
     }
 }
