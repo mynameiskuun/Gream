@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="main/mainpage">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+  <style>
+    #notice-write-header {
+      margin-bottom: 80px;
+    }
+    #post-notice-write-wrapper {
+      width: 80%;
+      margin: 100px auto;
+    }
+    .title-box {
+      margin-bottom: 30px;
+    }
+    .content-box {
+      margin-bottom: 30px;
+    }
+    .btns-box {
+      display: flex;
+      justify-content: center;
+    }
+    #write-btn {
+      cursor: pointer;
+    }
+  </style>
+  <script
+          src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"
+          referrerpolicy="origin"
+  ></script>
+  <script>
+    tinymce.init({
+      selector: '#notice-content'
+    });
+  </script>
+</head>
+<body>
+  <th:block layout:fragment="content">
+    <div id="post-notice-write-wrapper">
+      <div id="post-notice-write-container">
+        <form id="notice-form">
+          <div id="notice-write-header">
+            <h3>공지사항 작성</h3>
+          </div>
+          <div id="notice-write-body">
+            <div class="title-box">
+              <input th:if="${postDto == null}"
+                     type="text"
+                     class="form-control"
+                     th:id="notice-title"
+                     name="noticeTitle"
+                     placeholder="제목을 입력해 주세요" />
+              <input th:unless="${postDto == null}"
+                     type="text"
+                     class="form-control"
+                     th:id="notice-title"
+                     th:value="${postDto.title}"
+                     name="noticeTitle"
+                     placeholder="제목을 입력해 주세요" />
+            </div>
+            <div class="content-box">
+              <textarea th:if="${postDto == null}"
+                        class="form-control tiny"
+                        th:id="notice-content"
+                        name="noticeContent"
+                        placeholder="내용을 입력해 주세요"
+                        required>
+              </textarea>
+              <textarea th:unless="${postDto == null}"
+                        class="form-control tiny"
+                        th:id="notice-content"
+                        th:value="${postDto.content}"
+                        name="noticeContent"
+                        placeholder="내용을 입력해 주세요"
+                        required>
+              </textarea>
+              <input class="form-control" type="file" id="noticeImgs" name="noticeImgs" multiple="multiple">
+            </div>
+          </div>
+          <div id="notice-write-footer">
+            <div class="btns-box">
+              <a id="write-btn"> 작성 </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script th:inline="javascript">
+      $('#write-btn').on('click', function() {
+
+        let data = {
+          "noticeTitle" : $('#notice-title').val(),
+          "noticeContent" : tinymce.get("notice-content").getContent(),
+          "postType" : "NOTICE"
+        }
+
+        let form = $('#notice-form')[0];
+        let formData = new FormData(form);
+
+        formData.append('postRequestDto', new Blob([JSON.stringify(data)], {type : 'application/json'}));
+        formData.append('noticeImgs', $('#noticeImgs'));
+
+        console.log('formData : ', formData);
+
+        $.ajax({
+          url: '/post/notice',
+          type: 'POST',
+          processData: false,
+          contentType: false,
+          data: formData,
+          dataType: 'text',
+          success: function (result) {
+            alert(result)
+            $('#notice-title').val("");
+            tinymce.get("notice-content").setContent("");
+          },
+          error: function(error) {
+            console.log("error");
+            console.log("error : ", error);
+          },
+        })
+      })
+    </script>
+  </th:block>
+</body>
+</html>

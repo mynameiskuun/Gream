@@ -1,15 +1,17 @@
 package com.project.gream.domain.post.service;
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.common.config.S3Config;
+import com.project.gream.common.enumlist.PostType;
 import com.project.gream.domain.item.entity.Img;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;
 import com.project.gream.domain.member.dto.MemberDto;
-import com.project.gream.domain.post.dto.LikesVO;
-import com.project.gream.domain.post.dto.LikesResponseDto;
-import com.project.gream.domain.post.dto.PostDto;
-import com.project.gream.domain.post.dto.ReviewDto;
+import com.project.gream.domain.member.entity.Member;
+import com.project.gream.domain.member.repository.MemberRepository;
+import com.project.gream.domain.post.dto.*;
 import com.project.gream.domain.post.entity.Likes;
+import com.project.gream.domain.post.entity.Post;
 import com.project.gream.domain.post.entity.Review;
 import com.project.gream.domain.post.repository.LikesRepository;
 import com.project.gream.domain.post.repository.PostRepository;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import java.util.*;
@@ -37,7 +40,9 @@ public class PostServiceImpl implements PostService{
     private final ItemRepository itemRepository;
     private final LikesRepository likesRepository;
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
     private final EntityManager em;
+    private final S3Config s3Config;
 
     @Transactional
     @Override
@@ -264,8 +269,8 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public Page<PostDto> getAllQnaPosts(Pageable pageable) {
-        return postRepository.findAll(pageable)
+    public Page<PostDto> getAllNoticePosts(Pageable pageable) {
+        return postRepository.findAllByPostTypeOrderByCreatedTimeDesc(PostType.NOTICE, pageable)
                 .map(Post -> PostDto.builder()
                         .id(Post.getId())
                         .title(Post.getTitle())
@@ -276,4 +281,43 @@ public class PostServiceImpl implements PostService{
                         .build());
     }
 
+    @Override
+    public String saveNotice(PostRequestDto requestDto, List<MultipartFile> noticeImgs, MemberDto memberDto) throws Exception {
+
+        if (!memberDto.getId().equals("admin")) {
+            return "권한이 없습니다.";
+        }
+        Member member = memberRepository.findById(memberDto.getId()).orElseThrow();
+
+        Post post = Post.builder()
+                .title(requestDto.getNoticeTitle())
+                .content(requestDto.getNoticeContent())
+                .postType(PostType.NOTICE)
+                .thumbnailUrl(requestDto.getThumbnailUrl())
+                .member(member)
+                .build();
+
+        List<String> imgUrlList = s3Config.imgUpload(PostRequestDto.class, noticeImgs);
+
+        if (!noticeImgs.isEmpty()) {
+            post.setThumbnailUrl(imgUrlList.get(0));
+        }
+
+        postRepository.save(post);
+        return "공지사항 등록 완료";
+    }
+
+    @Override
+    public PostResponseDto getNoticeDetail(Long noticeId) {
+
+        Post post =  postRepository.findById(noticeId).orElseThrow();
+        List<String> imgUrlList = Optional.ofNullable(imgRepository.findAllByPost_Id(noticeId))
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(Img::getUrl)
+                .collect(Collectors.toList());
+
+        PostDto postDto = PostDto.fromEntity(post);
+        return new PostResponseDto(imgUrlList, postDto);
+    }
 }

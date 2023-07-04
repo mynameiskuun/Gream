@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ImgRepository extends JpaRepository<Img, Long> {
 
     @Query(value = "select img from Img img where img.item.id = :id and img.review.id = null")
     List<Img> findItemImgs(@Param("id") Long itemId);
+
+    List<Img> findAllByPost_Id(Long postId);
 
 }
