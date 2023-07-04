@@ -17,6 +17,28 @@
             display: flex;
             justify-content: end;
         }
+        #set-search-period {
+            display: inline-block;
+            width: 150px;
+        }
+        #set-search-target {
+            display: inline-block;
+            width: 150px;
+        }
+        #post-search {
+            margin-left: 10px;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+            border-bottom: 1px solid lightgray;
+            margin-right: 10px;
+        }
+        #search-btn {
+            cursor: pointer;
+        }
+        #notice-write-btn {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -40,43 +62,43 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="post : ${posts}">
+                        <tr th:each="notice : ${noticeList}">
                             <td><input type="hidden" value="${post.id}" /></td>
-                            <td th:text="${post.title}"></td>
-                            <td th:text="${post.member.name}"></td>
-                            <td th:text="${post.createTime}"></td>
-                            <td th:text="${post.hits}"></td>
+                            <td><a th:href="@{/post/notice/{noticeId}(noticeId=${notice.id})}" th:text="${notice.title}"></a></td>
+                            <td th:text="${notice.memberDto.id}"></td>
+                            <td th:text="${#strings.substring(notice.createdTime, 0, 10)}"></td>
+                            <td th:text="${notice.hits}"></td>
                         </tr>
                         </tbody>
                     </table>
                 </section>
                 <section id="post-notice-footer">
-                    <div id="buttons">
-                        <button id="write-btn">작성</button>
+                    <div id="buttons" th:if="${session.loginMember.id eq 'admin'}">
+                        <a id="notice-write-btn" href="/post/notice/write"> 작성 </a>
                     </div>
                     <div id="paging-area">
                         <div id="paging-btn-box">
                             <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
                                 <a th:if="${page != nowPage}" th:href="@{/orderlist/{memberId}(memberId=${session.loginMember.id}, page=${page - 1})}" th:text="${page}"></a>
-                                <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
+                                <strong th:unless="${page != nowPage}" style="color:black" th:text="${page}"></strong>
                             </div>
                         </div>
                     </div>
                     <div id="search-area">
                         <form id="search-form">
-                            <select name="period" id="set-search-period">
+                            <select class="form-select" name="period" id="set-search-period">
                                 <option value="all">전체 기간</option>
                                 <option value="last-six-months">최근 6개월</option>
                                 <option value="last-one-year">최근 1년</option>
                             </select>
-                            <select name="target" id="set-search-target">
+                            <select class="form-select" name="target" id="set-search-target">
                                 <option value="title-and-content">제목 + 내용</option>
                                 <option value="comment-content">댓글</option>
                                 <option value="post-writer">글 작성자</option>
                                 <option value="comment-writer">댓글 작성자</option>
                             </select>
                             <input type="search" name="post-search" id="post-search" placeholder="검색어를 입력 해 주세요"/>
-                            <a id="search-btn">검색</a>
+                            <a id="search-btn" href="/post/notice/write">검색</a>
                         </form>
                     </div>
                 </section>

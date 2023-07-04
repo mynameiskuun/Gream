@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="main/mainpage">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+  <style>
+    #notice-write-header {
+      margin-bottom: 80px;
+    }
+    #post-notice-write-wrapper {
+      width: 80%;
+      margin: 100px auto;
+    }
+    .title-box {
+      margin-bottom: 30px;
+    }
+    .content-box {
+      margin-bottom: 30px;
+    }
+    .btns-box {
+      display: flex;
+      justify-content: center;
+    }
+    #write-btn {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <th:block layout:fragment="content">
+    <div id="post-notice-write-wrapper">
+      <div id="post-notice-write-container">
+        <form id="notice-form">
+          <div id="notice-write-header">
+            <h3>공지사항</h3>
+          </div>
+          <div id="notice-write-body">
+            <div class="title-box">
+              <h3 th:text="${notice.postDto.getTitle()}"></h3>
+            </div>
+            <div class="content-box">
+              <div id="notice-writer" th:text="${notice.postDto.memberDto.id}"></div>
+              <div id="notice-createdTime" th:text="${#strings.substring(notice.postDto.createdTime, 0, 10)}"></div>
+              <div id="notice-content"></div>
+            </div>
+          </div>
+          <div id="notice-write-footer">
+            <div class="btns-box">
+              <a id="modify-btn" th:href="@{/post/notice/{noticeId}/edit(noticeId=${notice.postDto.id})}" th:if="${session.loginMember.id eq 'admin'}"> 수정 </a>
+              <a id="delete-btn" th:if="${session.loginMember.id eq 'admin'}"> 삭제 </a>
+              <a id="back-to-list-btn" th:href="@{/post/notice}">목록</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script th:inline="javascript">
+
+      $(document).ready(function () {
+        let noticeContent = [[${notice.postDto.content}]]
+        $('#notice-content').append(noticeContent);
+      });
+
+      $('#delete-btn').on('click', function() {
+        let noticeId = [[${notice.postDto.id}]];
+
+        if (confirm('정말 삭제하시겠습니까?')) {
+          $.ajax({
+            url: '/post/notice/' + [[${notice.postDto.id}]],
+            type: 'DELETE',
+            data: noticeId,
+            contentType: 'TEXT',
+            dataType: 'TEXT',
+            success(result) {
+              alert(result);
+            },
+            error(error) {
+              alert(error);
+            }
+          });
+        }
+      })
+
+    </script>
+  </th:block>
+</body>
+</html>

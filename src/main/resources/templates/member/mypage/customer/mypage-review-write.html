@@ -266,6 +266,10 @@
                     type: 'POST',
                     processData: false,
                     contentType: false,
+                    // 일반적으로 ajax 사용 시 데이터를 자동으로 처리 해 적절한 타입으로 설정하여 서버로 전송.
+                    // 하지만 @RequestPart 사용 시, 파일을 직렬화 하여 변환할 필요 없이 그대로 전송 시켜야 함.
+                    // 따라서 processData: false를 통해 파일을 원시 데이터 형태 그대로 전송.
+                    // ajax를 사용해서 비동기적으로 form 데이터와 이미지를 동시에 전송해야 할 때 이를 사용한다.
                     data: formData,
                     success: function(result) {
                         console.log(result);
