@@ -29,13 +29,37 @@
     }
   </style>
   <script
-          src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"
+          src="https://cdn.tiny.cloud/1/cdf15won1fs9c5ru9n5lxfk3avmwa50323recy5jikyi23c4/tinymce/6/tinymce.min.js"
           referrerpolicy="origin"
   ></script>
-  <script>
+  <script th:inline="javascript">
     tinymce.init({
-      selector: '#notice-content'
+
+      selector: '#notice-content',
+      // setup: function (editor) {
+      //   let postResponseDto =
+      //   console.log('postResponseDto : ', postResponseDto);
+      //
+      //   if (postResponseDto != null) {
+      //     editor.onLoadContent.add(function(editor,o) {
+      //       editor.focus();
+      //       tinymce.activeEditor.setContent(postResponseDto.postDto.content);
+      //     })
+      //   }
+      // },
+      setup: (editor) => {
+        editor.on('init', (e) => {
+          let content = "";
+          let postResponseDto = [[${postResponseDto}]];
+
+          if (postResponseDto != null) {
+            content = postResponseDto.postDto.content;
+          }
+          editor.setContent(content);
+        });
+      }
     });
+
   </script>
 </head>
 <body>
@@ -44,36 +68,28 @@
       <div id="post-notice-write-container">
         <form id="notice-form">
           <div id="notice-write-header">
-            <h3>공지사항 작성</h3>
+            <h3 th:if="${postResponseDto == null}">공지사항 작성</h3>
+            <h3 th:unless="${postResponseDto == null}">공지사항 수정</h3>
           </div>
           <div id="notice-write-body">
             <div class="title-box">
-              <input th:if="${postDto == null}"
+              <input th:if="${postResponseDto == null}"
                      type="text"
                      class="form-control"
                      th:id="notice-title"
                      name="noticeTitle"
                      placeholder="제목을 입력해 주세요" />
-              <input th:unless="${postDto == null}"
+              <input th:unless="${postResponseDto == null}"
                      type="text"
                      class="form-control"
                      th:id="notice-title"
-                     th:value="${postDto.title}"
+                     th:value="${postResponseDto.postDto.title}"
                      name="noticeTitle"
                      placeholder="제목을 입력해 주세요" />
             </div>
             <div class="content-box">
-              <textarea th:if="${postDto == null}"
-                        class="form-control tiny"
-                        th:id="notice-content"
-                        name="noticeContent"
-                        placeholder="내용을 입력해 주세요"
-                        required>
-              </textarea>
-              <textarea th:unless="${postDto == null}"
-                        class="form-control tiny"
-                        th:id="notice-content"
-                        th:value="${postDto.content}"
+              <textarea class="form-control tiny"
+                        id="notice-content"
                         name="noticeContent"
                         placeholder="내용을 입력해 주세요"
                         required>
@@ -83,13 +99,15 @@
           </div>
           <div id="notice-write-footer">
             <div class="btns-box">
-              <a id="write-btn"> 작성 </a>
+              <a th:if="${postResponseDto eq null}" th:id="write-btn"> 작성 </a>
+              <a th:unless="${postResponseDto eq null}" th:id="write-btn"> 수정 </a>
             </div>
           </div>
         </form>
       </div>
     </div>
     <script th:inline="javascript">
+
       $('#write-btn').on('click', function() {
 
         let data = {
@@ -104,7 +122,8 @@
         formData.append('postRequestDto', new Blob([JSON.stringify(data)], {type : 'application/json'}));
         formData.append('noticeImgs', $('#noticeImgs'));
 
-        console.log('formData : ', formData);
+        console.log(JSON.stringify(data, null, 2));
+        console.log("formData : ", formData);
 
         $.ajax({
           url: '/post/notice',

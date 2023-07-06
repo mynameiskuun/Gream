@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+    <style>
+        #popup-wrapper {
+            margin: 80px 40px;
+            width: 100%;
+        }
+        #popup-container {
+            width: 90%;
+        }
+        #popup-header {
+            text-align: center;
+            margin-bottom: 50px;
+            width:100%;
+        }
+    </style>
+</head>
+<body>
+    <section id="popup-wrapper">
+        <section id="popup-container">
+            <div id="popup-header">
+                <h3>문의글 작성</h3>
+            </div>
+
+            <div id="popup-body">
+                <form enctype="multipart/form-data" id="formData" name="formData">
+                    <table class="table align-middle text-center table-hover">
+                        <tr>
+                            <td>
+                                <div>
+                                    <h5>문의 유형</h5>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-detail-group btn-group" role="group">
+                                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                        <input type="radio" class="btn-check" name="qna-type" id="qna-type-radio1" autocomplete="off" value="PRODUCT"/>
+                                        <label class="btn btn-outline-primary" for="qna-type-radio1">상품</label>
+
+                                        <input type="radio" class="btn-check" name="qna-type" id="qna-type-radio2" autocomplete="off" value="DELIVERY"/>
+                                        <label class="btn btn-outline-primary" for="qna-type-radio2">배송</label>
+
+                                        <input type="radio" class="btn-check" name="qna-type" id="qna-type-radio3" autocomplete="off" value="EXCHANGE"/>
+                                        <label class="btn btn-outline-primary" for="qna-type-radio3">교환</label>
+
+                                        <input type="radio" class="btn-check" name="qna-type" id="qna-type-radio4" autocomplete="off" value="ETC"/>
+                                        <label class="btn btn-outline-primary" for="qna-type-radio4">기타</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5>제목</h5>
+                            </td>
+                            <td>
+                                <input type="text" id="qna-title" class="form-control" name="qna-title" placeholder="제목을 입력 해 주세요"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5>내용</h5>
+                            </td>
+                            <td>
+                                <textarea class="form-control" id="qna-content" name="qna-content" placeholder="문의 유형을 선택 해 주시고, 궁금한 내용을 작성 해 주세요"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h5>첨부파일</h5>
+                            </td>
+                            <td>
+                                <input type="file" id="qna-imgs" class="form-control" name="qna-imgs" multiple />
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+            <div style="text-align: center">
+                <a id="qna-submit-btn" class="btn btn-outline-danger ">제출</a>
+            </div>
+        </section>
+    </section>
+<script>
+    $('#qna-submit-btn').on('click', function() {
+
+        let data = {
+            "qnaType" : $('input[name=qna-type]:checked').val(),
+            "qnaTitle" : $('input[name=qna-title]').val(),
+            "qnaContent" : $('input[name=qna-content]').val()
+        }
+
+        let form = $('#formData')[0];
+        let formData = new FormData(form);
+
+        formData.append('postRequestDto', new Blob([JSON.stringify(data)], {type : 'application/json'}));
+        formData.append('qnaImgs', $('#qna-imgs'));
+
+        console.log(JSON.stringify(data, null, 2));
+        console.log("formData : ", formData);
+
+        $.ajax({
+            url : '/post/qna',
+            type: 'POST',
+            processData: false,
+            contentType: false,
+            data: formData,
+            dataType: 'TEXT',
+            success(result) {
+                console.log("result", result);
+            },
+            error(error) {
+                console.log("error", error);
+            },
+        })
+    })
+</script>
+</body>
+</html>

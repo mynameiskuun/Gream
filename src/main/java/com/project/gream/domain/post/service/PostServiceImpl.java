@@ -1,8 +1,10 @@
 package com.project.gream.domain.post.service;
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.common.auth.dto.CustomUserDetails;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.PostType;
+import com.project.gream.common.enumlist.Role;
 import com.project.gream.domain.item.entity.Img;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,8 +91,9 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<ReviewDto> getReviewDtoById(Long itemId) {
-        List<Review> reviews = reviewRepository.findAllById(itemId);
+    public List<ReviewDto> getReviewListByItemId(Long itemId) {
+        List<Review> reviews = Optional.ofNullable(reviewRepository.findAllByItem_Id(itemId))
+                .orElseThrow(() -> new NoSuchElementException(String.format("itemId [%s]의 리뷰는 존재하지 않습니다", itemId)));
 
         if (reviews == null) {
             return Collections.emptyList();
@@ -297,9 +301,13 @@ public class PostServiceImpl implements PostService{
                 .member(member)
                 .build();
 
-        List<String> imgUrlList = s3Config.imgUpload(PostRequestDto.class, noticeImgs);
+        Long size = (long) noticeImgs.size();
+        log.info("size : " + size);
 
-        if (!noticeImgs.isEmpty()) {
+        log.info(String.valueOf(noticeImgs.isEmpty()));
+
+        if (noticeImgs.size() != 0) {
+            List<String> imgUrlList = s3Config.imgUpload(PostRequestDto.class, noticeImgs);
             post.setThumbnailUrl(imgUrlList.get(0));
         }
 
@@ -319,5 +327,23 @@ public class PostServiceImpl implements PostService{
 
         PostDto postDto = PostDto.fromEntity(post);
         return new PostResponseDto(imgUrlList, postDto);
+    }
+
+    @Override
+    public String deleteNotice(final Long noticeId, CustomUserDetails user) {
+
+        String result = "삭제 완료";
+
+        if (!isRealAdmin(user)) {
+            result = "권한이 없습니다";
+            return result;
+        }
+        postRepository.deleteById(noticeId);
+        return result;
+    }
+
+    private boolean isRealAdmin(CustomUserDetails user) {
+        log.info("authorities : " + user.getAuthorities().toString());
+        return user.getRole().equals(Role.ADMIN);
     }
 }

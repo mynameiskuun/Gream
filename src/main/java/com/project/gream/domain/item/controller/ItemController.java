@@ -46,14 +46,15 @@ public class ItemController {
         log.info("------------------------------- 상품 디테일 페이지 진입");
 
         ModelAndView mav = new ModelAndView();
-        ItemDto itemDto = itemService.getItemById(itemId);
 
-//        postService.saveReviewsForTest(memberDto);
-        Map<Integer, Integer> starValMap = postService.getReviewScoreByItemId(itemId);
-        List<ReviewDto> reviewList = postService.getReviewDtoById(itemId);
-        LikesResponseDto likes = postService.checkLike(itemId, memberDto);
         List<CouponDto> couponList = itemService.getUsableCouponList(itemId);
+        List<ReviewDto> reviewList = postService.getReviewListByItemId(itemId);
+        Map<Integer, Integer> starValMap = postService.getReviewScoreByItemId(itemId);
+        ItemDto itemDto = itemService.getItemById(itemId);
+        LikesResponseDto likes = postService.checkLike(itemId, memberDto);
 
+
+        log.info("reviewList.size : ", reviewList.size());
         mav.addObject("couponList", couponList);
         mav.addObject("reviewList", reviewList);
         mav.addObject("starValMap", starValMap);

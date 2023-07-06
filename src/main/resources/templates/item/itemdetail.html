@@ -130,16 +130,26 @@
                     </div>
                 </div>
 
-                <div id="review-header">
-                    <div class="event-label outline-primary text-primary">EVENT</div>
-                    <div class="review-event-text text-secondary">
-                        사진 첨부 후기 작성 시 2,000원의 적립금을 드립니다.(직접 촬영한 사진 필수)
-                    </div>
-                    <div></div>
-                </div>
 
                 <div id="review-wrapper">
-                    <div id="cards-wrapper">
+                    <div id="review-wrapper-header">
+                        <div id="review-label">
+                            <h3> 구매 후기 </h3>
+                        </div>
+                        <div id="review-event-box">
+                            <div class="event-label outline-primary text-primary">EVENT</div>
+                            <div class="review-event-text text-secondary">
+                                사진 첨부 후기 작성 시 2,000원의 적립금을 드립니다.(직접 촬영한 사진 필수)
+                            </div>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div th:if="${reviewList.size() eq 0}" th:id="cards-wrapper">
+                        <div id="empty-review-msg-box">
+                            <h6> 등록된 후기가 없습니다. </h6>
+                        </div>
+                    </div>
+                    <div th:unless="${reviewList.size() eq 0}" th:id="cards-wrapper">
                         <div id="review-container" th:each="reviewList : ${reviewList}">
                             <div class="review-cards">
                                 <div class="review-top">회원 리뷰</div>
@@ -231,14 +241,54 @@
             </div>
         </div>
     </div>
-        <div id="item-qna-box">
-            문의란
-            <span>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fuga maiores, quis minima incidunt voluptatibus error consectetur et reprehenderit. Repellendus laudantium voluptates ad doloremque neque dolore error dolorum soluta temporibus suscipit.
-            </span>
-            <!-- 문의란. 게시판 형식으로 페이징 처리 -->
-            <!-- ajax 비동기 렌더링 -->
-            <!-- 11번가 참고 -->
+        <div id="item-qna-wrapper">
+            <div id="qna-wrapper-header">
+                <div id="qna-label">
+                    <h3>상품 문의</h3>
+                </div>
+            </div>
+            <div id="qna-body">
+                <!--<div th:if="${qnaList.size() == 0}" th:id="qna-container">
+                    <div><h6> 등록된 문의가 없습니다. </h6></div>
+                </div>
+                <div th:unless="${qnaList.size() == 0}" th:id="qna-container"> -->
+                <div id="qna-container">
+                    <table class="table align-middle text-center table-hover" id="qna-table">
+                        <thead>
+                            <tr class="align-middle" style="height:70px;">
+                                <th style="width: 100px;">문의 유형</th>
+                                <th>문의 / 답변</th>
+                                <th style="width: 150px;">작성자</th>
+                                <th style="width: 200px;">작성일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="qna : ${qnaList}">
+                                <td> 문의 유형 </td>
+                                <td>
+                                    <span>
+                                        <a style="color: cornflowerblue; border: 1px solid lightgray;">미완료</a> <!-- 답변 미료시 -->
+                                        <a style="color: cornflowerblue; background: lightblue; border: 1px solid cornflowerblue;">답변 완료</a> <!-- 답변 완료시 -->
+                                    </span>
+                                    <span>
+                                        제목
+                                    </span>
+                                </td>
+                                <td> 작성자 </td>
+                                <td> 작성일 </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="qna-footer">
+                    <div id="qna-btns">
+                        <a id="qna-write-btn" onclick="showQnaPopUp()" target = "_blank">상품 문의하기</a>
+                    </div>
+                    <div id="qna-paging-area">
+
+                    </div>
+                </div>
+            </div>
         </div>
         <!--   footer start   -->
         <th:block th:replace="main/footer :: footer"></th:block>
@@ -530,7 +580,13 @@
     $('.item-thumbs-up').click(itemLike);
     // $('.review-thumbs-up').click(like);
 
-    /*]]*/
+    function showQnaPopUp() {
+        let url = "/post/qna";
+        let name = "popup-test";
+        let option = "width = 800, height: 400, top = 100, left = 100, location = no";
+
+        window.open(url, name, option);
+    }
 </script>
 </body>
 </html>
