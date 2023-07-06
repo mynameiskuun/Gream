@@ -184,8 +184,9 @@ public class OrderServiceImpl implements OrderService {
 
         List<Long> itemIdArray = kakaoPayDto.getItemIds();
         List<Integer> qtyArray = kakaoPayDto.getItemQtys();
+        int itemIdArraySize = itemIdArray.size();
 
-        for (int i = 0; i < itemIdArray.size(); i++) {
+        for (int i = 0; i < itemIdArraySize; i++) {
             Item item = itemRepository.findById(itemIdArray.get(i))
                     .orElseThrow(() -> new NoSuchElementException());
 

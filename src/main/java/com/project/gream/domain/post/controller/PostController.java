@@ -1,6 +1,7 @@
 package com.project.gream.domain.post.controller;
 
 import com.project.gream.common.annotation.LoginMember;
+import com.project.gream.common.auth.dto.CustomUserDetails;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.Role;
 import com.project.gream.domain.member.dto.MemberDto;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -98,7 +101,7 @@ public class PostController {
 
         log.info("------------------ notice save start");
         log.info(String.valueOf(requestDto));
-        log.info(noticeImgs.toString());
+        log.info(String.valueOf(noticeImgs.get(0)));
 
         return postService.saveNotice(requestDto, noticeImgs, memberDto);
     }
@@ -122,9 +125,22 @@ public class PostController {
         }
         PostResponseDto response = postService.getNoticeDetail(noticeId);
 
-        mav.addObject("postDto", response);
+        mav.addObject("postResponseDto", response);
         mav.setViewName("post/post-notice-write");
         return mav;
     }
 
+    @DeleteMapping("/post/notice/{noticeId}")
+    public String deleteNotice(@PathVariable Long noticeId, @AuthenticationPrincipal CustomUserDetails user) {
+
+        return postService.deleteNotice(noticeId, user);
+    }
+
+    @GetMapping("/post/qna")
+    public ModelAndView toQnaWrite() {
+        ModelAndView mav = new ModelAndView();
+
+        mav.setViewName("post/qna-write-popup");
+        return mav;
+    }
 }

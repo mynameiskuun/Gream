@@ -67,6 +67,9 @@
     align-items: center;
     margin-top: 50px;
 }
+#review-wrapper-header {
+    border-bottom: 1px solid lightgray;
+}
 #item-detail-content {
     height: 200px;
     margin-left: 30px;
@@ -85,11 +88,11 @@
     /* height 나중에 지우기. 내용 추가되면 자동으로 길이 늘어나게 */
 }
 
-#item-qna-box {
-    width: 100%;
+#item-qna-wrapper {
+    width: 90%;
     margin: 0 auto;
-    background : darkolivegreen;
-    height: 400px;
+    min-height: 300px;
+    border: 1px solid lightgray;
     /* height 나중에 지우기. 내용 추가되면 자동으로 길이 늘어나게 */
 }
 .order-item-detail {
@@ -152,11 +155,11 @@
 .review-contents {
     display: flex;
 }
-#review-header {
+#review-event-box {
     height: 60px;
     display: flex;
-    margin-left: 50px;
-    margin-top: 20px;
+    margin-left: 40px;
+    margin-top: 15px;
     font-size: 18px;
 }
 .review-header {
@@ -171,8 +174,10 @@
 }
 
 #review-wrapper {
-    /*border: 2px solid black;*/
-    /*height: 1000px;*/
+    margin-bottom: 100px;
+    border: 1px solid lightgray;
+    margin-top: 40px;
+    min-height: 300px;
 }
 
 .review-cards {
@@ -203,8 +208,8 @@
     border: 1px solid lightgray;
 }
 .customer-review-img-box {
-    height: 250px;
-    width: 250px;
+    height: 400px;
+    width: 400px;
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -227,6 +232,7 @@
     font-size: 20px;
 }
 .review-text {
+    max-width: 500px;
     margin: 30px 30px;
     color: black;
     font-size: 22px;
@@ -353,4 +359,50 @@
     color: darkgreen;
     font-size: 25px;
     font-weight: bold;
+}
+.review-right-box {
+    padding-top: 30px;
+    margin: 0 auto;
+}
+#review-label {
+    padding-top: 35px;
+    padding-left: 35px;
+    /*margin-bottom: 30px;*/
+}
+#cards-wrapper {
+    padding-top: 35px;
+    /*padding-left: 35px;*/
+    /*min-height: 300px;*/
+}
+#empty-review-msg-box {
+    /*width: 300px;*/
+    margin: 100px auto;
+    text-align: center;
+}
+#qna-wrapper-header {
+    display: flex;
+    height: 120px;
+    align-items: center;
+    border-bottom: 1px solid lightgray;
+}
+#qna-label {
+    /*padding-top: 35px;*/
+    padding-left: 35px;
+}
+#qna-body {
+    /*padding-top: 35px;*/
+    /*padding-left: 35px;*/
+}
+#qna-container {
+    /*padding-left: 35px;*/
+    margin: 0 auto;
+    width: 90%;
+    padding-top: 35px;
+}
+#qna-footer {
+    width: 90%;
+}
+#qna-btns {
+    display: flex;
+    justify-content: flex-end;
 }

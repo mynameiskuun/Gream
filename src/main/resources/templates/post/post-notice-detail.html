@@ -7,6 +7,9 @@
     <title>Title</title>
 
   <style>
+    #notice-write-body{
+      border: 1px solid lightgray;
+    }
     #notice-write-header {
       margin-bottom: 80px;
     }
@@ -15,17 +18,36 @@
       margin: 100px auto;
     }
     .title-box {
-      margin-bottom: 30px;
+      margin: 10px auto;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      width: 95%;
+      border-bottom: 1px solid lightgray;
     }
     .content-box {
-      margin-bottom: 30px;
+      width: 95%;
+      margin: 0 auto;
+      margin-top: 10px;
+    }
+    #notice-content {
+      border-top: 1px dashed lightgray;
+      margin-top: 20px;
+      padding-top: 20px;
     }
     .btns-box {
+      width: 300px;
       display: flex;
-      justify-content: center;
+      justify-content: space-around;
     }
-    #write-btn {
+    .btns-box a {
       cursor: pointer;
+    }
+    #notice-write-footer {
+      display: flex;
+      width: 95%;
+      justify-content: end;
+      margin-top: 50px;
     }
   </style>
 </head>
@@ -42,7 +64,7 @@
               <h3 th:text="${notice.postDto.getTitle()}"></h3>
             </div>
             <div class="content-box">
-              <div id="notice-writer" th:text="${notice.postDto.memberDto.id}"></div>
+              <div id="notice-writer" th:text="${'Writer : ' + notice.postDto.memberDto.id}"></div>
               <div id="notice-createdTime" th:text="${#strings.substring(notice.postDto.createdTime, 0, 10)}"></div>
               <div id="notice-content"></div>
             </div>
@@ -76,6 +98,7 @@
             dataType: 'TEXT',
             success(result) {
               alert(result);
+              location.href = '/post/notice';
             },
             error(error) {
               alert(error);
