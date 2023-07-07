@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.entity.Post;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class PostDto {
     private String content;
     private int hits;
     private String thumbnailUrl;
+    private ItemDto itemDto;
     private MemberDto memberDto;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -37,12 +39,13 @@ public class PostDto {
 
     @Builder
     public PostDto(Long id, String title, String content, int hits, String thumbnailUrl, MemberDto memberDto,
-                   LocalDateTime createdTime, LocalDateTime modifiedTime) {
+                   ItemDto itemDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.hits = hits;
         this.thumbnailUrl = thumbnailUrl;
+        this.itemDto = itemDto;
         this.memberDto = memberDto;
         this.createdTime = createdTime;
         this.modifiedTime = modifiedTime;
@@ -55,6 +58,7 @@ public class PostDto {
                 .content(content)
                 .hits(hits)
                 .thumbnailUrl(thumbnailUrl)
+                .item(itemDto.toEntity())
                 .member(memberDto.toEntity())
                 .build();
     }
@@ -66,6 +70,7 @@ public class PostDto {
                 .content(post.getContent())
                 .hits(post.getHits())
                 .thumbnailUrl(post.getThumbnailUrl())
+                .itemDto(ItemDto.fromEntity(post.getItem()))
                 .memberDto(MemberDto.fromEntity(post.getMember()))
                 .createdTime(post.getCreatedTime())
                 .modifiedTime(post.getModifiedTime())

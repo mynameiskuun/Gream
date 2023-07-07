@@ -37,7 +37,8 @@ public class ReviewDto {
     private LocalDateTime modifiedTime;
 
     @Builder
-    public ReviewDto(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore, String content, String thumbnail, MemberDto memberDto, ItemDto itemDto) {
+    public ReviewDto(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore,
+                     int repurchaseScore, String content, String thumbnail, MemberDto memberDto, ItemDto itemDto) {
         this.id = id;
         this.starValue = starValue;
         this.priceScore = priceScore;

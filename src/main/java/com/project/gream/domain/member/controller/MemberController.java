@@ -68,6 +68,7 @@ public class MemberController {
     @PostMapping("/address")
     public ModelAndView updateAdditionalInformation(MemberRequestDto req, @LoginMember MemberDto memberDto) {
         ModelAndView mav = new ModelAndView();
+
         mav.setViewName("main/mainpage");
         memberService.updateAddressAndGender(req, memberDto);
         return mav;

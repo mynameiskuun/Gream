@@ -20,9 +20,7 @@ public interface ItemService {
     List<ItemDto> selectAllItems();
     List<ItemDto> selectMenItems();
     List<ItemDto> selectWomenItems();
-
     List<ItemDto> sortItemByCategory(String sortBy);
-
     ItemDto selectItemById(Long itemId);
     void deleteItem(Long itemId);
     void registerItemAndImgs(ItemRequestDto itemRequestDto) throws Exception;

@@ -21,6 +21,21 @@
             margin-bottom: 50px;
             width:100%;
         }
+        .item-img-box {
+            width: 150px;
+            height: 150px;
+            background-size: 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .qna-target-item {
+            display: flex;
+        }
+        .item-name-box {
+            align-items: center;
+            display: flex;
+            margin-left: 50px;
+        }
     </style>
 </head>
 <body>
@@ -33,6 +48,17 @@
             <div id="popup-body">
                 <form enctype="multipart/form-data" id="formData" name="formData">
                     <table class="table align-middle text-center table-hover">
+                        <tr>
+                            <td>
+                                <div>
+                                    <h5>문의 상품</h5>
+                                </div>
+                            </td>
+                            <td class="qna-target-item">
+                                <div class="item-img-box" th:style="'background-image: url('+ ${itemDto.thumbnailUrl} + ');'"></div>
+                                <div class="item-name-box" th:text="${itemDto.name}"></div>
+                            </td>
+                        </tr>
                         <tr>
                             <td>
                                 <div>
@@ -78,7 +104,7 @@
                                 <h5>첨부파일</h5>
                             </td>
                             <td>
-                                <input type="file" id="qna-imgs" class="form-control" name="qna-imgs" multiple />
+                                <input type="file" id="qnaImgs" class="form-control" name="qnaImgs" multiple="multiple" />
                             </td>
                         </tr>
                     </table>
@@ -89,20 +115,21 @@
             </div>
         </section>
     </section>
-<script>
+<script th:inline="javascript">
     $('#qna-submit-btn').on('click', function() {
 
         let data = {
             "qnaType" : $('input[name=qna-type]:checked').val(),
             "qnaTitle" : $('input[name=qna-title]').val(),
-            "qnaContent" : $('input[name=qna-content]').val()
+            "qnaContent" : $('#qna-content').val(),
+            "itemDto" : [[${itemDto}]]
         }
 
         let form = $('#formData')[0];
         let formData = new FormData(form);
 
-        formData.append('postRequestDto', new Blob([JSON.stringify(data)], {type : 'application/json'}));
-        formData.append('qnaImgs', $('#qna-imgs'));
+        formData.append('qnaRequestDto', new Blob([JSON.stringify(data)], {type : 'application/json'}));
+        formData.append('qnaImgs', $('#qnaImgs'));
 
         console.log(JSON.stringify(data, null, 2));
         console.log("formData : ", formData);
