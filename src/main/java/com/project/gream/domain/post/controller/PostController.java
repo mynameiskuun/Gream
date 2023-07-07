@@ -4,6 +4,8 @@ import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.auth.dto.CustomUserDetails;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.Role;
+import com.project.gream.domain.item.dto.ItemDto;
+import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.dto.*;
 import com.project.gream.domain.post.entity.Post;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +33,7 @@ public class PostController {
 
     private final PostService postService;
     private final S3Config s3Config;
-
+    private final ItemService itemService;
     @PostMapping("/review")
     public String saveReview(@RequestPart("reviewDto") ReviewDto reviewDto,
                              @RequestPart("imgFiles") List<MultipartFile> imgFiles) throws Exception {
@@ -136,11 +139,23 @@ public class PostController {
         return postService.deleteNotice(noticeId, user);
     }
 
-    @GetMapping("/post/qna")
-    public ModelAndView toQnaWrite() {
+    @GetMapping("/post/qna/{itemId}")
+    public ModelAndView toQnaWrite(@PathVariable Long itemId) {
         ModelAndView mav = new ModelAndView();
+        ItemDto itemDto = itemService.getItemById(itemId);
 
+        mav.addObject("itemDto", itemDto);
         mav.setViewName("post/qna-write-popup");
         return mav;
+    }
+
+    @PostMapping("/post/qna")
+    public String saveQna(@RequestPart("qnaRequestDto") PostRequestDto.QnaRequestDto postQnaDto,
+                          @RequestPart("qnaImgs") List<MultipartFile> qnaImgs,
+                          @LoginMember MemberDto memberDto) throws Exception {
+
+        log.info("------------------------ saveQna request start");
+
+        return postService.saveQna(postQnaDto, qnaImgs, memberDto);
     }
 }

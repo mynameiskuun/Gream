@@ -85,6 +85,8 @@ public class S3Config {
             prefix = "item";
         } else if (dto.getSimpleName().equals("PostRequestDto")) {
             prefix = "post";
+        } else if (dto.getSimpleName().equals("QnaRequestDto")) {
+            prefix = "qna";
         }
         return prefix + "_" + System.nanoTime();
     }
@@ -123,6 +125,8 @@ public class S3Config {
             imgDir = "/item/images";
         } else if (dto.getSimpleName().equals("PostRequestDto")) {
             imgDir = "/post/images";
+        } else if (dto.getSimpleName().equals("QnaRequestDto")) {
+            imgDir = "/post/qna/images";
         }
         return imgDir;
     }

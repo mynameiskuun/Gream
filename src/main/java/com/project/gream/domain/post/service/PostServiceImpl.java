@@ -23,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +42,6 @@ public class PostServiceImpl implements PostService{
 
     private final ImgRepository imgRepository;
     private final ReviewRepository reviewRepository;
-    private final ItemRepository itemRepository;
     private final LikesRepository likesRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
@@ -345,5 +346,36 @@ public class PostServiceImpl implements PostService{
     private boolean isRealAdmin(CustomUserDetails user) {
         log.info("authorities : " + user.getAuthorities().toString());
         return user.getRole().equals(Role.ADMIN);
+    }
+
+    @Override
+    public String saveQna(PostRequestDto.QnaRequestDto postQnaDto,
+                          List<MultipartFile> qnaImgs,
+                          @LoginMember MemberDto memberDto) throws Exception {
+
+        log.info("------------------------- QNA save");
+
+        if (postQnaDto == null) {
+            return "문의사항 접수에 실패했습니다.";
+        }
+
+        Member member = memberRepository.findById(memberDto.getId()).orElseThrow();
+        Post qna = Post.builder()
+                .title(postQnaDto.getQnaTitle())
+                .content(postQnaDto.getQnaContent())
+                .postType(PostType.QNA)
+                .item(postQnaDto.getItemDto().toEntity())
+                .member(member)
+                .build();
+
+        if (!qnaImgs.isEmpty()) {
+            List<String> imgUrlList = s3Config.imgUpload(PostRequestDto.QnaRequestDto.class, qnaImgs);
+//            imgUrlList.stream()
+//                            .map()
+            qna.setThumbnailUrl(imgUrlList.get(0));
+        }
+
+        postRepository.save(qna);
+        return "문의사항 접수가 완료되었습니다.";
     }
 }

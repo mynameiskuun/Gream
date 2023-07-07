@@ -1,9 +1,9 @@
 package com.project.gream.domain.post.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.project.gream.common.enumlist.QnaType;
+import com.project.gream.domain.item.dto.ItemDto;
+import com.project.gream.domain.member.dto.MemberDto;
+import lombok.*;
 
 @NoArgsConstructor
 @Getter
@@ -20,7 +20,8 @@ public class PostRequestDto {
     private String thumbnailUrl;
 
     @Builder
-    public PostRequestDto(Long id, String searchPeriod, String searchTarget, String searchKeyWords, String noticeTitle, String noticeContent, String postType, String thumbnailUrl) {
+    public PostRequestDto(Long id, String searchPeriod, String searchTarget, String searchKeyWords,
+                          String noticeTitle, String noticeContent, String postType, String thumbnailUrl) {
         this.id = id;
         this.searchPeriod = searchPeriod;
         this.searchTarget = searchTarget;
@@ -30,4 +31,26 @@ public class PostRequestDto {
         this.postType = postType;
         this.thumbnailUrl = thumbnailUrl;
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @ToString
+    public static class QnaRequestDto {
+        private QnaType qnaType;
+        private String qnaTitle;
+        private String qnaContent;
+        private ItemDto itemDto;
+        private MemberDto memberDto;
+
+        @Builder
+        public QnaRequestDto(QnaType qnaType, String qnaTitle, String qnaContent, ItemDto itemDto, MemberDto memberDto) {
+            this.qnaType = qnaType;
+            this.qnaTitle = qnaTitle;
+            this.qnaContent = qnaContent;
+            this.itemDto = itemDto;
+            this.memberDto = memberDto;
+        }
+    }
+
 }

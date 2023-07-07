@@ -3,6 +3,7 @@ package com.project.gream.domain.post.entity;
 import com.project.gream.common.enumlist.PostType;
 import com.project.gream.common.enumlist.converter.PostTypeConverter;
 import com.project.gream.common.util.BaseTimeEntity;
+import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,17 +29,21 @@ public class Post extends BaseTimeEntity {
     private PostType postType;
     private String thumbnailUrl;
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "item_id", nullable = true)
+    private Item item;
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Builder
-    public Post(Long id, String title, String content, int hits, PostType postType, String thumbnailUrl, Member member) {
+    public Post(Long id, String title, String content, int hits, PostType postType, String thumbnailUrl, Item item, Member member) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.hits = hits;
         this.postType = postType;
         this.thumbnailUrl = thumbnailUrl;
+        this.item = item;
         this.member = member;
     }
 
