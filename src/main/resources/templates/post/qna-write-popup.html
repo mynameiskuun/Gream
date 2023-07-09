@@ -123,7 +123,7 @@
             "qnaTitle" : $('input[name=qna-title]').val(),
             "qnaContent" : $('#qna-content').val(),
             "itemDto" : [[${itemDto}]]
-        }
+        };
 
         let form = $('#formData')[0];
         let formData = new FormData(form);
@@ -142,10 +142,11 @@
             data: formData,
             dataType: 'TEXT',
             success(result) {
-                console.log("result", result);
+                alert(result);
             },
-            error(error) {
-                console.log("error", error);
+            error(request, status, error) {
+                console.log("error")
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
             },
         })
     })

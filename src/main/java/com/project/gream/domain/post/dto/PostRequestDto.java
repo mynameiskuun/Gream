@@ -37,14 +37,14 @@ public class PostRequestDto {
     @NoArgsConstructor
     @ToString
     public static class QnaRequestDto {
-        private QnaType qnaType;
+        private String qnaType;
         private String qnaTitle;
         private String qnaContent;
         private ItemDto itemDto;
         private MemberDto memberDto;
 
         @Builder
-        public QnaRequestDto(QnaType qnaType, String qnaTitle, String qnaContent, ItemDto itemDto, MemberDto memberDto) {
+        public QnaRequestDto(String qnaType, String qnaTitle, String qnaContent, ItemDto itemDto, MemberDto memberDto) {
             this.qnaType = qnaType;
             this.qnaTitle = qnaTitle;
             this.qnaContent = qnaContent;

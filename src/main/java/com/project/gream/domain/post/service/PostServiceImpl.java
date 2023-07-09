@@ -4,8 +4,11 @@ import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.auth.dto.CustomUserDetails;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.PostType;
+import com.project.gream.common.enumlist.QnaType;
 import com.project.gream.common.enumlist.Role;
+import com.project.gream.common.util.StringToEnumUtil;
 import com.project.gream.domain.item.entity.Img;
+import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;
 import com.project.gream.domain.member.dto.MemberDto;
@@ -18,14 +21,13 @@ import com.project.gream.domain.post.entity.Review;
 import com.project.gream.domain.post.repository.LikesRepository;
 import com.project.gream.domain.post.repository.PostRepository;
 import com.project.gream.domain.post.repository.ReviewRepository;
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +37,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.project.gream.domain.post.entity.QLikes.likes;
+import static com.project.gream.domain.post.entity.QPost.post;
+import static com.project.gream.domain.item.entity.QItem.item;
+
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -45,6 +51,7 @@ public class PostServiceImpl implements PostService{
     private final LikesRepository likesRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final ItemRepository itemRepository;
     private final EntityManager em;
     private final S3Config s3Config;
 
@@ -348,6 +355,7 @@ public class PostServiceImpl implements PostService{
         return user.getRole().equals(Role.ADMIN);
     }
 
+    @Transactional
     @Override
     public String saveQna(PostRequestDto.QnaRequestDto postQnaDto,
                           List<MultipartFile> qnaImgs,
@@ -360,22 +368,85 @@ public class PostServiceImpl implements PostService{
         }
 
         Member member = memberRepository.findById(memberDto.getId()).orElseThrow();
-        Post qna = Post.builder()
+        QnaType qnaType = StringToEnumUtil.getEnumFromValue(QnaType.class, postQnaDto.getQnaType());
+
+        Post post = Post.builder()
                 .title(postQnaDto.getQnaTitle())
                 .content(postQnaDto.getQnaContent())
+                .qnaType(qnaType)
                 .postType(PostType.QNA)
                 .item(postQnaDto.getItemDto().toEntity())
                 .member(member)
                 .build();
 
-        if (!qnaImgs.isEmpty()) {
-            List<String> imgUrlList = s3Config.imgUpload(PostRequestDto.QnaRequestDto.class, qnaImgs);
-//            imgUrlList.stream()
-//                            .map()
-            qna.setThumbnailUrl(imgUrlList.get(0));
+        Post qna = postRepository.save(post);
+        List<String> imgUrlList = this.saveQnaImagesToS3Bucket(PostRequestDto.QnaRequestDto.class, qnaImgs);
+        this.saveQnaImgUrlToDB(qna, imgUrlList, postQnaDto.getItemDto().getId());
+
+        return "문의사항 접수가 완료되었습니다.";
+    }
+
+    private <T> List<String> saveQnaImagesToS3Bucket(Class<T> dto, List<MultipartFile> imgList) throws Exception {
+
+        log.info("------------------------- QnA img upload to S3");
+
+        if (imgList.size() == 0) {
+            return Collections.emptyList();
+        } else {
+            return s3Config.imgUpload(dto, imgList);
+        }
+    }
+
+    private void saveQnaImgUrlToDB(Post post, List<String> imgUrlList, Long itemId) {
+
+        log.info("------------------------- QNA img url save to DB");
+
+        Item item = itemRepository.getReferenceById(itemId);
+        if (imgUrlList.isEmpty()) {
+            return;
         }
 
-        postRepository.save(qna);
-        return "문의사항 접수가 완료되었습니다.";
+        for (String url : imgUrlList) {
+            Img img = Img.builder()
+                    .item(item)
+                    .url(url)
+                    .post(post)
+                    .build();
+            imgRepository.save(img);
+        }
+    }
+
+    @Override
+    public Page<Post> getQnaListByItemId(Long itemId, Pageable pageable) {
+
+        log.info("------------------------- Get All Qna List");
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        QueryResults<Post> results = queryFactory.selectFrom(post)
+                .where(
+                        post.item.id.eq(itemId),
+                        post.postType.eq(PostType.QNA)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchResults();
+
+        List<Post> content = results.getResults();
+        Long total = results.getTotal();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public PostResponseDto getQnaDetail(Long qnaId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        Post qna = queryFactory.selectFrom(post)
+                .where(post.id.eq(qnaId))
+                .fetchOne();
+
+        return PostResponseDto.builder()
+                .postDto(PostDto.fromEntity(qna))
+                .build();
     }
 }

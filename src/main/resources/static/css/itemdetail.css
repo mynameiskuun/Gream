@@ -401,8 +401,16 @@
 }
 #qna-footer {
     width: 90%;
+    align-items: center;
+    justify-content: end;
+    display: flex;
+    min-height: 80px;
+    margin: 0 auto;
 }
 #qna-btns {
     display: flex;
     justify-content: flex-end;
+}
+.qna-title-box {
+    cursor: pointer;
 }

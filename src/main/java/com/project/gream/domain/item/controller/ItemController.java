@@ -10,10 +10,13 @@ import com.project.gream.domain.order.dto.OrderItemDto;
 import com.project.gream.domain.order.service.OrderService;
 import com.project.gream.domain.post.dto.LikesResponseDto;
 import com.project.gream.domain.post.dto.ReviewDto;
+import com.project.gream.domain.post.entity.Post;
 import com.project.gream.domain.post.repository.ReviewRepository;
 import com.project.gream.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -42,7 +45,9 @@ public class ItemController {
     }
 
     @GetMapping("/item/{itemId}")
-    public ModelAndView toItemDetail(@PathVariable("itemId") Long itemId, @LoginMember MemberDto memberDto) {
+    public ModelAndView toItemDetail(@PathVariable("itemId") Long itemId,
+                                     @LoginMember MemberDto memberDto,
+                                     Pageable pageable) {
         log.info("------------------------------- 상품 디테일 페이지 진입");
 
         ModelAndView mav = new ModelAndView();
@@ -52,9 +57,20 @@ public class ItemController {
         Map<Integer, Integer> starValMap = postService.getReviewScoreByItemId(itemId);
         ItemDto itemDto = itemService.getItemById(itemId);
         LikesResponseDto likes = postService.checkLike(itemId, memberDto);
+        Page<Post> qnaList = postService.getQnaListByItemId(itemId, pageable);
 
+        int qnaNowPage = qnaList.getPageable().getPageNumber() + 1;
+        int qnaStartPage =  Math.max(qnaNowPage - 4, 1);
+        int qnaEndPage = Math.min(qnaNowPage + 9, qnaList.getTotalPages());
 
-        log.info("reviewList.size : ", reviewList.size());
+        log.info("reviewList.size : " + reviewList.size());
+        log.info("qnaList.size : " + qnaList.stream().count());
+
+        mav.addObject("nowPage", qnaNowPage);
+        mav.addObject("startPage", qnaStartPage);
+        mav.addObject("endPage", qnaEndPage);
+
+        mav.addObject("qnaList", qnaList);
         mav.addObject("couponList", couponList);
         mav.addObject("reviewList", reviewList);
         mav.addObject("starValMap", starValMap);
