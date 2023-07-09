@@ -1,7 +1,9 @@
 package com.project.gream.domain.post.entity;
 
 import com.project.gream.common.enumlist.PostType;
+import com.project.gream.common.enumlist.QnaType;
 import com.project.gream.common.enumlist.converter.PostTypeConverter;
+import com.project.gream.common.enumlist.converter.QnaTypeConverter;
 import com.project.gream.common.util.BaseTimeEntity;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.member.entity.Member;
@@ -25,6 +27,8 @@ public class Post extends BaseTimeEntity {
     private String title;
     private String content;
     private int hits;
+    @Convert(converter = QnaTypeConverter.class)
+    private QnaType qnaType;
     @Convert(converter = PostTypeConverter.class)
     private PostType postType;
     private String thumbnailUrl;
@@ -36,11 +40,12 @@ public class Post extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    public Post(Long id, String title, String content, int hits, PostType postType, String thumbnailUrl, Item item, Member member) {
+    public Post(Long id, String title, String content, int hits, QnaType qnaType, PostType postType, String thumbnailUrl, Item item, Member member) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.hits = hits;
+        this.qnaType = qnaType;
         this.postType = postType;
         this.thumbnailUrl = thumbnailUrl;
         this.item = item;

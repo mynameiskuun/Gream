@@ -263,19 +263,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="qna : ${qnaList}">
-                                <td> 문의 유형 </td>
-                                <td>
-                                    <span>
-                                        <a style="color: cornflowerblue; border: 1px solid lightgray;">미완료</a> <!-- 답변 미료시 -->
-                                        <a style="color: cornflowerblue; background: lightblue; border: 1px solid cornflowerblue;">답변 완료</a> <!-- 답변 완료시 -->
-                                    </span>
-                                    <span>
-                                        제목
-                                    </span>
+                            <tr th:if="${qnaList.isEmpty()}">
+                                <td colspan="4" style="height: 100px"><h5>등록된 문의 사항이 없습니다.</h5></td>
+                            </tr>
+                            <tr th:unless="${qnaList.isEmpty()}" th:each="qna : ${qnaList}">
+                                <td th:text="${qna.qnaType}"></td>
+                                <td class="qna-title-box">
+                                        <input type="hidden" class="qnaId" th:value="${qna.id}" />
+                                        <input type="hidden" class="qnaContext" th:value="${qna.content}" />
+                                        <span>
+                                            <a style="color: cornflowerblue; border: 1px solid lightgray;">미완료</a> <!-- 답변 미료시 -->
+                                            <a style="color: cornflowerblue; background: lightblue; border: 1px solid cornflowerblue;">답변 완료</a> <!-- 답변 완료시 -->
+                                        </span>
+                                        <span th:text="${qna.title}"></span>
                                 </td>
-                                <td> 작성자 </td>
-                                <td> 작성일 </td>
+                                <td th:text="${qna.member.id}"></td>
+                                <td th:text="${#strings.substring(qna.createdTime, 0, 10)}"> 작성일 </td>
                             </tr>
                         </tbody>
                     </table>
@@ -581,11 +584,57 @@
     // $('.review-thumbs-up').click(like);
 
     function showQnaPopUp() {
-        let url = "/post/qna/" + [[${item.id}]];
-        let name = "popup-test";
-        let option = "width = 800, height: 400, top = 100, left = 100, location = no";
 
-        window.open(url, name, option);
+        let loginMember = [[${session.loginMember}]];
+
+        if (loginMember === null) {
+            alert('로그인을 해주세요')
+            location.href = '/login';
+        } else {
+            let url = "/item/" + [[${item.id}]] + "/inquiries/form";
+            let name = "popup-test";
+            let option = "width = 800, height: 400, top = 100, left = 100, location = no";
+
+            window.open(url, name, option);
+        }
+    }
+
+    $('.qna-title-box').on('click', function() {
+
+        console.log("clicked");
+
+        const qnaDetailBox = $('#qna-table').find('tr[id="qnaDetail"]');
+        const eventDom = $(this);
+
+        if (qnaDetailBox.length > 0) {
+            qnaDetailBox.remove();
+            requestQnaDetail(eventDom)
+        } else {
+            requestQnaDetail(eventDom)
+        }
+    });
+
+    function requestQnaDetail(e) {
+        let targetDom = e.parent();
+        let qnaId = e.find('input[class="qnaId"]').val();
+
+        $.ajax({
+            url: "/item/inquiries/" + qnaId,
+            type: "GET",
+            contentType: "TEXT",
+            data: qnaId,
+            dataType: "JSON",
+            success: function (result) {
+                console.log("success")
+                console.log("result : ", result);
+                console.log(targetDom)
+                targetDom.after("<tr id='qnaDetail'>" + result.postDto.content + "</tr>");
+            },
+            error: function (request, status, error) {
+                console.log("error")
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            },
+        })
     }
 </script>
 </body>

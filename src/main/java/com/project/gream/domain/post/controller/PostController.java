@@ -139,7 +139,7 @@ public class PostController {
         return postService.deleteNotice(noticeId, user);
     }
 
-    @GetMapping("/post/qna/{itemId}")
+    @GetMapping("/item/{itemId}/inquiries/form")
     public ModelAndView toQnaWrite(@PathVariable Long itemId) {
         ModelAndView mav = new ModelAndView();
         ItemDto itemDto = itemService.getItemById(itemId);
@@ -157,5 +157,11 @@ public class PostController {
         log.info("------------------------ saveQna request start");
 
         return postService.saveQna(postQnaDto, qnaImgs, memberDto);
+    }
+
+    @GetMapping("/item/inquiries/{qnaId}")
+    public PostResponseDto getQnaDetail(@PathVariable("qnaId") Long qnaId) {
+
+        return postService.getQnaDetail(qnaId);
     }
 }

@@ -5,6 +5,7 @@ import com.project.gream.common.auth.dto.CustomUserDetails;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.dto.*;
 import com.project.gream.domain.post.entity.Likes;
+import com.project.gream.domain.post.entity.Post;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,4 +32,8 @@ public interface PostService {
     String saveQna(PostRequestDto.QnaRequestDto postQnaDto,
                    List<MultipartFile> qnaImgs,
                    @LoginMember MemberDto memberDto) throws Exception;
+
+    Page<Post> getQnaListByItemId(Long itemId, Pageable pageable);
+
+    PostResponseDto getQnaDetail(Long qnaId);
 }
