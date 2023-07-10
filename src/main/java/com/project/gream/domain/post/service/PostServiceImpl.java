@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 
 import static com.project.gream.domain.post.entity.QLikes.likes;
 import static com.project.gream.domain.post.entity.QPost.post;
-import static com.project.gream.domain.item.entity.QItem.item;
 
 
 @Slf4j
@@ -289,6 +288,7 @@ public class PostServiceImpl implements PostService{
                         .content(Post.getContent())
                         .hits(Post.getHits())
                         .thumbnailUrl(Post.getThumbnailUrl())
+                        .postType(PostType.NOTICE)
                         .memberDto(MemberDto.fromEntity(Post.getMember()))
                         .build());
     }
@@ -448,5 +448,26 @@ public class PostServiceImpl implements PostService{
         return PostResponseDto.builder()
                 .postDto(PostDto.fromEntity(qna))
                 .build();
+    }
+
+    @Override
+    public Page<Post> getQnaListByMemberId(String memberId, PostType postType, Pageable pageable) {
+
+        return postRepository.findAllByMember_IdAndPostTypeOrderByCreatedTimeDesc(memberId, PostType.QNA, pageable);
+    }
+
+    @Override
+    public List<PostDto> getQnaListForMyPage(String memberId) {
+
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return queryFactory.selectFrom(post)
+                .where(post.member.id.eq(memberId),
+                        post.postType.eq(PostType.QNA))
+                .limit(4)
+                .fetch()
+                .stream()
+                .map(PostDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }

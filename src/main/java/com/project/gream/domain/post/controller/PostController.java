@@ -159,9 +159,9 @@ public class PostController {
         return postService.saveQna(postQnaDto, qnaImgs, memberDto);
     }
 
-    @GetMapping("/item/inquiries/{qnaId}")
-    public PostResponseDto getQnaDetail(@PathVariable("qnaId") Long qnaId) {
-
-        return postService.getQnaDetail(qnaId);
-    }
+//    @GetMapping("/item/inquiries/{qnaId}")
+//    public PostResponseDto getQnaDetail(@PathVariable("qnaId") Long qnaId) {
+//
+//        return postService.getQnaDetail(qnaId);
+//    }
 }

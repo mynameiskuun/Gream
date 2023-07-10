@@ -413,4 +413,5 @@
 }
 .qna-title-box {
     cursor: pointer;
+    text-align: initial;
 }

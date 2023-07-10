@@ -270,12 +270,12 @@
                                 <td th:text="${qna.qnaType}"></td>
                                 <td class="qna-title-box">
                                         <input type="hidden" class="qnaId" th:value="${qna.id}" />
-                                        <input type="hidden" class="qnaContext" th:value="${qna.content}" />
-                                        <span>
-                                            <a style="color: cornflowerblue; border: 1px solid lightgray;">미완료</a> <!-- 답변 미료시 -->
-                                            <a style="color: cornflowerblue; background: lightblue; border: 1px solid cornflowerblue;">답변 완료</a> <!-- 답변 완료시 -->
+                                        <input type="hidden" class="qnaContent" th:value="${qna.content}" />
+                                        <span style="margin-left:90px;">
+                                            <a style="color: cornflowerblue; border: 1px solid lightgray;" th:if="${qna.postType.name().equals('QNA')}">미완료</a> <!-- 답변 미료시 -->
+                                            <a style="color: cornflowerblue; background: lightblue; border: 1px solid cornflowerblue;" th:if="${qna.postType.name().equals('COMPLETED')}">답변 완료</a> <!-- 답변 완료시 -->
                                         </span>
-                                        <span th:text="${qna.title}"></span>
+                                        <span th:text="${qna.title}" style="font-weight: bold"></span>
                                 </td>
                                 <td th:text="${qna.member.id}"></td>
                                 <td th:text="${#strings.substring(qna.createdTime, 0, 10)}"> 작성일 </td>
@@ -617,24 +617,49 @@
     function requestQnaDetail(e) {
         let targetDom = e.parent();
         let qnaId = e.find('input[class="qnaId"]').val();
+        let content = e.find('input[class="qnaContent"]').val();
 
-        $.ajax({
-            url: "/item/inquiries/" + qnaId,
-            type: "GET",
-            contentType: "TEXT",
-            data: qnaId,
-            dataType: "JSON",
-            success: function (result) {
-                console.log("success")
-                console.log("result : ", result);
-                console.log(targetDom)
-                targetDom.after("<tr id='qnaDetail'>" + result.postDto.content + "</tr>");
-            },
-            error: function (request, status, error) {
-                console.log("error")
-                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            },
-        })
+        targetDom.after(`<tr id='qnaDetail' style='display: table-row'>
+                        <td colspan='4' class='qna-answer-box' style='min-height: 100px; display: table-cell'>
+                            <div class='qna-question' style="display: flex">
+                                <span class='question-img' style='height: 80px;
+                                width: 80px;
+                                margin-left: 10px;
+                                background-size: 100%;
+                                background-repeat: no-repeat;
+                                background-position: center;
+                                background-image: url(https://cdn.icon-icons.com/icons2/643/PNG/512/q-letter-single-brand-social-media_icon-icons.com_59312.png);'></span>
+                                <span style="margin-left: 100px">` + content + `</span>
+                            </div>
+<!--                            <div style='display: flex' th:if="$\{session.loginMember.role eq 'ROLE_ADMIN'}">-->
+<!--                                <span class='answer-img' style='height: 80px;-->
+<!--                                width: 80px;-->
+<!--                                margin-left: 10px;-->
+<!--                                background-size: 100%;-->
+<!--                                background-repeat: no-repeat;-->
+<!--                                background-position: center;-->
+<!--                                background-image: url(https://cdn2.iconfinder.com/data/icons/pretty-office-part14-2/256/A_blue-1024.png);'></span>-->
+<!--                                <span>답변 내용</span>-->
+<!--                            </div>-->
+                        </td>
+                    </tr>`)
+        // $.ajax({
+        //     url: "/item/inquiries/" + qnaId,
+        //     type: "GET",
+        //     contentType: "TEXT",
+        //     data: qnaId,
+        //     dataType: "JSON",
+        //     success: function (result) {
+        //         console.log("success")
+        //         console.log("result : ", result);
+        //         console.log(targetDom)
+        //         targetDom.after();
+        //     },
+        //     error: function (request, status, error) {
+        //         console.log("error")
+        //         alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+        //     },
+        // })
     }
 </script>
 </body>

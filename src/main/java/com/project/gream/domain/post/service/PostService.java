@@ -2,6 +2,7 @@ package com.project.gream.domain.post.service;
 
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.auth.dto.CustomUserDetails;
+import com.project.gream.common.enumlist.PostType;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.dto.*;
 import com.project.gream.domain.post.entity.Likes;
@@ -36,4 +37,8 @@ public interface PostService {
     Page<Post> getQnaListByItemId(Long itemId, Pageable pageable);
 
     PostResponseDto getQnaDetail(Long qnaId);
+
+    Page<Post> getQnaListByMemberId(String memberId, PostType postType, Pageable pageable);
+
+    List<PostDto> getQnaListForMyPage(String memberId);
 }
