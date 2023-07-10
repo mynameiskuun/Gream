@@ -1,6 +1,5 @@
 package com.project.gream.common.enumlist.converter;
 
-import com.project.gream.common.enumlist.CouponStatus;
 import com.project.gream.common.enumlist.PostType;
 
 import javax.persistence.AttributeConverter;

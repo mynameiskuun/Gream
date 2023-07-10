@@ -12,6 +12,8 @@ import com.project.gream.domain.order.dto.OrderItemDto;
 import com.project.gream.domain.order.entity.OrderItem;
 import com.project.gream.domain.order.repository.OrderItemRepository;
 import com.project.gream.domain.order.service.OrderService;
+import com.project.gream.domain.post.dto.PostDto;
+import com.project.gream.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,18 +33,21 @@ public class MemberPageController {
 
     private final ItemService itemService;
     private final OrderService orderService;
+    private final PostService postService;
     private final OrderItemRepository orderItemRepository;
 
     @GetMapping("/mypage/{memberId}")
     public ModelAndView toBuyer(@PathVariable("memberId") String memberId) {
-        List<OrderItemDto> orderItemList = orderService.findOrderItemForMypage(memberId);
-        List<ItemDto> likeItems = itemService.getLikedItemListForMypage(itemService.getLikedItemIds(memberId));
+        List<OrderItemDto> userOrderItemList = orderService.findOrderItemForMypage(memberId);
+        List<ItemDto> userLikeItems = itemService.getLikedItemListForMypage(itemService.getLikedItemIds(memberId));
         List<UserCouponResponseDto> userCouponList = itemService.getMemberCouponForMypage(memberId);
+        List<PostDto> userQnaList = postService.getQnaListForMyPage(memberId);
 
         ModelAndView mav = new ModelAndView();
+        mav.addObject("qnaList", userQnaList);
         mav.addObject("couponList", userCouponList);
-        mav.addObject("likeItems", likeItems);
-        mav.addObject("orderItemList", orderItemList);
+        mav.addObject("likeItems", userLikeItems);
+        mav.addObject("orderItemList", userOrderItemList);
         mav.setViewName("member/mypage/customer/mypage-customer-main");
 
         return mav;

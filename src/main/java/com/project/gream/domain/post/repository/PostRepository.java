@@ -11,4 +11,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findAllByPostTypeOrderByCreatedTimeDesc(PostType postType, Pageable pageable);
+    Page<Post> findAllByMember_IdAndPostTypeOrderByCreatedTimeDesc(String memberId, PostType postType, Pageable pageable);
+    List<Post> findTop4ByMember_IdAndPostTypeOrderByCreatedTimeDesc(String MemberId, PostType postType);
 }

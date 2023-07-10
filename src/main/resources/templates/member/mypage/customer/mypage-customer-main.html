@@ -156,6 +156,9 @@
                                                 <td>
                                                     <div class="valid-date" th:text="${#strings.substring(coupon.getCouponDto().createdTime, 0, 10) + ' ~ ' + #strings.substring(coupon.getCouponDto().expireDate, 0, 10)}"></div>
                                                 </td>
+                                                <td class="coupon-target-show">
+                                                    적용 대상 상품 보기
+                                                </td>
                                             </tr>
                                             </tbody>
                                         </th:block>
@@ -171,57 +174,32 @@
                                         <thead>
                                         <tr>
                                             <th scope="col" style="width: 15%">상품 정보</th>
-                                            <th scope="col" style="width: 40%">내용</th>
+                                            <th scope="col" style="width: 40%">제목</th>
                                             <th scope="col">문의 유형</th>
                                             <th scope="col">작성일</th>
                                             <th scope="col">처리 상태</th>
                                         </tr>
                                         </thead>
                                         <tbody class="table-group-divider">
-                                        <tr class="item-inquiry-rows">
+                                        <tr class="item-inquiry-rows" th:each="qna : ${qnaList}">
                                             <td>
-                                                <div class="item-information">
-                                                    <div class="inquiry-item-image"></div>
-
-                                                    <div class="inquiry-item-name">
-                                                        자바 ORM 표준 JPA 프로그래밍
-                                                    </div>
-                                                </div>
+                                                <div class="inquiry-item-name" th:text="${qna.itemDto.name}"></div>
                                             </td>
-                                            <th scope="col" class="align-left">
-                                                <div class="item-inquiry-content">상품문의</div>
-                                            </th>
-                                            <td>
-                                                <div class="item-inquiry-type">상품</div>
+                                            <td class="align-left">
+                                                <div class="item-inquiry-content" th:text="${qna.title}"></div>
                                             </td>
                                             <td>
-                                                <div class="item-inquiry-date">2023.04.17</div>
+                                                <div th:if="${qna.qnaType.name().equals('PRODUCT')}" class="item-inquiry-type">상품</div>
+                                                <div th:if="${qna.qnaType.name().equals('DELIVERY')}" class="item-inquiry-type">배송</div>
+                                                <div th:if="${qna.qnaType.name().equals('EXCHANGE')}" class="item-inquiry-type">교환</div>
+                                                <div th:if="${qna.qnaType.name().equals('ETC')}" class="item-inquiry-type">기타</div>
                                             </td>
                                             <td>
-                                                <div class="item-inquiry-status">답변 대기중</div>
-                                            </td>
-                                        </tr>
-                                        <tr class="item-inquiry-rows">
-                                            <td>
-                                                <div class="item-information">
-                                                    <div class="inquiry-item-image"></div>
-
-                                                    <div class="inquiry-item-name">
-                                                        자바 ORM 표준 JPA 프로그래밍
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <th scope="col">
-                                                <div class="item-inquiry-content">배송문의</div>
-                                            </th>
-                                            <td>
-                                                <div class="item-inquiry-type">배송</div>
+                                                <div class="item-inquiry-date" th:text="${#strings.substring(qna.createdTime, 0, 10)}">2023.04.17</div>
                                             </td>
                                             <td>
-                                                <div class="item-inquiry-date">2023.04.01</div>
-                                            </td>
-                                            <td>
-                                                <div class="item-inquiry-status">답변 완료</div>
+                                                <div th:if="${qna.postType.name().equals('QNA')}" class="item-inquiry-status">답변 대기중</div>
+                                                <div th:unless="${qna.postType.name().equals('QNA')}" class="item-inquiry-status">답변 완료</div>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -247,9 +225,7 @@
                                         <tr class="common-inquiry-rows">
                                             <th scope="row">
                                                 <div class="common-inquiry-information">
-                                                    <div class="common-inquiry-category">
-                                                        적립금 문의
-                                                    </div>
+                                                    <div class="common-inquiry-category"></div>
                                                 </div>
                                             </th>
                                             <td>
@@ -301,6 +277,11 @@
 
 <th:block th:replace="main/footer :: footer"></th:block>
 
+<script>
+    $('.coupon-target-show').on('click', function() {
+        alert("개발중인 기능입니다.")
+    })
+</script>
 </body>
 </div>
 </html>
