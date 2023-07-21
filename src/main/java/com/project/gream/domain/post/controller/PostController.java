@@ -75,18 +75,24 @@ public class PostController {
     }
 
     @PostMapping("/post/notice/search")
-    public String searchPosts(@RequestBody PostRequestDto postRequestDto) {
-
+    public ModelAndView searchPosts(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                    PostRequestDto postRequestDto) {
         log.info("-------------------- 게시글 검색 start");
-        log.info("period : " + postRequestDto.getSearchPeriod());
-        log.info("target : " + postRequestDto.getSearchTarget());
-        log.info("keywords : " + postRequestDto.getSearchKeyWords());
 
-        if (postRequestDto.getSearchPeriod() == null || postRequestDto.getSearchTarget() == null) {
+        ModelAndView mav = new ModelAndView();
+        Page<PostDto> searchResults = postService.searchNoticeByCondition(postRequestDto, pageable);
 
-            return "둘 중 하나 null";
-        }
-        return "성공";
+        int nowPage = searchResults.getPageable().getPageNumber() + 1;
+        int startPage = Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, searchResults.getTotalPages());
+
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
+        mav.addObject("noticeList", searchResults);
+        mav.setViewName("post/post-notice");
+
+        return mav;
     }
 
     @GetMapping("/post/notice/write")
@@ -123,7 +129,7 @@ public class PostController {
     public ModelAndView toNoticeModify(@PathVariable Long noticeId, @LoginMember MemberDto memberDto) {
         ModelAndView mav = new ModelAndView();
         if (memberDto.getRole() != Role.ADMIN) {
-            mav.setViewName("/main/mainpage");
+            mav.setViewName("main/mainpage");
             return mav;
         }
         PostResponseDto response = postService.getNoticeDetail(noticeId);

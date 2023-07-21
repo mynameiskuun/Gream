@@ -6,6 +6,7 @@ import com.project.gream.domain.item.repository.CouponRepository;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.member.repository.MemberRepository;
+import com.project.gream.domain.order.dto.OrderHistoryDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,8 +31,8 @@ public class AdminPageController {
     @GetMapping("/main")
     public ModelAndView toAdmin() {
         ModelAndView mav = new ModelAndView();
-        List<ItemDto> itemList = itemService.selectAllItems();
-        mav.addObject("itemList", itemList);
+        List<OrderHistoryDto> orderHistoryList = itemService.findTop5OrderByCreatedTimeDesc();
+        mav.addObject("orderHistoryList", orderHistoryList);
         mav.setViewName("member/mypage/admin/admin-main");
         return mav;
     }

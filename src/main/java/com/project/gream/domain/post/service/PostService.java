@@ -41,4 +41,6 @@ public interface PostService {
     Page<Post> getQnaListByMemberId(String memberId, PostType postType, Pageable pageable);
 
     List<PostDto> getQnaListForMyPage(String memberId);
+
+    Page<PostDto> searchNoticeByCondition(PostRequestDto requestDto, Pageable pageable);
 }

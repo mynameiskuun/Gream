@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public enum PointRate implements EnumBase{
+public enum Grade implements EnumBase {
 
     BRONZE("0.03"),
     SILVER("0.05"),

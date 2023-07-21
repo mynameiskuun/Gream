@@ -73,32 +73,33 @@
                     </table>
                 </section>
                 <section id="post-notice-footer">
-                    <div id="buttons" th:if="${session.loginMember.id eq 'admin'}">
-                        <a id="notice-write-btn" href="/post/notice/write"> 작성 </a>
-                    </div>
+                        <div id="buttons" th:if="${session.loginMember != null && session.loginMember.id eq 'admin'}">
+                            <a id="notice-write-btn" href="/post/notice/write"> 작성 </a>
+                        </div>
                     <div id="paging-area">
                         <div id="paging-btn-box">
                             <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
-                                <a th:if="${page != nowPage}" th:href="@{/orderlist/{memberId}(memberId=${session.loginMember.id}, page=${page - 1})}" th:text="${page}"></a>
+                                <a th:if="${page != nowPage}" page="${page - 1}" th:text="${page}"></a>
                                 <strong th:unless="${page != nowPage}" style="color:black" th:text="${page}"></strong>
                             </div>
                         </div>
                     </div>
                     <div id="search-area">
-                        <form id="search-form">
-                            <select class="form-select" name="period" id="set-search-period">
-                                <option value="all">전체 기간</option>
-                                <option value="last-six-months">최근 6개월</option>
-                                <option value="last-one-year">최근 1년</option>
+                        <form action="/post/notice/search", method="POST" >
+                            <select class="form-select" name="searchPeriod" id="set-search-period">
+                                <option value="ALL">전체 기간</option>
+                                <option value="LAST_SIX_MONTH">최근 6개월</option>
+                                <option value="LAST_ONE_YEAR">최근 1년</option>
                             </select>
-                            <select class="form-select" name="target" id="set-search-target">
-                                <option value="title-and-content">제목 + 내용</option>
-                                <option value="comment-content">댓글</option>
-                                <option value="post-writer">글 작성자</option>
-                                <option value="comment-writer">댓글 작성자</option>
+                            <select class="form-select" name="searchTarget" id="set-search-target">
+                                <option value="TITLE_AND_CONTENT">제목 + 내용</option>
+                                <option value="WRITER">글 작성자</option>
+<!--                                <option value="comment-content">댓글</option>-->
+<!--                                <option value="comment-writer">댓글 작성자</option>-->
                             </select>
-                            <input type="search" name="post-search" id="post-search" placeholder="검색어를 입력 해 주세요"/>
-                            <a id="search-btn" href="/post/notice/write">검색</a>
+                            <input type="search" name="searchKeyWords" id="post-search" placeholder="검색어를 입력 해 주세요"/>
+<!--                            <a id="search-btn">검색</a>-->
+                            <input type="submit" value="검색" class="btn btn-secondary-outline" />
                         </form>
                     </div>
                 </section>
@@ -113,13 +114,13 @@
             let searchKeyWords = $('#post-search').val();
 
             let data = {
-                "period" : $('#set-search-period').val(),
-                "target" : $('#set-search-target').val(),
+                "searchPeriod" : $('#set-search-period').val(),
+                "searchTarget" : $('#set-search-target').val(),
                 "searchKeyWords" : $('#post-search').val()
             }
 
-            console.log("period : ", period);
-            console.log("target : ", target);
+            console.log("searchPeriod : ", period);
+            console.log("searchTarget : ", target);
             console.log("searchKeyWords : ", searchKeyWords);
 
             $.ajax({
@@ -132,10 +133,9 @@
                     console.log("success");
                     console.log("result : ", result)
                 },
-                error: function (error) {
-                    console.log('error');
-                    console.log('error : ', error);
-                },
+                error: function (request, status, error) {
+                    alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                }
             })
         })
     </script>
