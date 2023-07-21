@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="member/mypage/customer/mypage-customer-main">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 정보 수정</title>
+    <style>
+        #edit-sidebar-header {
+            margin-bottom: 50px;
+        }
+        #member-id-box {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        #member-id {
+            margin-left: 300px;
+        }
+        #member-name-box {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        #member-name {
+            margin-left: 288px;
+        }
+        #submit-btn-box {
+            margin-top: 70px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="mypage-content">
+<!--    비밀번호 변경 -->
+<!--    주소지 변경 -->
+<!--    이메일 변경 -->
+
+    <div id="mypage-edit-wrapper">
+        <div id="mypage-edit-container">
+            <div id="mypage-edit-sidebar">
+                <div id="edit-sidebar-header">
+                    <h3>회원 정보</h3>
+                    <div id="edit-notice">
+                        <h5>구글, 네이버 로그인 회원은 본 페이지에서 주소지 변경만 가능합니다.</h5>
+                        <h5>해당 웹 사이트에서 직접 비밀번호를 변경 해 주세요.</h5>
+                    </div>
+                </div>
+            </div>
+            <div id="mypage-edit-main">
+                <div id="edit-main-header">
+<!--                    <h3>회원 정보</h3>-->
+                </div>
+                <div id="edit-main-body">
+                    <div id="member-id-box">
+                        <label for="member-id">회원 ID</label>
+                        <div id="member-id" th:text="${loginMember.id}"></div>
+                    </div>
+                    <div id="member-name-box">
+                        <label for="member-name">회원 이름</label>
+                        <div id="member-name" th:text="${loginMember.name}"></div>
+                    </div>
+                    <div th:if="${!isOauthLogin}" id="member-password-box">
+                        <div>
+                            <label for="current-password">현재 비밀번호</label>
+                            <input type="password" class="form-control" name="password" id="current-password" />
+                        </div>
+                        <div>
+                            <label for="modified-password">비밀번호</label>
+                            <input type="password" class="form-control" name="modifiedPassword" id="modified-password" />
+                        </div>
+                        <div>
+                            <label for="modified-password-check">비밀번호 확인</label>
+                            <input type="password" class="form-control" name="modifiedPasswordCheck" id="modified-password-check" />
+                        </div>
+                    </div>
+                    <div id="member-address-box">
+                        <label for="address">회원 주소</label>
+                        <input type="text" class="form-control" name="address" id="address" th:value="${loginMember.address}"/>
+                    </div>
+                    <div id="member-email-box">
+                        <label th:for="email">회원 이메일</label>
+                        <input th:if="${isOauthLogin}" type="text" class="form-control" name="email" th:id="email" th:value="${loginMember.email}" readonly/>
+                        <input th:unless="${isOauthLogin}"type="text" class="form-control" name="email" th:id="email" th:value="${loginMember.email}"/>
+                    </div>
+                </div>
+                <div id="submit-btn-box">
+                    <a class="btn btn-secondary" id="submitBtn">수정하기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+
+        $('#submitBtn').on('click', function() {
+
+            let isOauthLogin = [[${isOauthLogin}]];
+            console.log("isOauthLogin : ", isOauthLogin);
+
+            if (isOauthLogin) {
+                console.log("OauthLogin function start")
+                let data = {
+                    address : $('#address').val(),
+                    isOauthLogin : isOauthLogin
+                }
+
+                checkAllValuesFilled(data)
+                    .then(() => {
+                        modifyAccountInformation(data);
+                })
+            } else {
+                console.log("securityLogin function start")
+
+                let data = {
+                    password: $('#current-password').val(),
+                    modifiedPassword: $('#modified-password').val(),
+                    modifiedPasswordCheck : $('#modified-password-check').val(),
+                    address: $('#address').val(),
+                    email: $('#email').val(),
+                    isOauthLogin : isOauthLogin
+                };
+
+                checkAllValuesFilled(data)
+                    .then(() => isCurrentPasswordRight($('#current-password').val()))
+                    .then(() => comparePasswords($('#modifiedPassword').val(), $('#modified-password-check').val()))
+                    .then(() => regexCheck($('#modifiedPassword').val()))
+                    .then(() => {
+                        console.log('update data : ', data);
+                        modifyAccountInformation(data);
+                    });
+            }
+        });
+
+        function modifyAccountInformation(data) {
+            $.ajax({
+                url: '/member/information',
+                type: 'PATCH',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'JSON',
+                success: function(result) {
+                    alert(result.message);
+                    location.reload();
+                },
+                error: function(request, status, error) {
+                    console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                    alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                }
+            });
+        }
+        function checkAllValuesFilled(data) {
+            return new Promise(function(resolve, reject) {
+                Object.values(data).forEach(property => {
+                    if (property === null || property === "") {
+                        alert('모든 항목을 입력 해 주세요');
+                        reject();
+                    }
+                });
+                resolve();
+            });
+        }
+
+        function isCurrentPasswordRight(currentPassword) {
+            let data = {
+                currentPassword : currentPassword
+            }
+            return new Promise(function(resolve, reject) {
+                $.ajax({
+                    url: "/member/password/check",
+                    type: "POST",
+                    contentType: "application/JSON",
+                    data: JSON.stringify(data),
+                    dataType: "JSON",
+                    success: function(result) {
+                        if (!result.isSuccess) {
+                            alert('현재 비밀번호가 일치하지 않습니다.');
+                            reject();
+                        } else {
+                            resolve();
+                        }
+                    },
+                    error: function(request, status, error) {
+                        alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        reject();
+                    }
+                });
+            });
+        }
+
+        function comparePasswords(modifiedPassword, modifiedPasswordCheck) {
+            return new Promise(function(resolve, reject) {
+                if (modifiedPassword !== modifiedPasswordCheck) {
+                    alert('비밀번호 확인란이 일치하지 않습니다.');
+                    reject();
+                } else {
+                    resolve();
+                }
+            });
+        }
+
+        function regexCheck(modifiedPassword) {
+            return new Promise(function(resolve, reject) {
+                const numberRegex = /\d{1,}/; // 숫자 최소 1개 이상
+                const upperRegex = /[A-Z]{1,}/; // 대문자 최소 1개 이상
+                const digitRegex = /^.{7,}$/; // 아무거나 해서 7자 이상
+
+                if (!numberRegex.test(modifiedPassword)) {
+                    alert('비밀번호는 숫자를 포함해야 합니다');
+                    reject();
+                } else if (!upperRegex.test(modifiedPassword)) {
+                    alert('비밀번호는 대문자를 포함해야 합니다');
+                    reject();
+                } else if (!digitRegex.test(modifiedPassword)) {
+                    alert('비밀번호는 7자리 이상이어야 합니다.');
+                    reject();
+                } else {
+                    resolve();
+                }
+            });
+        }
+    </script>
+</div>
+</body>
+</html>

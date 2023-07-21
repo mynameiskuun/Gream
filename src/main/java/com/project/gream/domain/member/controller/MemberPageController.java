@@ -8,6 +8,7 @@ import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.Member;
+import com.project.gream.domain.member.service.MemberService;
 import com.project.gream.domain.order.dto.OrderItemDto;
 import com.project.gream.domain.order.entity.OrderItem;
 import com.project.gream.domain.order.repository.OrderItemRepository;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,6 +38,7 @@ public class MemberPageController {
     private final OrderService orderService;
     private final PostService postService;
     private final OrderItemRepository orderItemRepository;
+    private final MemberService memberService;
 
     @GetMapping("/mypage/{memberId}")
     public ModelAndView toBuyer(@PathVariable("memberId") String memberId) {
@@ -189,7 +193,22 @@ public class MemberPageController {
 
         log.info("userCouponList : " + userCouponList);
         mav.addObject("userCouponList", userCouponList);
-        mav.setViewName("/member/mypage/customer/mypage-customer-coupon");
+        mav.setViewName("member/mypage/customer/mypage-customer-coupon");
+        return mav;
+    }
+
+    @GetMapping("/member/{memberId}/information/edit")
+    public ModelAndView toMemberInformation(@LoginMember MemberDto memberDto) {
+        ModelAndView mav = new ModelAndView();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authClass = String.valueOf(authentication.getClass());
+        boolean isOauthLogin = authClass.contains("OAuth2AuthenticationToken");
+
+        log.info("isOauthLogin : " + isOauthLogin);
+        mav.addObject("isOauthLogin", isOauthLogin);
+        mav.addObject("loginMember", memberDto);
+        mav.setViewName("member/mypage/customer/mypage-information-edit");
         return mav;
     }
 }

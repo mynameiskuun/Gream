@@ -137,9 +137,8 @@
             $('#notice-title').val("");
             tinymce.get("notice-content").setContent("");
           },
-          error: function(error) {
-            console.log("error");
-            console.log("error : ", error);
+          error: function (request, status, error) {
+            alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
           },
         })
       })

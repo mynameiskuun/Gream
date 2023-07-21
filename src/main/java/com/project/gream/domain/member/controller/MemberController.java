@@ -12,10 +12,12 @@ import com.project.gream.domain.member.service.MemberService;
 import com.project.gream.domain.order.dto.OrderRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -58,20 +60,27 @@ public class MemberController {
         mav.setViewName("main/mainpage");
         return mav;
     }
+
     @PostMapping("/join")
     public int memberRegister(@RequestBody MemberDto memberDto) {
         return memberService.userRegister(memberDto);
     }
 
+    @PostMapping("/member/additional_inform")
+    public String updateAdditionalInformation(@RequestBody MemberRequestDto req, @LoginMember MemberDto memberDto) {
 
-    // form 태그로 전해진 값은 JSON 형식이 아니기 때문에 @RequestBody를 붙이지 않는다.
-    @PostMapping("/address")
-    public ModelAndView updateAdditionalInformation(MemberRequestDto req, @LoginMember MemberDto memberDto) {
-        ModelAndView mav = new ModelAndView();
-
-        mav.setViewName("main/mainpage");
-        memberService.updateAddressAndGender(req, memberDto);
-        return mav;
+        return memberService.updateAddressAndGender(req, memberDto);
     }
 
+    @PostMapping("/member/password/check")
+    public MemberDto.MemberResponseDto isCurrentPasswordRight(@RequestBody String currentPassword, @LoginMember MemberDto memberDto) {
+
+        return memberService.isCurrentPasswordRight(currentPassword, memberDto);
+    }
+
+    @PatchMapping("/member/information")
+    public ResponseEntity modifyMemberInformation(@RequestBody MemberRequestDto requestDto, @LoginMember MemberDto memberDto) {
+
+        return memberService.modifyMemberInformation(requestDto, memberDto);
+    }
 }

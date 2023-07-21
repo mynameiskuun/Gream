@@ -38,11 +38,11 @@
 <!--                    &lt;!&ndash; 리뷰 혹은 qna 글 출력 &ndash;&gt;-->
 <!--                </div>-->
                 <div>
-                    <a href="/postlist"><h3>작성 글 목록</h3></a>
+                    <a th:href="@{/member/{memberId}(memberId=${session.loginMember.getId()})/post}"><h3>작성 글 목록</h3></a>
                     <!-- 리뷰 혹은 qna 글 출력 -->
                 </div>
                 <div>
-                    <h3>회원 정보 수정</h3>
+                    <a th:href="@{/member/{memberId}(memberId=${session.loginMember.getId()})/information/edit}"><h3>회원 정보 수정</h3></a>
                     <!-- 닉네임, 비밀번호 등 회원 개인정보 수정. -->
                 </div>
             </div>
@@ -206,68 +206,68 @@
                                     </table>
                                 </div>
                             </section>
-                            <section id="common-inquiry-wrapper">
-                                <div id="common-inquiry-header">
-                                    <div><h3>1:1 문의</h3></div>
-                                </div>
-                                <div id="common-inquiry-body">
-                                    <table id="common-inquiry-table" class="table align-middle text-center">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col" style="width: 20%">문의 유형</th>
-                                            <th scope="col" style="width: 50%">내용</th>
-                                            <th scope="col">주문 번호</th>
-                                            <th scope="col">작성일</th>
-                                            <th scope="col">처리 상태</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody class="table-group-divider">
-                                        <tr class="common-inquiry-rows">
-                                            <th scope="row">
-                                                <div class="common-inquiry-information">
-                                                    <div class="common-inquiry-category"></div>
-                                                </div>
-                                            </th>
-                                            <td>
-                                                <div class="common-inquiry-content">적립이 안되여</div>
-                                            </td>
-                                            <td>
-                                                <div class="order-number">2</div>
-                                            </td>
-                                            <td>
-                                                <div class="common-inquiry-date">23.04.01</div>
-                                            </td>
-                                            <td>
-                                                <div class="common-inquiry-state">처리중</div>
-                                            </td>
-                                        </tr>
-                                        <tr class="common-inquiry-rows">
-                                            <th scope="row">
-                                                <div class="common-inquiry-information">
-                                                    <div class="common-inquiry-detail">
-                                                        <div class="common-inquiry-category">
-                                                            비밀번호 변경 문의
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </th>
-                                            <td>
-                                                <div class="common-inquiry-content">변경이 안됩니다</div>
-                                            </td>
-                                            <td>
-                                                <div class="order-number">3</div>
-                                            </td>
-                                            <td>
-                                                <div class="common-inquiry-date">23.01.01</div>
-                                            </td>
-                                            <td>
-                                                <div class="common-inquiry-state">답변 완료</div>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section>
+<!--                            <section id="common-inquiry-wrapper">-->
+<!--                                <div id="common-inquiry-header">-->
+<!--                                    <div><h3>1:1 문의</h3></div>-->
+<!--                                </div>-->
+<!--                                <div id="common-inquiry-body">-->
+<!--                                    <table id="common-inquiry-table" class="table align-middle text-center">-->
+<!--                                        <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th scope="col" style="width: 20%">문의 유형</th>-->
+<!--                                            <th scope="col" style="width: 50%">내용</th>-->
+<!--                                            <th scope="col">주문 번호</th>-->
+<!--                                            <th scope="col">작성일</th>-->
+<!--                                            <th scope="col">처리 상태</th>-->
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody class="table-group-divider">-->
+<!--                                        <tr class="common-inquiry-rows">-->
+<!--                                            <th scope="row">-->
+<!--                                                <div class="common-inquiry-information">-->
+<!--                                                    <div class="common-inquiry-category"></div>-->
+<!--                                                </div>-->
+<!--                                            </th>-->
+<!--                                            <td>-->
+<!--                                                <div class="common-inquiry-content">적립이 안되여</div>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <div class="order-number">2</div>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <div class="common-inquiry-date">23.04.01</div>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <div class="common-inquiry-state">처리중</div>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr class="common-inquiry-rows">-->
+<!--                                            <th scope="row">-->
+<!--                                                <div class="common-inquiry-information">-->
+<!--                                                    <div class="common-inquiry-detail">-->
+<!--                                                        <div class="common-inquiry-category">-->
+<!--                                                            비밀번호 변경 문의-->
+<!--                                                        </div>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                            </th>-->
+<!--                                            <td>-->
+<!--                                                <div class="common-inquiry-content">변경이 안됩니다</div>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <div class="order-number">3</div>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <div class="common-inquiry-date">23.01.01</div>-->
+<!--                                            </td>-->
+<!--                                            <td>-->
+<!--                                                <div class="common-inquiry-state">답변 완료</div>-->
+<!--                                            </td>-->
+<!--                                        </tr>-->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </section>-->
                         </section>
                     </div>
                 </div>

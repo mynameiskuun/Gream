@@ -18,8 +18,10 @@ import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.member.repository.MemberRepository;
 import com.project.gream.domain.order.dto.KakaoPayDto;
+import com.project.gream.domain.order.dto.OrderHistoryDto;
 import com.project.gream.domain.order.dto.OrderRequestDto;
 import com.project.gream.domain.order.entity.OrderHistory;
+import com.project.gream.domain.order.repository.OrderHistoryRepository;
 import com.project.gream.domain.post.entity.QLikes;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -34,6 +36,8 @@ import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.project.gream.domain.order.entity.QOrderHistory.orderHistory;
+import static com.project.gream.domain.item.entity.QUserCoupon.userCoupon;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,6 +51,8 @@ public class ItemServiceImpl implements ItemService{
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
     private final UserCouponRepository userCouponRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
+    private final JPAQueryFactory queryFactory;
     private final EntityManager em;
 
     @Override
@@ -87,15 +93,15 @@ public class ItemServiceImpl implements ItemService{
                 .map(ItemDto::fromEntity)
                 .collect(Collectors.toList());
     }
-    @Override
-    public ItemDto selectItemById(Long itemId) {
-        return ItemDto.fromEntity(itemRepository.findById(itemId).orElseThrow());
-    }
+//    @Override
+//    public ItemDto selectItemById(Long itemId) {
+//        return ItemDto.fromEntity(itemRepository.findById(itemId).orElseThrow());
+//    }
 
-    @Override
-    public void deleteItem(Long itemId) {
-        itemRepository.deleteById(itemId);
-    }
+//    @Override
+//    public void deleteItem(Long itemId) {
+//        itemRepository.deleteById(itemId);
+//    }
 
     @Transactional
     @Override
@@ -123,20 +129,20 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public List<ImgDto> getImgsByItemId(Long itemId) {
-        return imgRepository.findItemImgs(itemId).stream()
-                .map(ImgDto::fromEntityForItem).collect(Collectors.toList());
-    }
+//    public List<ImgDto> getImgsByItemId(Long itemId) {
+//        return imgRepository.findItemImgs(itemId).stream()
+//                .map(ImgDto::fromEntityForItem).collect(Collectors.toList());
+//    }
 
     public ItemDto getItemById(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow();
         return ItemDto.fromEntity(item);
     }
 
-    @Override
-    public void deleteImg(Long imgId) {
-
-    }
+//    @Override
+//    public void deleteImg(Long imgId) {
+//
+//    }
 
     @Transactional
     @Override
@@ -388,5 +394,45 @@ public class ItemServiceImpl implements ItemService{
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<OrderHistoryDto> findTop5OrderByCreatedTimeDesc() {
 
+        return queryFactory.selectFrom(orderHistory)
+                .orderBy(orderHistory.createdTime.desc())
+                .limit(5).stream()
+                .map(OrderHistoryDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, String> isPointUsable(int point, @LoginMember MemberDto memberDto) {
+
+        // 멤버가 가진 포인트보다 적으면 key = false, message = ''
+        // 많으면 (가진 포인트를 초과했으면) key = true, message = '사용 가능한 포인트는 memberDto.getPoint() P 입니다'
+        Map<String, String> result = new HashMap<>();
+
+        log.info("point : " + point);
+        boolean isPointUsable = memberDto.getPoint() >= point;
+        if (isPointUsable) {
+            result.put("isPointUsable", "true");
+        } else {
+            result.put("isPointUsable", "false");
+            result.put("message", "보유 포인트를 초과했습니다.");
+        }
+        return result;
+    }
+
+    @Override
+    public List<UserCouponResponseDto> getUserCouponForItem(Long itemId, String category, MemberDto memberDto) {
+
+//        Category discountFor = StringToEnumUtil.getEnumFromValue(Category.class, category);
+        return queryFactory.selectFrom(userCoupon)
+                .where(userCoupon.member.id.eq(memberDto.getId()),
+                        userCoupon.coupon.id.eq(itemId),
+                        userCoupon.coupon.discountFor.eq(category))
+                .fetch().stream()
+                .map(UserCouponVO::fromEntity)
+                .map(UserCouponResponseDto::new)
+                .collect(Collectors.toList());
+    }
 }

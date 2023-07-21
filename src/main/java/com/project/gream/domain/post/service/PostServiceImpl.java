@@ -22,6 +22,7 @@ import com.project.gream.domain.post.repository.LikesRepository;
 import com.project.gream.domain.post.repository.PostRepository;
 import com.project.gream.domain.post.repository.ReviewRepository;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +32,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +54,7 @@ public class PostServiceImpl implements PostService{
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
+    private final JPAQueryFactory queryFactory;
     private final EntityManager em;
     private final S3Config s3Config;
 
@@ -118,7 +122,7 @@ public class PostServiceImpl implements PostService{
 
         log.info("-------------------------- 회원이 이미 좋아한 게시물인지 확인");
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         Likes like = new Likes();
 
@@ -191,7 +195,7 @@ public class PostServiceImpl implements PostService{
 
         log.info("------------------------- 상품 상세페이지의 좋아요 갯수 반환");
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         Map<String, String> itemLikeBackgroundColorMap = new HashMap<>();
         Map<Long, Long> reviewLikeCountsMap = new HashMap<>();
         Map<String, String> reviewLikeBackgroundColorMap = new HashMap<>();
@@ -314,6 +318,7 @@ public class PostServiceImpl implements PostService{
 
         log.info(String.valueOf(noticeImgs.isEmpty()));
 
+
         if (noticeImgs.size() != 0) {
             List<String> imgUrlList = s3Config.imgUpload(PostRequestDto.class, noticeImgs);
             post.setThumbnailUrl(imgUrlList.get(0));
@@ -421,7 +426,7 @@ public class PostServiceImpl implements PostService{
 
         log.info("------------------------- Get All Qna List");
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         QueryResults<Post> results = queryFactory.selectFrom(post)
                 .where(
@@ -440,7 +445,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public PostResponseDto getQnaDetail(Long qnaId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         Post qna = queryFactory.selectFrom(post)
                 .where(post.id.eq(qnaId))
                 .fetchOne();
@@ -459,7 +464,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public List<PostDto> getQnaListForMyPage(String memberId) {
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         return queryFactory.selectFrom(post)
                 .where(post.member.id.eq(memberId),
@@ -469,5 +474,67 @@ public class PostServiceImpl implements PostService{
                 .stream()
                 .map(PostDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<PostDto> searchNoticeByCondition(PostRequestDto requestDto, Pageable pageable) {
+
+        String searchPeriod = requestDto.getSearchPeriod();
+        String searchTarget = requestDto.getSearchTarget();
+        String searchKeyWords = requestDto.getSearchKeyWords();
+
+        log.info("searchPeriod : " + searchPeriod);
+        log.info("searchTarget : " + searchTarget);
+        log.info("searchKeyWords : " + searchKeyWords);
+
+//        QueryResults<Post> searchResults = queryFactory.selectFrom(post)
+//                .where(eqPeriod(searchPeriod),
+//                        eqTarget(searchTarget, searchKeyWords))
+//                .orderBy(post.createdTime.desc())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+
+        List<PostDto> postList =  queryFactory.selectFrom(post)
+                .where(eqPeriod(searchPeriod),
+                        eqTarget(searchTarget, searchKeyWords),
+                        post.postType.eq(PostType.NOTICE))
+                .orderBy(post.createdTime.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch().stream()
+                .map(PostDto::fromEntity)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(postList, pageable, postList.size());
+    }
+
+    private BooleanExpression eqPeriod(String searchPeriod) {
+        if (StringUtils.isEmpty(searchPeriod)) {
+            return null;
+        }
+        if (StringUtils.equals(searchPeriod, "ALL")) {
+            return null;
+        }
+        if (StringUtils.equals(searchPeriod, "LAST_SIX_MONTH")) {
+            return post.createdTime.after(LocalDateTime.now().minusMonths(6));
+        }
+        if (StringUtils.equals(searchPeriod, "LAST_ONE_YEAR")) {
+            return post.createdTime.after(LocalDateTime.now().minusYears(1));
+        }
+        return null;
+    }
+
+    private BooleanExpression eqTarget(String searchTarget, String searchKeyWord) {
+        if (StringUtils.isEmpty(searchTarget)) {
+            return null;
+        }
+        if (StringUtils.equals(searchTarget, "TITLE_AND_CONTENT")) {
+            return post.content.like(searchKeyWord).or(post.title.like(searchKeyWord));
+        }
+        if (StringUtils.equals(searchTarget, "WRITER")) {
+            return post.member.id.like(searchKeyWord);
+        }
+        return null;
     }
 }

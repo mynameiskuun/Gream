@@ -74,7 +74,7 @@ public class PostDto {
     }
 
     public static PostDto fromEntity(Post post) {
-        return PostDto.builder()
+        PostDto postDto =  PostDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
@@ -82,10 +82,15 @@ public class PostDto {
                 .thumbnailUrl(post.getThumbnailUrl())
                 .qnaType(post.getQnaType())
                 .postType(post.getPostType())
-                .itemDto(ItemDto.fromEntity(post.getItem()))
                 .memberDto(MemberDto.fromEntity(post.getMember()))
                 .createdTime(post.getCreatedTime())
                 .modifiedTime(post.getModifiedTime())
                 .build();
+
+        if (post.getItem() == null) {
+            return postDto;
+        }
+        postDto.setItemDto(ItemDto.fromEntity(post.getItem()));
+        return postDto;
     }
 }

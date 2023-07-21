@@ -7,6 +7,7 @@ import com.project.gream.common.enumlist.converter.QnaTypeConverter;
 import com.project.gream.common.util.BaseTimeEntity;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.member.entity.Member;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +16,13 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.*;
 import java.util.List;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
+@Table(name = "post", indexes = {
+        @Index(name = "idx_title_content_createdTime", columnList = "title, content, createdTime"),
+        @Index(name = "idx_writer", columnList = "member_id")
+})
 public class Post extends BaseTimeEntity {
 
     @Id

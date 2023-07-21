@@ -12,7 +12,7 @@
       <div id="additional-header">
         <h2>추가 정보를 입력 해 주세요</h2>
       </div>
-      <form action="/address" method="POST">
+      <form id="additional-information-form">
         <div class="additional-input-box">
           <label for="addressBox" class="form-label">주소를 입력 해 주세요</label>
           <input type="text" class="register-input" name="address" id="addressBox" placeholder="&nbsp;&nbsp;&nbsp;ADDRESS"/>
@@ -32,11 +32,51 @@
           </div>
         </div>
         <div class="btn-box">
-          <input type="submit" class="btn register-btn" value="저장" />
+          <a class="btn register-btn">저장</a>
         </div>
       </form>
     </div>
   </div>
+
+  <script>
+    $('.register-btn').on('click', function() {
+
+      let address = $('#addressBox').val();
+      let gender = $('.gender-checkbox:checked').val();
+
+      console.log("address : ", address);
+      console.log("gender : ", gender);
+
+      if (address === "" || gender == null) {
+        alert('모든 항목을 입력 해 주세요');
+        return;
+      }
+
+      let data = {
+        address : $('#addressBox').val(),
+        gender: $('.gender-checkbox:checked').val()
+      };
+
+      $.ajax({
+        url : '/member/additional_inform',
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        dataType: 'TEXT',
+        success: function(result) {
+          if (result === "추가정보 입력 완료.") {
+            alert(result + "다시 로그인 해주세요.")
+            location.href='/logout';
+          } else {
+            alert(result)
+          }
+        },
+        error: function (request, status, error) {
+          alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+        }
+      })
+    })
+  </script>
 </th:block>
 </body>
 </html>

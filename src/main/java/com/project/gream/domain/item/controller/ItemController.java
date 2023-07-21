@@ -6,6 +6,7 @@ import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.repository.CartItemRepository;
+import com.project.gream.domain.order.dto.OrderHistoryDto;
 import com.project.gream.domain.order.dto.OrderItemDto;
 import com.project.gream.domain.order.service.OrderService;
 import com.project.gream.domain.post.dto.LikesResponseDto;
@@ -60,7 +61,7 @@ public class ItemController {
         Page<Post> qnaList = postService.getQnaListByItemId(itemId, pageable);
 
         int qnaNowPage = qnaList.getPageable().getPageNumber() + 1;
-        int qnaStartPage =  Math.max(qnaNowPage - 4, 1);
+        int qnaStartPage = Math.max(qnaNowPage - 4, 1);
         int qnaEndPage = Math.min(qnaNowPage + 9, qnaList.getTotalPages());
 
         log.info("reviewList.size : " + reviewList.size());
@@ -114,7 +115,7 @@ public class ItemController {
         return itemService.deleteCartItem(cartItemIds);
     }
 
-    @PostMapping("cart/item/quantity")
+    @PostMapping("/cart/item/quantity")
     public String updateCartItemQuantity(@RequestBody CartItemRequestDto req) {
 
         log.info("------------------------상품 수량 업데이트");
@@ -150,5 +151,19 @@ public class ItemController {
 
         log.info(itemService.sortItemByCategory(sortBy).toString());
         return itemService.sortItemByCategory(sortBy);
+    }
+
+    @GetMapping("/point/check/{inputPoint}")
+    public Map<String, String> isPointUsable(@PathVariable("inputPoint") int point, @LoginMember MemberDto memberDto) {
+
+        return itemService.isPointUsable(point, memberDto);
+    }
+
+    @GetMapping("/member/coupon/popup/{itemId}/{category}")
+    public List<UserCouponResponseDto> getUserCouponForItem(@PathVariable("itemId") Long itemId,
+                                                      @PathVariable("category") String category,
+                                                            @LoginMember MemberDto memberDto) {
+
+        return itemService.getUserCouponForItem(itemId, category, memberDto);
     }
 }

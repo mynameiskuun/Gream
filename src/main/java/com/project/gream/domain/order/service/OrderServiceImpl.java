@@ -80,9 +80,9 @@ public class OrderServiceImpl implements OrderService {
         parameters.add("quantity", String.valueOf(request.getSize()));
         parameters.add("total_amount", String.valueOf(request.getFinalPaymentAmount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", kakaoPayRealUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
-        parameters.add("cancel_url", kakaoPayRealUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
-        parameters.add("fail_url", kakaoPayRealUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
+        parameters.add("approval_url", kakaoPayLocalUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
+        parameters.add("cancel_url", kakaoPayLocalUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
+        parameters.add("fail_url", kakaoPayLocalUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
 
         log.info("--------------------- 결제준비 parameters : " + parameters);
 
