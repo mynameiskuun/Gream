@@ -37,19 +37,6 @@ public interface ItemService {
     List<ItemDto> getLikedItemListForMypage(List<Long> itemIds);
     List<ItemDto> getLikedItemListByMemberId(String memberId);
     boolean itemStockCheck(OrderRequestDto requestDto);
-    String createCoupon(CouponRequestDto requestDto);
-    Page<CouponDto> getCouponList(Pageable pageable);
-    String deleteCoupon(Long couponId);
-    List<CouponDto> getUsableCouponList(Long itemId);
-    String saveUsableCoupon(CouponRequestDto requestDto);
-    List<UserCouponResponseDto> getMemberCoupon(Member member);
-    List<UserCouponResponseDto> getMemberCouponForMypage(String memberId);
-
-    List<OrderHistoryDto> findTop5OrderByCreatedTimeDesc();
-
-    Map<String, String> isPointUsable(int point, @LoginMember MemberDto memberDto);
-
-    List<UserCouponResponseDto> getUserCouponForItem(Long itemId, String category, MemberDto memberDto);
 
     //    List<ImgDto> getImgsByItemId(Long itemId);
     //    ItemDto selectItemById(Long itemId);

@@ -3,6 +3,7 @@ package com.project.gream.domain.item.service;
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.Category;
+import com.project.gream.common.enumlist.CouponStatus;
 import com.project.gream.common.enumlist.Gender;
 import com.project.gream.common.util.EnumValueUtil;
 import com.project.gream.domain.item.dto.*;
@@ -38,6 +39,9 @@ import java.util.stream.Collectors;
 
 import static com.project.gream.domain.order.entity.QOrderHistory.orderHistory;
 import static com.project.gream.domain.item.entity.QUserCoupon.userCoupon;
+import static com.project.gream.domain.item.entity.QCoupon.coupon;
+import static com.project.gream.domain.member.entity.QMember.member;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -285,154 +289,5 @@ public class ItemServiceImpl implements ItemService{
     public boolean itemStockCheck(OrderRequestDto requestDto) {
         Item item = itemRepository.findById(requestDto.getItemDto().getId()).orElseThrow();
         return item.getItemStock() > 0;
-    }
-
-    @Override
-    public String createCoupon(CouponRequestDto requestDto) {
-        log.info("-------------------------- 쿠폰 생성");
-
-        String discountFor = String.join(",", requestDto.getDiscountFor());
-        try {
-            Coupon coupon = Coupon.builder()
-                    .type(requestDto.getType())
-                    .name(requestDto.getName())
-                    .discountRate(requestDto.getDiscountRate())
-                    .expireDate(requestDto.getExpireDate())
-                    .stock(requestDto.getStock())
-                    .minOrderPrice(requestDto.getMinOrderPrice())
-                    .discountFor(discountFor)
-                    .build();
-            couponRepository.save(coupon);
-            return "success";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "fail";
-        }
-    }
-
-    @Override
-    public Page<CouponDto> getCouponList(Pageable pageable) {
-        return couponRepository.findAll(pageable).map(Coupon -> CouponDto.builder()
-                .id(Coupon.getId())
-                .type(Coupon.getType())
-                .name(Coupon.getName())
-                .discountRate(Coupon.getDiscountRate())
-                .expireDate(Coupon.getExpireDate())
-                .stock(Coupon.getStock())
-                .minOrderPrice(Coupon.getMinOrderPrice())
-                .discountFor(Coupon.getDiscountFor())
-                .createdTime(Coupon.getCreatedTime())
-                .modifiedTime(Coupon.getModifiedTime())
-                .build());
-    }
-
-    @Override
-    public String deleteCoupon(Long couponId) {
-        try {
-            couponRepository.deleteById(couponId);
-        } catch(Exception e) {
-            e.printStackTrace();
-            return "오류 발생";
-        }
-        return "쿠폰 삭제 완료.";
-    }
-
-    @Override
-    public List<CouponDto> getUsableCouponList(Long itemId) {
-        Item item = itemRepository.findById(itemId).orElseThrow();
-        return couponRepository.findCouponsByDiscountForContaining(String.valueOf(item.getCategory())).stream()
-                .map(CouponDto::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public String saveUsableCoupon(CouponRequestDto requestDto) {
-
-        Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow();
-        String memberId = member.getId();
-        List<Long> couponIdList = requestDto.getCouponIdList();
-
-        if (memberId == null || couponIdList == null) {
-            return "쿠폰 저장에 실패했습니다.";
-        }
-
-        List<Coupon> couponList = requestDto.getCouponIdList().stream()
-                .filter(couponId -> !userCouponRepository.existsByMember_IdAndCouponId(memberId,couponId))
-                .map(couponRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-        for (Coupon coupon : couponList) {
-            UserCoupon userCoupon = UserCoupon.builder()
-                    .coupon(coupon)
-                    .member(member)
-                    .build();
-            log.info(String.valueOf(userCoupon.getCoupon().getId()));
-            userCouponRepository.save(userCoupon);
-        }
-
-        return "쿠폰 저장 완료(사용완료, 수령완료 쿠폰 제외)";
-    }
-
-    @Override
-    public List<UserCouponResponseDto> getMemberCoupon(Member member) {
-
-        List<UserCoupon> couponList = userCouponRepository.getByMember_Id(member.getId());
-        return couponList.stream()
-                .map(UserCouponVO::fromEntity)
-                .map(UserCouponResponseDto::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<UserCouponResponseDto> getMemberCouponForMypage(String memberId) {
-
-        return userCouponRepository.getTop4ByMember_IdOrderByCreatedTimeAsc(memberId).stream()
-                .map(UserCouponVO::fromEntity)
-                .map(UserCouponResponseDto::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<OrderHistoryDto> findTop5OrderByCreatedTimeDesc() {
-
-        return queryFactory.selectFrom(orderHistory)
-                .orderBy(orderHistory.createdTime.desc())
-                .limit(5).stream()
-                .map(OrderHistoryDto::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Map<String, String> isPointUsable(int point, @LoginMember MemberDto memberDto) {
-
-        // 멤버가 가진 포인트보다 적으면 key = false, message = ''
-        // 많으면 (가진 포인트를 초과했으면) key = true, message = '사용 가능한 포인트는 memberDto.getPoint() P 입니다'
-        Map<String, String> result = new HashMap<>();
-
-        log.info("point : " + point);
-        boolean isPointUsable = memberDto.getPoint() >= point;
-        if (isPointUsable) {
-            result.put("isPointUsable", "true");
-        } else {
-            result.put("isPointUsable", "false");
-            result.put("message", "보유 포인트를 초과했습니다.");
-        }
-        return result;
-    }
-
-    @Override
-    public List<UserCouponResponseDto> getUserCouponForItem(Long itemId, String category, MemberDto memberDto) {
-
-//        Category discountFor = StringToEnumUtil.getEnumFromValue(Category.class, category);
-        return queryFactory.selectFrom(userCoupon)
-                .where(userCoupon.member.id.eq(memberDto.getId()),
-                        userCoupon.coupon.id.eq(itemId),
-                        userCoupon.coupon.discountFor.eq(category))
-                .fetch().stream()
-                .map(UserCouponVO::fromEntity)
-                .map(UserCouponResponseDto::new)
-                .collect(Collectors.toList());
     }
 }
