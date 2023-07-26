@@ -2,6 +2,7 @@ package com.project.gream.domain.item.controller;
 
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.domain.item.dto.*;
+import com.project.gream.domain.item.service.DiscountService;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
@@ -18,9 +19,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +38,7 @@ public class ItemController {
     private final ItemService itemService;
     private final PostService postService;
     private final OrderService orderService;
+    private final DiscountService discountService;
 
     @PostMapping("/cart")
     public String addItemToCart(@RequestBody CartItemDto cartItemDto, @LoginMember MemberDto memberDto) {
@@ -53,7 +60,7 @@ public class ItemController {
 
         ModelAndView mav = new ModelAndView();
 
-        List<CouponDto> couponList = itemService.getUsableCouponList(itemId);
+        List<CouponDto> couponList = discountService.getUsableCouponList(itemId);
         List<ReviewDto> reviewList = postService.getReviewListByItemId(itemId);
         Map<Integer, Integer> starValMap = postService.getReviewScoreByItemId(itemId);
         ItemDto itemDto = itemService.getItemById(itemId);
@@ -128,12 +135,12 @@ public class ItemController {
         log.info(requestDto.getDiscountFor().toString());
         log.info(String.valueOf(requestDto.getDiscountFor().getClass()));
 
-        return itemService.createCoupon(requestDto);
+        return discountService.createCoupon(requestDto);
     }
 
     @PostMapping("/member/coupon")
     public String saveUsableCoupon(@RequestBody CouponRequestDto requestDto) {
-        return itemService.saveUsableCoupon(requestDto);
+        return discountService.saveUsableCoupon(requestDto);
     }
 
     @GetMapping("/mypage/order/{sortBy}")
@@ -156,14 +163,23 @@ public class ItemController {
     @GetMapping("/point/check/{inputPoint}")
     public Map<String, String> isPointUsable(@PathVariable("inputPoint") int point, @LoginMember MemberDto memberDto) {
 
-        return itemService.isPointUsable(point, memberDto);
+        return discountService.isPointUsable(point, memberDto);
     }
 
-    @GetMapping("/member/coupon/popup/{itemId}/{category}")
-    public List<UserCouponResponseDto> getUserCouponForItem(@PathVariable("itemId") Long itemId,
-                                                      @PathVariable("category") String category,
+    @GetMapping("/member/coupon/popup/{category}")
+    public List<UserCouponResponseDto> getUserCouponForItem(@PathVariable("category") String category,
                                                             @LoginMember MemberDto memberDto) {
 
-        return itemService.getUserCouponForItem(itemId, category, memberDto);
+        return discountService.getUserCouponForItem(category, memberDto);
+    }
+
+    @PostMapping("/apply-coupon")
+    public ResponseEntity<UserCouponDto.CouponApplyResponse> couponValidation(@RequestBody UserCouponDto.CouponApplyRequest request) {
+
+        UserCouponDto.CouponApplyResponse response = discountService.applyCoupon(request);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+
+        return new ResponseEntity<>(response, header, HttpStatus.OK);
     }
 }

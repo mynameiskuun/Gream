@@ -2,7 +2,6 @@ package com.project.gream.domain.order.service;
 
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.enumlist.OrderState;
-import com.project.gream.common.util.StringToEnumUtil;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.item.repository.ItemRepository;
@@ -41,6 +40,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import static com.project.gream.domain.order.entity.QOrderHistory.orderHistory;
+
 @Validated
 @RequiredArgsConstructor
 @Slf4j
@@ -62,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
     private final ItemRepository itemRepository;
     private final ItemService itemService;
     private final MemberService memberService;
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public KakaoPayRequestVO kakaoPayReady(KakaoPayDto request) {
@@ -286,6 +288,16 @@ public class OrderServiceImpl implements OrderService {
 
         return orderItemRepository.findAllByStateAndOrderHistory_Member(state, memberDto.toEntity()).stream()
                 .map(OrderItemDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderHistoryDto> findTop5OrderByCreatedTimeDesc() {
+
+        return queryFactory.selectFrom(orderHistory)
+                .orderBy(orderHistory.createdTime.desc())
+                .limit(5).stream()
+                .map(OrderHistoryDto::fromEntity)
                 .collect(Collectors.toList());
     }
 }

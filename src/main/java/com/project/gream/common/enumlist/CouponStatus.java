@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum CouponStatus implements EnumBase{
 
     VALID("사용 가능"),
-    INVALID("사용 완료");
+    INVALID("사용 완료"),
+    EXPIRED("기간 만료");
 
     private final String value;
     @Override

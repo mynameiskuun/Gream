@@ -4,6 +4,7 @@ import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.domain.item.dto.CouponDto;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.dto.UserCouponResponseDto;
+import com.project.gream.domain.item.service.DiscountService;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
@@ -39,12 +40,13 @@ public class MemberPageController {
     private final PostService postService;
     private final OrderItemRepository orderItemRepository;
     private final MemberService memberService;
+    private final DiscountService discountService;
 
     @GetMapping("/mypage/{memberId}")
     public ModelAndView toBuyer(@PathVariable("memberId") String memberId) {
         List<OrderItemDto> userOrderItemList = orderService.findOrderItemForMypage(memberId);
         List<ItemDto> userLikeItems = itemService.getLikedItemListForMypage(itemService.getLikedItemIds(memberId));
-        List<UserCouponResponseDto> userCouponList = itemService.getMemberCouponForMypage(memberId);
+        List<UserCouponResponseDto> userCouponList = discountService.getMemberCouponForMypage(memberId);
         List<PostDto> userQnaList = postService.getQnaListForMyPage(memberId);
 
         ModelAndView mav = new ModelAndView();
@@ -189,7 +191,7 @@ public class MemberPageController {
 
         log.info("------------------------------ 유저가 가지고 있는 쿠폰 조회");
         ModelAndView mav = new ModelAndView();
-        List<UserCouponResponseDto> userCouponList = itemService.getMemberCoupon(memberDto.toEntity());
+        List<UserCouponResponseDto> userCouponList = discountService.getMemberCoupon(memberDto.toEntity());
 
         log.info("userCouponList : " + userCouponList);
         mav.addObject("userCouponList", userCouponList);

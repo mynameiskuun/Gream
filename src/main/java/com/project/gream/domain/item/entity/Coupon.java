@@ -42,4 +42,8 @@ public class Coupon extends BaseTimeEntity {
         this.minOrderPrice = minOrderPrice;
         this.discountFor = discountFor;
     }
+
+    public boolean isExpired() {
+        return this.expireDate.isBefore(LocalDateTime.now());
+    }
 }

@@ -18,6 +18,7 @@
 
       #point-input-box {
         display: flex;
+        margin-top: 10px;
       }
 
       #use-all-btn {
@@ -25,6 +26,7 @@
       }
       #member-point-box {
         display: flex;
+        margin-top: 30px;
       }
     </style>
   </head>
@@ -63,7 +65,7 @@
             <table class="table align-middle table-hover">
               <thead>
                 <tr><td colspan="5"><h3>주문서</h3></td></tr>
-                <tr><td></td><td><h4>상품명</h4></td><td><h4>수량</h4></td><td><h4>총 금액</h4></td><td><h4>쿠폰 적용</h4></td></tr>
+                <tr><td></td><td><h4>상품명</h4></td><td><h4>수량</h4></td><td><h4>총 금액</h4></td><td></td></tr>
               </thead>
               <tbody>
                 <th:block th:if="${orderQuantity == null}">
@@ -73,11 +75,17 @@
                     </td>
                     <td class="item-name" th:text="${orderItemList.itemDto.name}"></td>
                     <td class="item-qty" th:text="${orderItemList.quantity}"></td>
-                    <td class="item-price" th:text="${#numbers.formatInteger(orderItemList.getQuantity() * orderItemList.itemDto.price, 3, 'COMMA')}"></td>
-                    <td><button type="button" class="btn btn-danger coupon-btn" style="width:100%; height: 40px;">쿠폰 사용</button></td>
+                    <td class="item-price">
+                      <div class="origin-price" th:text="${#numbers.formatInteger(orderItemList.getQuantity() * orderItemList.itemDto.price, 3, 'COMMA')}"></div>
+                      <div class="modified-price"></div>
+                    </td>
+                    <td class="coupon-btn-box">
+                      <button type="button" class="btn btn-danger coupon-btn" style="width:100px; height: 40px;">쿠폰 사용</button>
+                      <input type="hidden" class="coupon-discount-amount" value="0"/>
+                    </td>
                     <input type="hidden" class="order-item-id" th:value="${orderItemList.getItemDto().getId()}" />
                     <input type="hidden" class="order-item-category" th:value="${orderItemList.getItemDto().getCategory()}" />
-                    <input type="hidden" class="cart-item-id" th:value="${orderItemList.getId()}" />
+                    <input type= "hidden" class="cart-item-id" th:value="${orderItemList.getId()}" />
                   </tr>
                 </th:block>
                 <th:block th:unless="${orderQuantity == null}">
@@ -87,9 +95,16 @@
                       </td>
                       <td class="item-name" th:text="${itemDto.name}"></td>
                       <td class="item-qty" th:text="${orderQuantity}"></td>
-                      <td class="item-price" th:text="${#numbers.formatInteger(orderQuantity * itemDto.price, 3, 'COMMA')}"></td>
-                    <td><button type="button" class="btn btn-danger coupon-btn" style="width:100%; height: 40px;">쿠폰 사용</button></td>
+                      <td class="item-price">
+                        <div class="origin-price" th:text="${#numbers.formatInteger(orderQuantity * itemDto.price, 3, 'COMMA')}"></div>
+                        <div class="modified-price"></div>
+                      </td>
+                    <td class="coupon-btn-box">
+                      <button type="button" class="btn btn-danger coupon-btn" style="width:100px; height: 40px;">쿠폰 사용</button>
+                      <input type="hidden" class="coupon-discount-amount" value="0"/>
+                    </td>
                     <input type="hidden" class="order-item-id" th:value="${itemDto.getId()}" />
+                    <input type="hidden" class="order-item-category" th:value="${itemDto.getCategory()}" />
                   </tr>
                 </th:block>
               </tbody>
@@ -107,6 +122,8 @@
               </div>
               <div id="point-input-box" class="input-group mb-3">
                 <input type="text" id="point-use-input" class="form-control" placeholder="사용 포인트를 입력 해 주세요"/>
+                <input type="hidden" id="use-point-amount" value="0"/>
+                <button class="btn btn-outline-secondary" type="button" id="point-clear-btn">초기화</button>
                 <button class="btn btn-outline-secondary" type="button" id="use-all-btn">전액 사용</button>
               </div>
             </div>
@@ -165,8 +182,10 @@
 <!--              <p>사용 가능한 쿠폰이 없습니다.</p>-->
 <!--            </div>-->
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn-primary" data-bs-dismiss="modal">확인</button>
+          <div class="modal-footer user-coupon-modal-footer">
+            <div><h5>쿠폰 적용은 한 주문, 한 상품에 한해서만 적용됩니다.</h5></div>
+            <button type="button" class="btn-secondary-outline coupon-submit-btn" data-bs-dismiss="modal">확인</button>
+            <div id="item-id-box"></div>
           </div>
         </div>
       </div>
@@ -193,17 +212,31 @@
     }
 
     // 배송료 계산
-    function setDeliveryFee(totalPrice) {
-      return totalPrice >= 50000 ? 0 : 3000;
+    function setDeliveryFee(totalPrice, couponDiscountAmount, pointDiscountAmount) {
+      return totalPrice - couponDiscountAmount - pointDiscountAmount >= 50000 ? 0 : 3000;
     }
 
-    // 주문 총액 계산
+    // 최초 주문 총액 계산
     function calculateTotalOrderPrice() {
+
+      console.log("최초 주문 총액 계산")
       let totalPrice = 0;
-      $('.item-price').each(function() {
+      $('.origin-price').each(function() {
         totalPrice += parseInt(removeComma($(this).html()))
       })
+      console.log("최초 주문 총액 : ", totalPrice);
       return totalPrice;
+    }
+
+    // 쿠폰 할인 금액 계산
+    function totalCouponDiscountAmount() {
+      console.log("쿠폰 할인 총 금액 계산")
+      let totalDiscountPrice = 0;
+      $('.coupon-discount-amount').each(function() {
+        totalDiscountPrice += parseInt($(this).val());
+      })
+      console.log("쿠폰 할인 총 금액 : ", totalDiscountPrice);
+      return totalDiscountPrice;
     }
 
     // 할인금액 검증
@@ -234,10 +267,19 @@
 
       if (!numberRegex.test(inputPoint)) {
         alert('숫자를 입력 해 주세요');
-        $(this).val('');
+        $('#point-use-input').val('0');
         return true;
       }
     }
+
+    // 포인트 적용 초기화 이벤트
+    $('#point-clear-btn').on('click', function() {
+
+      $('#use-point-amount').val(0);
+      $('#point-use-input').val('0');
+      setPrice(); // 페이지 가격 전체 재설정
+    })
+
 
     // 포인트 적립금 계산
     function calculateRewardAmount(totalPrice) {
@@ -247,30 +289,50 @@
     // 최종 결제금액 계산
     function setPrice() {
 
-      let totalPrice = calculateTotalOrderPrice()
+      // 1. 쿠폰 및 포인트 할인 적용 전 최초의 주문금액 계산.
+      // 2. 쿠폰 발급 할인 금액 계산.
+      // 3. 포인트 할인 금액 계산.
+      // 4. 배송비 부과 여부 판단 및 계산.
+      // 5. 최종 구매금액에 따른 포인트 적립금 계산.
 
-      // let totalPrice = 0;
-      // $('.item-price').each(function() {
-      //   totalPrice += parseInt(removeComma($(this).html()));
-      // })
+      // 최초 주문금액 - 쿠폰 할인금액 - 포인트 할인금액 + 배송비 = 최종 주문 금액.
+      // 필요한 변수
+      // 1. 최초 주문금액
+      // 2. 쿠폰 할인금액
+      // 3. 포인트 할인금액
+      // 4. 배송비
+      // 5. 최종 주문금액
 
-      $('#total-item-price').html(addCommas(totalPrice));
-      $('#delivery-fee').html(addCommas(setDeliveryFee(totalPrice)));
-      // $('#discount-price').html(addCommas(calculateDiscountAmount()));
-      $('#discount-price').html('0');
+      let originTotalPrice = calculateTotalOrderPrice(); // 최초 주문 총액
+      let couponDiscountAmount = totalCouponDiscountAmount(); // 쿠폰 할인 총액
+      let pointDiscountAmount = parseInt($('#use-point-amount').val()); // 포인트 할인 금액
+      let deliveryFee = setDeliveryFee(originTotalPrice, couponDiscountAmount, pointDiscountAmount); // 배송비
+      let finalOrderAmount = originTotalPrice - couponDiscountAmount - pointDiscountAmount + deliveryFee; // 최종 결제 금액
 
-      // let paymentAmount = totalPrice + setDeliveryFee(totalPrice) - calculateDiscountAmount();
-      let paymentAmount = totalPrice + setDeliveryFee(totalPrice);
-      $('#payment-amount').html(addCommas(paymentAmount));
-      $('#point-reward').html(addCommas(calculateRewardAmount(paymentAmount)));
-    }
+      if ((originTotalPrice + deliveryFee) <= (couponDiscountAmount + pointDiscountAmount)) {
+        alert('할인금액은 상품 금액을 초과할 수 없습니다.');
+        location.reload();
+        return;
+      }
 
-    function setPriceTest(totalProductPrice, pointDiscountPrice, couponDiscountPrice) {
+      console.log("최초 주문 총액 : ", originTotalPrice);
+      console.log("쿠폰 할인 총액 : ", couponDiscountAmount);
+      console.log("포인트 할인 총액 : ", pointDiscountAmount);
+      console.log("배송비 : ", deliveryFee);
+      console.log("최종 결제 금액 : ", finalOrderAmount);
 
+      $('#total-item-price').html(addCommas(originTotalPrice)); // 최초 주문 총액
+      $('#delivery-fee').html(addCommas(deliveryFee)); // 배송비
+      $('#discount-price').html(addCommas(couponDiscountAmount + pointDiscountAmount)); // 총 할인 금액
+      $('#payment-amount').html(addCommas(finalOrderAmount)); // 최종 결제 금액
+      $('#point-reward').html(addCommas(calculateRewardAmount(finalOrderAmount))); // 포인트 적립 금액
+
+      // 처음 주문 페이지 진입 시, 포인트 input focusout 시, 전액 사용 시, 초기화 시,
+      // 쿠폰 사용 시, 사용 취소 시 호출.
     }
 
     $(document).ready(function() {
-      setPrice();
+      setPrice(); // 페이지 가격 전체 재설정
     })
 
     function toValueArray(domList) {
@@ -297,13 +359,16 @@
               .then(data => {
                 if (data.isPointUsable !== 'true') {
                   alert(data.message);
-                  $(this).val('');
+                  // $(this).text('');
+                  $('#use-point-amount').val(0);
+                  $('#point-use-input').val('0');
                   return;
                 }
                 let pointDiscountPrice = calculateMaxUsablePoint(inputPoint);
                 $('#pointDiscountShow').html("포인트 할인 금액 : " + pointDiscountPrice);
-                // setPriceTest(totalOrderPrice, pointDiscountPrice, couponDiscountPrice)
-                setPriceTest(totalOrderPrice, pointDiscountPrice, 0)
+                $('#use-point-amount').val(pointDiscountPrice); // input hidden에 값 할당.
+
+                setPrice(); // 페이지 가격 전체 재설정
               })
 
               .catch(error  => {
@@ -312,39 +377,166 @@
               });
     })
 
-    function createCouponRows(userCoupon) {
+    // 포인트 전액 사용 이벤트
+    $('#use-all-btn').on('click', function() {
+
+      let originTotalPrice = calculateTotalOrderPrice(); // 최초 주문 총액
+      let couponDiscountAmount = totalCouponDiscountAmount(); // 쿠폰 할인 총액
+      let pointDiscountAmount = $('#use-point-amount').val(); // 포인트 할인 금액
+      let deliveryFee = setDeliveryFee(originTotalPrice, couponDiscountAmount, pointDiscountAmount);
+
+      let loginMember = [[${session.loginMember}]];
+      let finalOrderAmount = calculateTotalOrderPrice()
+              - totalCouponDiscountAmount()
+              + deliveryFee;
+
+      if (loginMember === null) {
+        return;
+      }
+
+      let maxUsablePoint;
+      // 1. 이벤트 발생 당시의 최종 결제금액과 현재 회원이 보유한 포인트 비교.
+      // 2. 최종 결제 회원이 보유한 포인트 > 최종 결제금액 ? 최종 결제금액 : 회원 보유 포인트
+
+      maxUsablePoint =
+              loginMember.point > finalOrderAmount ? finalOrderAmount : loginMember.point;
+      // 최대 사용 가능 포인트 할당.
+
+      $('#use-point-amount').val(maxUsablePoint);
+      $('#point-use-input').val(maxUsablePoint);
+      // hidden 변수에 할당, point input에 값 입력.
+      setPrice(); // 페이지 가격 전체 재설정
+
+      console.log("maxUsablePoint : ", maxUsablePoint);
+      console.log("point hidden value : ", $('#use-point-amount').val())
+    })
+
+    function createCouponRows(userCoupon, itemId) {
       let rootDom = $('.usable-coupon-list');
-      let containerDom = document.createElement('div');
-      containerDom.className = 'usable-coupon';
+
+      let containerDom = $('<div class="usable-coupon" style="display: flex"></div>')
+      let couponDetailDom = $('<div class="coupon-detail-box" style="width: 80%"></div>')
+      let radioBtnDom = $('<div class="coupon-radio-btn" style="width: 20%">사용하기<input type="radio" name="checked" /><input type="hidden" value=""</div>')
+      let couponIdDom = $('<input type="hidden" class="user-coupon-id"/>')
+      // let itemIdDom = $('<input type="hidden" class="item-id" />')
+
+      couponIdDom.val(userCoupon.id)
+      // itemIdDom.val(itemId);
 
       if (userCoupon.couponDto.discountRate < 100) {
-        containerDom.append('<div class="discount-rate-box"> "+" userCoupon.couponDto.discountRate + % + </div>');
+        couponDetailDom.append('<div class="discount-rate-box">' + userCoupon.couponDto.discountRate + '%' + '</div>');
       } else {
-        containerDom.append('<div class="discount-rate-box">' + userCoupon.couponDto.discountRate + '원' + '</div>');
+        couponDetailDom.append('<div class="discount-rate-box">' + userCoupon.couponDto.discountRate + '원' + '</div>');
       }
-      containerDom.append('<div class="coupon-name">' + userCoupon.couponDto.name + '</div>')
-      containerDom.append('<div class="coupon-condition">' + userCoupon.couponDto.minOrderPrice.toLocaleString() + '원 이상 구매시 (~' + userCoupon.couponDto.expireDate.substring(0, 10) + ')' + '</div>')
+      couponDetailDom.append('<div class="coupon-name">' + userCoupon.couponDto.name + '</div>')
+      couponDetailDom.append('<div class="coupon-condition">' + userCoupon.couponDto.minOrderPrice.toLocaleString() + '원 이상 구매시 (~' + userCoupon.couponDto.expireDate.substring(0, 10) + ')' + '</div>')
+
+      // radioBtnDom.append(itemIdDom);
+      radioBtnDom.append(couponIdDom);
+      containerDom.append(couponDetailDom);
+      containerDom.append(radioBtnDom);
       rootDom.append(containerDom);
     }
 
-    $('.coupon-btn').on('click', function() {
+    function createCouponCancelBtn(itemId, data) {
 
-      let itemId = $(this).parent().parent().find('input[class="order-item-id"]').val();
-      let category = $(this).parent().parent().find('input[class="order-item-category"]').val();
+      let targetDom;
+      if (data.singleItemPrice === 0) {
+        return;
+      }
 
-      const url = "/member/coupon/popup/" + itemId + "/" + category;
+      if (isOrderFromCart()) {
+        targetDom = $(`.cart-item-id[value=${itemId}]`).parent().find('td[class="coupon-btn-box"]');
+      } else {
+        targetDom = $(`.order-item-id[value=${itemId}]`).parent().find('td[class="coupon-btn-box"]');
+      }
+      targetDom.children('button').filter('.coupon-btn').remove();
+      targetDom.append($('<button type="button" class="btn btn-outline-danger coupon-cancel" style="width:100px; height: 40px;">사용 취소</button>'))
+      console.log(targetDom);
+    }
+
+    function displayAndSetDiscountedPrice(targetId, data) {
+
+      if (data.singleItemPrice === 0) {
+        return;
+      }
+
+      let displayTargetDom; // 할인금액 표시 target dom
+      let setTargetDom; // 할인금액 설정 target dom
+
+      if (isOrderFromCart()) {
+        displayTargetDom = $(`.cart-item-id[value=${targetId}]`).parent().find('div[class="origin-price"]');
+        setTargetDom = $(`.cart-item-id[value=${targetId}]`).parent().find('input[class="coupon-discount-amount"]');
+      } else {
+        displayTargetDom = $(`.order-item-id[value=${targetId}]`).parent().find('div[class="origin-price"]');
+        setTargetDom = $(`.order-item-id[value=${targetId}]`).parent().find('input[class="coupon-discount-amount"]');
+      }
+
+      console.log("받은 data 객체 : ", data);
+      console.log("최초 금액 " + data.singleItemPrice);
+      console.log("할인 금액 " + data.discountAmount);
+      console.log("할인 후 금액 " + data.afterDiscountPrice);
+
+      let quantityPrice = parseInt(removeComma(displayTargetDom.html()));
+      console.log("quantityPrice : ", quantityPrice); // 단건금액 * 수량
+
+      setTargetDom.val(data.discountAmount); // 할인금액 input hidden에 할당
+      console.log("hiddenDom value 확인 : ", setTargetDom.val());
+
+      $(displayTargetDom).css('text-decoration', 'line-through');
+      displayTargetDom.next().append(
+              $('<h4 style="text-decoration: none">'
+                      + (parseInt(removeComma(displayTargetDom.html())) - data.discountAmount).toLocaleString()
+                      + '</h4>'));
+    }
+
+    function isOrderFromCart() {
+      let orderQuantity = [[${orderQuantity}]];
+      console.log("장바구니 주문? : " + orderQuantity === null);
+      return orderQuantity === null;
+    }
+
+    $(document).on('click', '.coupon-btn', function() {
+
+      // $('.coupon-btn').on('click', function() {
+
+      let itemId;
       const modal = new bootstrap.Modal(document.querySelector('.coupon-modal'));
+
+      if (isOrderFromCart()) {
+        // 장바구니 주문
+        itemId = $(this).parent().parent().find('input[class="cart-item-id"]').val();
+        console.log("적용 대상 cartItem Id : " + itemId);
+      } else {
+        itemId = $(this).parent().parent().find('input[class="order-item-id"]').val();
+        console.log("적용 대상 item Id : " + itemId);
+      }
+
+      let category = $(this).parent().parent().find('input[class="order-item-category"]').val();
+      let itemIdContainer = $('#item-id-box');
+      let itemIdDom = $('<input type="hidden" id="item-id"/>')
+      itemIdDom.val(itemId);
+
+      const url = "/member/coupon/popup/" + category;
 
       fetch(url, {
         method : 'GET'
       })
               .then(response => response.json())
               .then(data => {
-                if (data.size === 0) {
-                  $('.usable-coupon-list').append('<div><p>사용 가능한 쿠폰이 없습니다.</p></div>\n')
+
+                console.log("data : ", data);
+
+                if (data.length === 0) {
+                  $('.usable-coupon-list').empty();
+                  $('.usable-coupon-list').append('<div><p>사용 가능한 쿠폰이 없습니다.</p></div>')
                   modal.show();
                   // 사용 가능한 쿠폰이 없습니다 출력.
                 } else {
+                  $('.usable-coupon-list').empty();
+                  itemIdContainer.empty();
+                  itemIdContainer.append(itemIdDom)
+
                   data.forEach(userCoupon => createCouponRows(userCoupon))
                   modal.show();
                 }
@@ -357,6 +549,95 @@
       // 현재 로그인 한 유저가 해당 카테고리 상품에 적용시킬 수 있는 쿠폰을 가지고 있는지 확인한다.
       // 확인 후 쿠폰이 있으면 해당 쿠폰 객체를 모달창에 출력시키고, 라디오 버튼 선택 및 확인 버튼을 통해 쿠폰을 적용 시킨다.
 
+    })
+
+    $('.coupon-submit-btn').on('click', function() {
+
+      // 체크된 쿠폰 없으면 아무 이벤트 없이 모달 닫기
+      // 체크된 쿠폰 있으면 해당 쿠폰 아이디와 적용시킬 상품 아이디 서버로 전송
+      // 1. 해당 쿠폰 유효성 검사. (최저 요구 금액 만족하는지, 유효기간 만료되지 않았는지)
+      // 2. 통과하면 해당 상품 할인금액 출력, 안되면 alert창에 해당 오류 출력
+      // 통과 후 -> 최종 구매 완료되면 해당 usercoupon 아이디 status 바꾸기.
+
+      // 쿠폰 없을때, 체크된 쿠폰 없을때 return;
+      let couponDom = $('.usable-coupon');
+      let itemId = $(this).parent().find('input[type="hidden"]').val();
+      let userCouponId = $('input[name=checked]:checked').parent().find('input[class="user-coupon-id"]').val();
+
+      if (couponDom.size === 0 || userCouponId === undefined) {
+        console.log("선택된 쿠폰 없음 or 쿠폰 없음")
+        return;
+      }
+
+      let data;
+      if (isOrderFromCart()) {
+        data = {
+          "cartItemId": itemId,
+          "userCouponId" : userCouponId
+        }
+      } else {
+        data = {
+          "itemId" : itemId,
+          "userCouponId": userCouponId
+        }
+      }
+
+      console.log('서버로 보낼 itemId : ' + itemId);
+      console.log('서버로 보낼 userCouponId : ' + userCouponId);
+
+      const url = "/apply-coupon";
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+              .then(response => {
+
+                console.log("response : ", response);
+                console.log("status : ", response.status);
+
+                if (response.status === 200) {
+                  return response.json();
+                } else {
+                  return new Promise.reject(response.message);
+                }
+              })
+              .then(data => {
+                console.log("200 호출 시 data : ", data);
+                console.log("최초 금액 " + data.singleItemPrice);
+                console.log("할인 금액 " + data.discountAmount);
+                console.log("할인 후 금액 " + data.afterDiscountPrice);
+                createCouponCancelBtn(itemId, data); // 쿠폰 취소 버튼 생성
+                displayAndSetDiscountedPrice(itemId, data); // 할인 금액 출력
+                setPrice(); // 페이지 가격 전체 재설정
+                alert(data.message);
+              })
+              .catch(error => {
+                alert(error);
+              })
+
+    })
+
+    // 쿠폰 취소 이벤트
+    $(document).on('click', '.coupon-cancel', function() {
+
+      // 취소버튼을 누른다
+
+      // 1. 할인 금액 표시 삭제
+      // 2. 취소 버튼 삭제. 쿠폰선택 버튼 생성.
+      // 3. 할인금액, 최종 결제금액 재계산
+      // 4. 쿠폰 사용처리 취소
+      // 5. originPrice에 줄친것 원상복구
+      // 6. 쿠폰 할인 금액 할당되어있던 input hidden value 0으로 초기화.
+
+      $(this).parent().parent().find('div[class="modified-price"]').empty() // 할인 금액 표시 삭제
+      $(this).parent().parent().find('div[class="origin-price"]').css('text-decoration', 'none'); // 최초 금액 가운데 줄 css 해제
+      $(this).parent().parent().find('input[class="coupon-discount-amount"]').val(0); // 쿠폰 할인 금액 0 할당
+      $(this).parent().append($('<button type="button" class="btn btn-danger coupon-btn" style="width:100px; height: 40px;">쿠폰 사용</button>')) // 쿠폰 선택 버튼 생성
+      $(this).remove(); // 누른 취소버튼 삭제
+      setPrice(); // 페이지 가격 전체 재설정
     })
 
     $('#btn-kakao-pay').on('click', function(){
