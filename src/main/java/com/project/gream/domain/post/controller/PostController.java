@@ -16,6 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 @Slf4j
@@ -165,9 +169,11 @@ public class PostController {
         return postService.saveQna(postQnaDto, qnaImgs, memberDto);
     }
 
-//    @GetMapping("/item/inquiries/{qnaId}")
-//    public PostResponseDto getQnaDetail(@PathVariable("qnaId") Long qnaId) {
-//
-//        return postService.getQnaDetail(qnaId);
-//    }
+    @PostMapping("/review/comment")
+    public ResponseEntity<CommentDto.Response> saveReviewComment(@RequestBody CommentDto.Request request) {
+        CommentDto.Response response = postService.saveReviewComment(request);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        return new ResponseEntity(response, header, HttpStatus.OK);
+    }
 }

@@ -4,6 +4,7 @@ import com.project.gream.common.enumlist.CommentTargetType;
 import com.project.gream.common.enumlist.converter.CommentTargetTypeConverter;
 import com.project.gream.common.util.BaseTimeEntity;
 import com.project.gream.domain.member.entity.Member;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,5 +25,21 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "member_id")
     public Member member;
+    @ManyToOne()
+    @JoinColumn(name = "post_id")
+    public Post post;
+    @ManyToOne
+    @JoinColumn(name = "review_id")
+    public Review review;
 
+    @Builder
+    public Comment(Long id, String content, int depth,
+                   Member member, Post post, Review review) {
+        this.id = id;
+        this.content = content;
+        this.depth = depth;
+        this.member = member;
+        this.post = post;
+        this.review = review;
+    }
 }

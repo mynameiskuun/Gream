@@ -43,4 +43,6 @@ public interface PostService {
     List<PostDto> getQnaListForMyPage(String memberId);
 
     Page<PostDto> searchNoticeByCondition(PostRequestDto requestDto, Pageable pageable);
+
+    CommentDto.Response saveReviewComment(CommentDto.Request request);
 }

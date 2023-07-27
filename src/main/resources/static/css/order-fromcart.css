@@ -44,3 +44,22 @@
     display: flex;
     justify-content: space-between;
 }
+.order-item-img-box {
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100px;
+    height: 100px;
+}
+#point-input-box {
+    display: flex;
+    margin-top: 10px;
+}
+
+#use-all-btn {
+    width: 100px;
+}
+#member-point-box {
+    display: flex;
+    margin-top: 30px;
+}

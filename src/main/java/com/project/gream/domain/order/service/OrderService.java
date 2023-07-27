@@ -15,7 +15,7 @@ public interface OrderService {
     KakaoPayRequestVO kakaoPayReady(KakaoPayDto request);
     KakaoPayApprovedResultVO payApprove(String tid, String pgToken, KakaoPayDto request);
     void updateDataBaseAfterPayment(KakaoPayDto kakaoPayDto, @LoginMember MemberDto memberDto);
-    void sendPaymentReceiptEmail(KakaoPayApprovedResultVO result, @LoginMember MemberDto memberDto) throws Exception;
+    void sendPaymentReceiptEmail(KakaoPayApprovedResultVO result, @LoginMember MemberDto memberDto, int totalDiscountAmount) throws Exception;
     List<OrderItemDto> findOrderItemForMypage(String memberId);
     Page<OrderItemDto> findAllOrderItem(String memberId, Pageable pageable);
     List<OrderItemDto> sortByOrderState(String sortBy, MemberDto memberDto);

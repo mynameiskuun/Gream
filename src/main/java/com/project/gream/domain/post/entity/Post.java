@@ -38,7 +38,7 @@ public class Post extends BaseTimeEntity {
     private PostType postType;
     private String thumbnailUrl;
     @ManyToOne
-    @JoinColumn(name = "item_id", nullable = true)
+    @JoinColumn(name = "item_id")
     private Item item;
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
