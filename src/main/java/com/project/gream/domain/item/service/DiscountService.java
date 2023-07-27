@@ -25,4 +25,5 @@ public interface DiscountService {
     Map<String, String> isPointUsable(int point, @LoginMember MemberDto memberDto);
     List<UserCouponResponseDto> getUserCouponForItem(String category, MemberDto memberDto);
     UserCouponDto.CouponApplyResponse applyCoupon(UserCouponDto.CouponApplyRequest request);
+    void updateUserCouponStatus(List<Long> usedCouponIds);
 }

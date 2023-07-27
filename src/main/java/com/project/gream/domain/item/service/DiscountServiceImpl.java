@@ -19,21 +19,14 @@ import com.project.gream.domain.member.repository.MemberRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnitUtil;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.project.gream.domain.item.entity.QCoupon.coupon;
@@ -110,6 +103,7 @@ public class DiscountServiceImpl implements DiscountService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public String saveUsableCoupon(CouponRequestDto requestDto) {
 
@@ -185,7 +179,7 @@ public class DiscountServiceImpl implements DiscountService {
         log.info("트랜잭션 상태 : " + String.valueOf(isInTransaction));
         log.info("트랜잭션 이름 : " + TransactionSynchronizationManager.getCurrentTransactionName());
 
-        Category discountFor = StringToEnumUtil.getEnumFromValue(Category.class, category);
+//        Category discountFor = StringToEnumUtil.getEnumFromValue(Category.class, category);
         return queryFactory.selectFrom(userCoupon)
                 .join(userCoupon.coupon, coupon)
                 .fetchJoin()
@@ -200,22 +194,6 @@ public class DiscountServiceImpl implements DiscountService {
                 .map(UserCouponResponseDto::new)
                 .collect(Collectors.toList());
 
-//        return queryFactory.select(userCoupon.status,
-//                        coupon.discountRate,
-//                        coupon.discountFor,
-//                        coupon.minOrderPrice,
-//                        coupon.expireDate,
-//                        member.id)
-//                .from(userCoupon, member, coupon)
-//                .leftJoin(userCoupon.coupon, coupon)
-//                .fetchJoin()
-//                .leftJoin(userCoupon.member, member)
-//                .fetchJoin()
-//                .where(userCoupon.member.id.eq(memberDto.getId()),
-//                        userCoupon.status.eq(CouponStatus.VALID),
-//                        userCoupon.coupon.discountFor.contains(category))
-//                .distinct()
-//                .fetch();
     }
 
     @Transactional
@@ -250,7 +228,6 @@ public class DiscountServiceImpl implements DiscountService {
                     .build();
         }
 
-//            userCoupon.setStatus(CouponStatus.INVALID); // 쿠폰 사용 완료 처리
             return UserCouponDto.CouponApplyResponse.builder()
                     .singleItemPrice(item.getPrice())
                     .discountAmount(discountAmount)
@@ -282,5 +259,19 @@ public class DiscountServiceImpl implements DiscountService {
             return itemRepository.findById(request.getItemId()).orElseThrow();
         }
         return cartItemRepository.findById(request.getCartItemId()).get().getItem();
+    }
+
+    @Override
+    public void updateUserCouponStatus(List<Long> usedCouponIds) {
+
+        log.info("---------------------- 유저가 사용한 쿠폰 INVALID 처리.");
+
+        if (usedCouponIds.isEmpty()) {
+            return;
+        }
+
+        List<UserCoupon> userCouponList = Optional.ofNullable(userCouponRepository.findByIdIn(usedCouponIds))
+                .orElse(Collections.emptyList());
+        userCouponList.forEach(userCoupon -> userCoupon.setStatus(CouponStatus.INVALID));
     }
 }

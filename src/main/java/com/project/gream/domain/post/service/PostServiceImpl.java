@@ -3,9 +3,7 @@ package com.project.gream.domain.post.service;
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.auth.dto.CustomUserDetails;
 import com.project.gream.common.config.S3Config;
-import com.project.gream.common.enumlist.PostType;
-import com.project.gream.common.enumlist.QnaType;
-import com.project.gream.common.enumlist.Role;
+import com.project.gream.common.enumlist.*;
 import com.project.gream.common.util.StringToEnumUtil;
 import com.project.gream.domain.item.entity.Img;
 import com.project.gream.domain.item.entity.Item;
@@ -14,10 +12,13 @@ import com.project.gream.domain.item.repository.ItemRepository;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.member.repository.MemberRepository;
+import com.project.gream.domain.order.entity.OrderItem;
 import com.project.gream.domain.post.dto.*;
+import com.project.gream.domain.post.entity.Comment;
 import com.project.gream.domain.post.entity.Likes;
 import com.project.gream.domain.post.entity.Post;
 import com.project.gream.domain.post.entity.Review;
+import com.project.gream.domain.post.repository.CommentRepository;
 import com.project.gream.domain.post.repository.LikesRepository;
 import com.project.gream.domain.post.repository.PostRepository;
 import com.project.gream.domain.post.repository.ReviewRepository;
@@ -34,13 +35,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.project.gream.domain.post.entity.QLikes.likes;
 import static com.project.gream.domain.post.entity.QPost.post;
+import static com.project.gream.domain.post.entity.QComment.comment;
+import static com.project.gream.domain.order.entity.QOrderItem.orderItem;
+
 
 
 @Slf4j
@@ -55,7 +58,7 @@ public class PostServiceImpl implements PostService{
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
     private final JPAQueryFactory queryFactory;
-    private final EntityManager em;
+    private final CommentRepository commentRepository;
     private final S3Config s3Config;
 
     @Transactional
@@ -63,6 +66,9 @@ public class PostServiceImpl implements PostService{
     public void saveReview(ReviewDto reviewDto, List<String> imgPaths) {
 
         log.info("---------------------------- 리뷰 및 리뷰 이미지 DB 저장");
+
+        Item reviewTargetItem = reviewDto.getItemDto().toEntity();
+        Member member = reviewDto.toEntity().getMember();
 
         if(!imgPaths.isEmpty()) {
             reviewDto.setThumbnail(imgPaths.get(0));
@@ -76,6 +82,12 @@ public class PostServiceImpl implements PostService{
                     .review(review)
                     .build());
         }
+
+        OrderItem orderedItem = queryFactory.selectFrom(orderItem)
+                .where(orderItem.item.eq(reviewTargetItem),
+                        orderItem.orderHistory.member.eq(member))
+                .fetchOne();
+        orderedItem.updateState(OrderState.REVIEWED);
     }
 
     @Override
@@ -110,11 +122,31 @@ public class PostServiceImpl implements PostService{
             return Collections.emptyList();
         }
 
-        return reviews.stream()
+        // 리뷰 id로 commentRepository를 탐색한다.
+        // targetId를 해당 리뷰 id로 갖는 모든 코멘트를 가져와서 reviewDto에 담는다.
+
+
+        List<ReviewDto> reviewDtoList = reviews.stream()
                 .map(ReviewDto::fromEntity)
                 .collect(Collectors.toList());
+
+        reviewDtoList.forEach(this::addCommentListToReview);
+        return reviewDtoList;
     }
 
+    private ReviewDto addCommentListToReview(ReviewDto reviewDto) {
+        List<CommentDto.Response> responseList = commentRepository.getReviewComments(reviewDto.getId()).stream()
+                .map(CommentDto::fromEntity)
+                .map(CommentDto.Response::new)
+                .collect(Collectors.toList());
+        for (CommentDto.Response response : responseList) {
+            long likeCount = likesRepository.countByComment_Id(response.getId());
+            response.setLikeCount(likeCount);
+        }
+        reviewDto.setCommentList(responseList);
+
+        return reviewDto;
+    }
     @Override
     public Likes isAlreadyLiked(LikesVO likesVO) {
 
@@ -536,5 +568,21 @@ public class PostServiceImpl implements PostService{
             return post.member.id.like(searchKeyWord);
         }
         return null;
+    }
+
+    @Override
+    public CommentDto.Response saveReviewComment(CommentDto.Request request) {
+        Review review = reviewRepository.findById(request.getReviewId()).orElseThrow();
+        Comment comment = Comment.builder()
+                .content(request.getContent())
+                .depth(0)
+                .review(review)
+                .member(request.getMemberDto().toEntity())
+                .build();
+
+        commentRepository.save(comment);
+        return CommentDto.Response.builder()
+                .message("댓글 등록에 성공했습니다.")
+                .build();
     }
 }

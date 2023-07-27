@@ -150,88 +150,90 @@
                         </div>
                     </div>
                     <div th:unless="${reviewList.size() eq 0}" th:id="cards-wrapper">
-                        <div id="review-container" th:each="reviewList : ${reviewList}">
+                        <div id="review-container" th:each="review : ${reviewList}">
                             <div class="review-cards">
                                 <div class="review-top">회원 리뷰</div>
                                 <div class="review-contents">
                                     <div class="review-left-box">
                                         <div class="review-header" style="justify-content: space-between; display: flex">
-                                            <span th:text="${'작성자 : ' + reviewList.memberDto.name}"></span><span th:text="${#strings.substring(reviewList.createdTime, 0, 10)}"></span>
+                                            <span th:text="${'작성자 : ' + review.memberDto.name}"></span><span th:text="${#strings.substring(review.createdTime, 0, 10)}"></span>
                                         </div>
                                         <div class="order-item-detail" style="display: flex">
-                                            <div class="item-img" th:style="'background-image: url('+ ${reviewList.itemDto.thumbnailUrl} + ');'"></div>
-                                            <div class="like-item-name" th:text="${reviewList.itemDto.name}"></div>
+                                            <div class="item-img" th:style="'background-image: url('+ ${review.itemDto.thumbnailUrl} + ');'"></div>
+                                            <div class="like-item-name" th:text="${review.itemDto.name}"></div>
                                         </div>
                                         <div class="customer-star-rating-box">
                                     <span class="star counted-stars text-primary">
                                         <span class="review-star-value"></span>
-                                        <input type="hidden" th:value="${reviewList.starValue}" />
+                                        <input type="hidden" th:value="${review.starValue}" />
                                     </span>
                                         </div>
-                                        <div class="review-text" th:text="${reviewList.content}"></div>
+                                        <div class="review-text" th:text="${review.content}"></div>
                                         <div class="review-features-container">
                                             <div class="review-item-features text-secondary review-item-price-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
                                                 <span class="feature-title">상품 가격</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 1}">비싸요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 2}">보통이에요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 3}">저렴해요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 1}">비싸요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 3}">저렴해요</span>
                                             </div>
                                             <div class="review-item-features text-secondary review-item-quality-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
                                                 <span class="feature-title">상품 품질</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 1}">나빠요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 2}">보통이에요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 3}">좋아요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 1}">나빠요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 3}">좋아요</span>
                                             </div>
                                             <div class="review-item-features text-secondary review-item-delivery-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
                                                 <span class="feature-title">상품 배송</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 1}">느려요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 2}">보통이에요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 3}">빨라요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 1}">느려요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 3}">빨라요</span>
                                             </div>
                                             <div class="review-item-features text-secondary review-item-repurchase-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
                                                 <span class="feature-title">재구매 의사</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 1}">없어요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 2}">보통이에요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 3}">있어요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 1}">없어요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 3}">있어요</span>
                                             </div>
                                         </div>
                                         <div class="review-like-box">
                                             <div class="review-thumbs-up"></div>
                                             <div class="like-title">도움돼요</div>
-                                            <input type="hidden" th:value="${reviewList.id}"/>
+                                            <input type="hidden" th:value="${review.id}"/>
                                             <div class="like-counts"></div>
                                             <input type="hidden" class="target" value="REVIEW" />
                                         </div>
                                     </div>
                                     <div class="review-right-box">
-                                        <div class="customer-review-img-box" th:style="'background-image: url('+ ${reviewList.thumbnail} + ');'"></div>
+                                        <div class="customer-review-img-box" th:style="'background-image: url('+ ${review.thumbnail} + ');'"></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="review-reply-box">
-                                <div class="review-reply-header">
+                            <div class="review-comment-box">
+                                <div class="review-comment-header">
                                     <span>댓글&nbsp;</span>
-                                    <span class="reply-counts text-secondary">2</span>
+                                    <span class="comment-counts text-secondary" th:text="${review.commentList.size()}"></span>
                                     <span class="text-secondary">개</span>
                                 </div>
-                                <div id="reply-input-container">
-                                    <div id="reply-input-box">
-                                        <textarea type="textarea" class="form-control" id="reply-input-area" onfocus="replyAreaToggle()"></textarea>
-                                        <input type="button" class="btn btn-outline-secondary" value="작성"/>
+                                <div id="comment-input-container">
+                                    <div id="comment-input-box">
+                                        <textarea type="textarea" class="form-control" id="comment-input-area" onfocus="commentAreaToggle()"></textarea>
+                                        <input type="button" class="btn btn-outline-secondary comment-write-btn" value="작성"/>
+                                        <input type="hidden" th:value="${review.id}" />
                                     </div>
                                 </div>
-                                <div class="reply-output-container">
-                                    <div class="reply-cards">
-                                        <div class="reply-center-box">
-                                            <div class="reply-writer-id">id</div>
-                                            <div class="reply-context-box">
-                                                댓글내용 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nece
+                                <div class="comment-output-container">
+                                    <div class="comment-cards" th:each="comment : ${review.commentList}">
+                                        <div class="comment-center-box">
+                                            <div class="comment-writer-id" th:text="${comment.memberDto.id}"></div>
+                                            <div class="comment-context-box" th:text="${comment.content}">
                                             </div>
                                         </div>
-                                        <div class="reply-like-box">
-                                            <div class="reply-thumbs-up"></div>
-                                            <div class="reply-like-counts">2</div>
+                                        <div class="comment-like-box">
+                                            <div class="comment-thumbs-up"></div>
+                                            <div class="comment-like-counts" th:text="${comment.likeCount}"></div>
+                                            <input type="hidden" th:value="${comment.id}" />
                                         </div>
+                                        <div class="comment-created-time" th:text="${comment.}"></div>
                                     </div>
                                 </div>
                             </div>
@@ -297,7 +299,6 @@
         <th:block th:replace="main/footer :: footer"></th:block>
         <!--   footer end   -->
     </div>
-
 
     <!--  modal start  -->
         <div class="modal cart-modal" tabindex="-1">
@@ -443,13 +444,13 @@
         location.href='/cart';
     })
 
-    $("#reply-input-container").on("focus", function () {
-        $("#reply-input-area").css("height", "100px");
+    $("#comment-input-container").on("focus", function () {
+        $("#comment-input-area").css("height", "100px");
     });
 
     // 댓글란 토글
-    function replyAreaToggle() {
-        $("#reply-input-area").css("height", "100px");
+    function commentAreaToggle() {
+        $("#comment-input-area").css("height", "100px");
     }
 
     // 상품 구매 후기 만족도 조사 이벤트
@@ -631,36 +632,45 @@
                                 background-image: url(https://cdn.icon-icons.com/icons2/643/PNG/512/q-letter-single-brand-social-media_icon-icons.com_59312.png);'></span>
                                 <span style="margin-left: 100px">` + content + `</span>
                             </div>
-<!--                            <div style='display: flex' th:if="$\{session.loginMember.role eq 'ROLE_ADMIN'}">-->
-<!--                                <span class='answer-img' style='height: 80px;-->
-<!--                                width: 80px;-->
-<!--                                margin-left: 10px;-->
-<!--                                background-size: 100%;-->
-<!--                                background-repeat: no-repeat;-->
-<!--                                background-position: center;-->
-<!--                                background-image: url(https://cdn2.iconfinder.com/data/icons/pretty-office-part14-2/256/A_blue-1024.png);'></span>-->
-<!--                                <span>답변 내용</span>-->
-<!--                            </div>-->
                         </td>
                     </tr>`)
-        // $.ajax({
-        //     url: "/item/inquiries/" + qnaId,
-        //     type: "GET",
-        //     contentType: "TEXT",
-        //     data: qnaId,
-        //     dataType: "JSON",
-        //     success: function (result) {
-        //         console.log("success")
-        //         console.log("result : ", result);
-        //         console.log(targetDom)
-        //         targetDom.after();
-        //     },
-        //     error: function (request, status, error) {
-        //         console.log("error")
-        //         alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-        //     },
-        // })
     }
+
+    // 댓글 작성 이벤트
+    $('.comment-write-btn').on('click', function() {
+        let loginMember = [[${session.loginMember}]];
+
+        if (loginMember === null) {
+            return;
+        }
+
+        let content = $(this).prev().value();
+        let reviewId = $(this).parent().find('input[type="hidden"]').val();
+        let data = {
+            memberDto : loginMember,
+            content : content,
+            reviewId: reviewId
+        }
+        const url = "/review/comment"
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    response.json();
+                } else {
+                    new Promise.reject();
+                }
+            })
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+    })
 </script>
 </body>
 </html>

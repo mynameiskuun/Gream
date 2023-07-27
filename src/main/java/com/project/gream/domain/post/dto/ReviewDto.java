@@ -10,6 +10,7 @@ import com.project.gream.domain.post.entity.Review;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,6 +27,7 @@ public class ReviewDto {
     private String thumbnail;
     private MemberDto memberDto;
     private ItemDto itemDto;
+    private List<CommentDto.Response> commentList;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

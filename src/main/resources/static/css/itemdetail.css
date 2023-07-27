@@ -264,14 +264,14 @@
     border: 1px solid lightgray;
     margin: 20px 30px;
 }
-.reply-output-container {
+.comment-output-container {
     padding: 0 30px;
 }
-.review-reply-box {
+.review-comment-box {
     margin-top: 20px;
     padding: 0 30px;
 }
-.review-reply-box div {
+.review-comment-box div {
     margin-bottom: 20px;
 }
 .item-thumbs-up {
@@ -296,25 +296,25 @@
     background-position-y: 0px;
     background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png");
 }
-#reply-input-container {
+#comment-input-container {
     background: rgb(245, 245, 245);
     border: 1px solid rgb(240, 240, 240);
     cursor: pointer;
 }
-#reply-input-box {
+#comment-input-box {
     display: flex;
     padding-top: 15px;
     cursor: pointer;
     justify-content: space-evenly;
 }
-#reply-input-area {
+#comment-input-area {
     height: 38px;
     width: 90%;
 }
 .review-features-container {
     margin-left: 30px;
 }
-.reply-thumbs-up {
+.comment-thumbs-up {
     background-color: steelblue;
     border-radius: 50%;
     height: 30px;
@@ -325,14 +325,14 @@
     background-position-y: 0px;
     background-image: url("https://mynameiskuun-img-bucket.s3.ap-northeast-2.amazonaws.com/static/images/thumbs-up.png");
 }
-.reply-cards {
+.comment-cards {
     display: flex;
     justify-content: space-between;
 }
-.reply-center-box {
+.comment-center-box {
     width: 70%;
 }
-.reply-like-counts {
+.comment-like-counts {
     text-align: center;
 }
 #item-detail-header {

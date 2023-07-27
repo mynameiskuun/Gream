@@ -80,7 +80,11 @@ public class Member extends BaseTimeEntity {
     public void updateEmail(String email) {
         this.email = email;
     }
-    public void updatePoint(int point) {
-        this.point = point;
+    public void updatePoint(int point, int reward) {
+        if (this.point < point) {
+            return;
+        }
+        this.point -= point;
+        this.point += reward;
     }
 }
