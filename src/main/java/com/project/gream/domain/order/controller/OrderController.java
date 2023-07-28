@@ -92,12 +92,12 @@ public class OrderController {
         return mav;
     }
 
-    @GetMapping("/order/pay/cancel")
+    @GetMapping("/order/kakaopay/cancel")
     public String toResult() {
         return "order/order-cancel";
     }
 
-    @GetMapping("/order/pay/fail")
+    @GetMapping("/order/kakaopay/fail")
     public String toCancel() {
         return "order/order-fail";
     }

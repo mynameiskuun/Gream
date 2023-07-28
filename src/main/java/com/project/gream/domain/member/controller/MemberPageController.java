@@ -77,10 +77,18 @@ public class MemberPageController {
     }
 
     @GetMapping("/like/{memberId}")
-    public ModelAndView toMemberLikeList(@PathVariable("memberId") String memberId) {
+    public ModelAndView toMemberLikeList(@PathVariable("memberId") String memberId,
+                                         @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         ModelAndView mav = new ModelAndView();
 
-        List<ItemDto> likedItemList = itemService.getLikedItemListByMemberId(memberId);
+        Page<ItemDto> likedItemList = itemService.getLikedItemListByMemberId(memberId, pageable);
+        int nowPage = likedItemList.getPageable().getPageNumber() + 1;
+        int startPage = Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, likedItemList.getTotalPages());
+
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
         mav.addObject("likedItemList", likedItemList);
         mav.setViewName("member/mypage/customer/mypage-like-list");
         return mav;

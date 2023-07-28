@@ -66,6 +66,14 @@
                         </div>
                     </a>
                 </th:block>
+                <div id="item-footer">
+                    <div id="paging-btn-box">
+                        <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
+                            <a th:if="${page != nowPage}" th:href="@{/item/men(page=${page - 1})}" th:text="${page}"></a>
+                            <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

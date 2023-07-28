@@ -65,14 +65,30 @@ public class ItemServiceImpl implements ItemService{
                 .map(ItemDto::fromEntity).collect(Collectors.toList());
     }
     @Override
-    public List<ItemDto> selectMenItems() {
-        return itemRepository.findByGender(Gender.MAN).stream()
-                .map(ItemDto::fromEntity).collect(Collectors.toList());
+    public Page<ItemDto> selectMenItems(Pageable pageable) {
+        return itemRepository.findByGender(Gender.MAN, pageable).map(item -> ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .price(item.getPrice())
+                .detail(item.getDetail())
+                .itemStock(item.getItemStock())
+                .thumbnailUrl(item.getThumbnailUrl())
+                .category(item.getCategory())
+                .gender(item.getGender())
+                .build());
     }
     @Override
-    public List<ItemDto> selectWomenItems() {
-        return itemRepository.findByGender(Gender.WOMAN).stream()
-                .map(ItemDto::fromEntity).collect(Collectors.toList());
+    public Page<ItemDto> selectWomenItems(Pageable pageable) {
+        return itemRepository.findByGender(Gender.WOMAN, pageable).map(item -> ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .price(item.getPrice())
+                .detail(item.getDetail())
+                .itemStock(item.getItemStock())
+                .thumbnailUrl(item.getThumbnailUrl())
+                .category(item.getCategory())
+                .gender(item.getGender())
+                .build());
     }
 
     @Override
@@ -86,7 +102,7 @@ public class ItemServiceImpl implements ItemService{
 //                .get();
 
         if (sortBy.equals("ALL")) {
-            return itemRepository.findByGender(Gender.MAN).stream()
+            return itemRepository.getByGender(Gender.MAN).stream()
                     .map(ItemDto::fromEntity)
                     .collect(Collectors.toList());
         }
@@ -278,11 +294,18 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public List<ItemDto> getLikedItemListByMemberId(String memberId) {
+    public Page<ItemDto> getLikedItemListByMemberId(String memberId, Pageable pageable) {
 
-        return itemRepository.findAllById(this.getLikedItemIds(memberId)).stream()
-                .map(ItemDto::fromEntity)
-                .collect(Collectors.toList());
+        return itemRepository.findAllByIdIn(this.getLikedItemIds(memberId), pageable).map(item -> ItemDto.builder()
+                        .id(item.getId())
+                        .category(item.getCategory())
+                        .gender(item.getGender())
+                        .name(item.getName())
+                        .price(item.getPrice())
+                        .detail(item.getDetail())
+                        .itemStock(item.getItemStock())
+                        .thumbnailUrl(item.getThumbnailUrl())
+                        .build());
     }
 
     @Override

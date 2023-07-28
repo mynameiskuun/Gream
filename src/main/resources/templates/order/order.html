@@ -114,7 +114,11 @@
       <div id="order-side-bar">
         <div id="order-sbar-wrapper">
           <div id="side-bar-header" class="underline">
-            <span><h4>적립예정</h4></span><span id="point-reward"></span>
+            <div><h4>적립예정</h4></div>
+            <div style="display: flex; justify-content: end">
+              <div id="point-reward"></div>
+              <div>point</div>
+            </div>
           </div>
           <div id="side-bar-body">
             <div class="sbar-body-header">
@@ -298,7 +302,7 @@
 
     // 포인트 적립금 계산
     function calculateRewardAmount(totalPrice) {
-      return Math.round(((totalPrice * 3) / 100)) + ' point';
+      return Math.round(((totalPrice * 3) / 100));
     }
 
     // 최종 결제금액 계산

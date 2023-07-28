@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -89,21 +91,37 @@ public class ItemController {
     }
 
     @GetMapping("/item/men")
-    public ModelAndView toMenItem() {
+    public ModelAndView toMenItem(@PageableDefault(page = 0, size = 8, sort = "id",  direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("------------------------------- 남성용 상품 페이지 진입");
 
+        Page<ItemDto> manItemList = itemService.selectMenItems(pageable);
+        int nowPage = manItemList.getPageable().getPageNumber() + 1;
+        int startPage =  Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, manItemList.getTotalPages());
+
         ModelAndView mav = new ModelAndView();
-        mav.addObject("items", itemService.selectMenItems());
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
+        mav.addObject("items", manItemList);
         mav.setViewName("item/men-item-list");
         return mav;
     }
 
     @GetMapping("/item/women")
-    public ModelAndView toWomenItem() {
+    public ModelAndView toWomenItem(@PageableDefault(page = 0, size = 8, sort = "id",  direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("------------------------------- 여성용 상품 페이지 진입");
 
         ModelAndView mav = new ModelAndView();
-        mav.addObject("items", itemService.selectWomenItems());
+        Page<ItemDto> womanItemList = itemService.selectWomenItems(pageable);
+        int nowPage = womanItemList.getPageable().getPageNumber() + 1;
+        int startPage =  Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, womanItemList.getTotalPages());
+
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
+        mav.addObject("items", itemService.selectWomenItems(pageable));
         mav.setViewName("item/women-item-list");
         return mav;
     }
@@ -152,11 +170,21 @@ public class ItemController {
     }
 
     @GetMapping("/item/men/{sortBy}")
-    public List<ItemDto> sortMenItemsByCategory(@PathVariable String sortBy) {
+    public List<ItemDto> sortMenItemsByCategory(@PathVariable String sortBy,
+                                                @PageableDefault(size = 8, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
 
         log.info("------------------------------ 카테고리 별 상품 요청");
 
-        log.info(itemService.sortItemByCategory(sortBy).toString());
+//        int nowPage = manItemList.getPageable().getPageNumber() + 1;
+//        int startPage =  Math.max(nowPage - 4, 1);
+//        int endPage = Math.min(nowPage + 9, manItemList.getTotalPages());
+
+        ModelAndView mav = new ModelAndView();
+//        mav.addObject("nowPage", nowPage);
+//        mav.addObject("startPage", startPage);
+//        mav.addObject("endPage", endPage);
+//        log.info(itemService.sortItemByCategory(sortBy, pageable).toString());
+//        return itemService.sortItemByCategory(sortBy, pageable);
         return itemService.sortItemByCategory(sortBy);
     }
 
