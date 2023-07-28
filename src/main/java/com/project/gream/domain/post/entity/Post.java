@@ -60,4 +60,7 @@ public class Post extends BaseTimeEntity {
     public void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
     }
+    public void updateHits() {
+        this.hits += 1;
+    }
 }

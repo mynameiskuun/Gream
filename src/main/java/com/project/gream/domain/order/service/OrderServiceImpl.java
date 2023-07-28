@@ -149,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
         OrderHistory orderHistory = this.saveOrderhistory(kakaoPayDto, memberDto);
         Member member = memberRepository.findById(memberDto.getId()).orElseThrow();
 
-        member.updatePoint(kakaoPayDto.getUsePoint(), kakaoPayDto.getPointRewardAmount());
+        member.resetPointAfterOrder(kakaoPayDto.getUsePoint(), kakaoPayDto.getPointRewardAmount());
         this.saveOrderItems(kakaoPayDto, orderHistory);
         itemService.updateItemStock(kakaoPayDto, orderHistory);
         memberService.updateCartItems(kakaoPayDto);
@@ -291,11 +291,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderItemDto> sortByOrderState(String sortBy, MemberDto memberDto) {
-        String state = EnumSet.allOf(OrderState.class).stream()
-                .filter(c -> c.name().equals(sortBy))
-                .findAny()
-                .get()
-                .getValue();
+//        String state = EnumSet.allOf(OrderState.class).stream()
+//                .filter(c -> c.name().equals(sortBy))
+//                .findAny()
+//                .get()
+//                .name();
+
+        OrderState state = StringToEnumUtil.getEnumFromValue(OrderState.class, sortBy);
 
         return orderItemRepository.findAllByStateAndOrderHistory_Member(state, memberDto.toEntity()).stream()
                 .map(OrderItemDto::fromEntity)

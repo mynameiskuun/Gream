@@ -64,3 +64,15 @@
     color: black;
     transition: 0.4s;
 }
+#paging-btn-box {
+    display: flex;
+    margin: 0 auto;
+}
+#paging-btn-box div {
+    display: flex;
+    width: 30px;
+    height: 30px;
+    border: 1px solid lightGray;
+    justify-content: center;
+    align-items: center;
+}

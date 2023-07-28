@@ -38,7 +38,8 @@
 <!--                    &lt;!&ndash; 리뷰 혹은 qna 글 출력 &ndash;&gt;-->
 <!--                </div>-->
                 <div>
-                    <a th:href="@{/member/{memberId}(memberId=${session.loginMember.getId()})/post}"><h3>작성 글 목록</h3></a>
+<!--                    <a th:href="@{/member/{memberId}(memberId=${session.loginMember.getId()})/post}"><h3>작성 글 목록</h3></a>-->
+                    <a onclick="onDevelop()"><h3>작성 글 목록</h3></a>
                     <!-- 리뷰 혹은 qna 글 출력 -->
                 </div>
                 <div>
@@ -91,7 +92,7 @@
                                                     <div th:text="${orderItemList.quantity + ' 개'}"></div>
                                                 </td>
                                                 <td>
-                                                    <div th:text="${orderItemList.state}"></div>
+                                                    <div th:text="${orderItemList.state.value}"></div>
                                                 </td>
                                             </tr>
                                         </th:block>
@@ -281,6 +282,9 @@
     $('.coupon-target-show').on('click', function() {
         alert("개발중인 기능입니다.")
     })
+    function onDevelop() {
+        alert("개발중인 기능입니다.")
+    }
 </script>
 </body>
 </div>

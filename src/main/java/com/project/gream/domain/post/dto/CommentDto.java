@@ -28,11 +28,14 @@ public class CommentDto {
     private LocalDateTime modifiedTime;
 
     @Builder
-    public CommentDto(Long id, String content, int depth, MemberDto memberDto) {
+    public CommentDto(Long id, String content, int depth, MemberDto memberDto,
+                      LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.content = content;
         this.depth = depth;
         this.memberDto = memberDto;
+        this.createdTime = createdTime;
+        this.modifiedTime = modifiedTime;
     }
 
     public Comment toEntity() {
@@ -50,6 +53,8 @@ public class CommentDto {
                 .content(comment.getContent())
                 .depth(comment.getDepth())
                 .memberDto(MemberDto.fromEntity(comment.getMember()))
+                .createdTime(comment.getCreatedTime())
+                .modifiedTime(comment.getModifiedTime())
                 .build();
     }
 
@@ -84,13 +89,20 @@ public class CommentDto {
         private Long likeCount;
         private int depth;
         private String message;
+        private LocalDateTime createdTime;
+        private LocalDateTime modifiedTime;
+
         @Builder
-        public Response(Long id, String content, Long likeCount, int depth, String message) {
+        public Response(Long id, String content, MemberDto memberDto, Long likeCount, int depth,
+                        String message, LocalDateTime createdTime, LocalDateTime modifiedTime) {
             this.id = id;
             this.content = content;
+            this.memberDto = memberDto;
             this.likeCount = likeCount;
             this.depth = depth;
             this.message = message;
+            this.createdTime = createdTime;
+            this.modifiedTime = modifiedTime;
         }
 
         public Response(CommentDto commentDto) {
@@ -98,6 +110,8 @@ public class CommentDto {
             this.content = commentDto.getContent();
             this.memberDto = commentDto.getMemberDto();
             this.depth = commentDto.getDepth();
+            this.createdTime = commentDto.getCreatedTime();
+            this.modifiedTime = commentDto.getModifiedTime();
         }
     }
 }

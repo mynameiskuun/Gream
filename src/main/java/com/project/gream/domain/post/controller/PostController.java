@@ -160,13 +160,16 @@ public class PostController {
     }
 
     @PostMapping("/post/qna")
-    public String saveQna(@RequestPart("qnaRequestDto") PostRequestDto.QnaRequestDto postQnaDto,
+    public ResponseEntity<PostRequestDto.QnaRequestDto> saveQna(@RequestPart("qnaRequestDto") PostRequestDto.QnaRequestDto postQnaDto,
                           @RequestPart("qnaImgs") List<MultipartFile> qnaImgs,
                           @LoginMember MemberDto memberDto) throws Exception {
 
         log.info("------------------------ saveQna request start");
+        String msg = postService.saveQna(postQnaDto, qnaImgs, memberDto);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "text", Charset.forName("UTF-8")));
 
-        return postService.saveQna(postQnaDto, qnaImgs, memberDto);
+        return new ResponseEntity(msg, header, HttpStatus.OK);
     }
 
     @PostMapping("/review/comment")

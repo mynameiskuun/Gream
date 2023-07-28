@@ -39,6 +39,18 @@
         #notice-write-btn {
             cursor: pointer;
         }
+        #paging-btn-box {
+            display: flex;
+            margin: 0 auto;
+        }
+        #paging-btn-box div {
+            display: flex;
+            width: 30px;
+            height: 30px;
+            border: 1px solid lightGray;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -79,29 +91,29 @@
                     <div id="paging-area">
                         <div id="paging-btn-box">
                             <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
-                                <a th:if="${page != nowPage}" page="${page - 1}" th:text="${page}"></a>
-                                <strong th:unless="${page != nowPage}" style="color:black" th:text="${page}"></strong>
+                                <a th:if="${page != nowPage}" th:href="@{/post/notice/search(page=${page - 1})}" th:text="${page}"></a>
+                                <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
                             </div>
                         </div>
                     </div>
-                    <div id="search-area">
-                        <form action="/post/notice/search", method="POST" >
-                            <select class="form-select" name="searchPeriod" id="set-search-period">
-                                <option value="ALL">전체 기간</option>
-                                <option value="LAST_SIX_MONTH">최근 6개월</option>
-                                <option value="LAST_ONE_YEAR">최근 1년</option>
-                            </select>
-                            <select class="form-select" name="searchTarget" id="set-search-target">
-                                <option value="TITLE_AND_CONTENT">제목 + 내용</option>
-                                <option value="WRITER">글 작성자</option>
-<!--                                <option value="comment-content">댓글</option>-->
-<!--                                <option value="comment-writer">댓글 작성자</option>-->
-                            </select>
-                            <input type="search" name="searchKeyWords" id="post-search" placeholder="검색어를 입력 해 주세요"/>
-<!--                            <a id="search-btn">검색</a>-->
-                            <input type="submit" value="검색" class="btn btn-secondary-outline" />
-                        </form>
-                    </div>
+<!--                    <div id="search-area">-->
+<!--                        <form action="/post/notice/search", method="POST" >-->
+<!--                            <select class="form-select" name="searchPeriod" id="set-search-period">-->
+<!--                                <option value="ALL">전체 기간</option>-->
+<!--                                <option value="LAST_SIX_MONTH">최근 6개월</option>-->
+<!--                                <option value="LAST_ONE_YEAR">최근 1년</option>-->
+<!--                            </select>-->
+<!--                            <select class="form-select" name="searchTarget" id="set-search-target">-->
+<!--                                <option value="TITLE_AND_CONTENT">제목 + 내용</option>-->
+<!--                                <option value="WRITER">글 작성자</option>-->
+<!--&lt;!&ndash;                                <option value="comment-content">댓글</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                                <option value="comment-writer">댓글 작성자</option>&ndash;&gt;-->
+<!--                            </select>-->
+<!--                            <input type="search" name="searchKeyWords" id="post-search" placeholder="검색어를 입력 해 주세요"/>-->
+<!--&lt;!&ndash;                            <a id="search-btn">검색</a>&ndash;&gt;-->
+<!--                            <input type="submit" value="검색" class="btn btn-secondary-outline" />-->
+<!--                        </form>-->
+<!--                    </div>-->
                 </section>
             </div>
         </div>
@@ -112,7 +124,7 @@
             let period = $('#set-search-period').val();
             let target = $('#set-search-target').val();
             let searchKeyWords = $('#post-search').val();
-
+            const url = '/post/notice/search';
             let data = {
                 "searchPeriod" : $('#set-search-period').val(),
                 "searchTarget" : $('#set-search-target').val(),
@@ -123,6 +135,14 @@
             console.log("searchTarget : ", target);
             console.log("searchKeyWords : ", searchKeyWords);
 
+
+            // fetch(url, {
+            //     method: 'GET',
+            // })
+            //     .then(response => response.json())
+            //     .then(data => {
+            //
+            //     })
             $.ajax({
                 url: '/post/notice/search',
                 type: 'POST',

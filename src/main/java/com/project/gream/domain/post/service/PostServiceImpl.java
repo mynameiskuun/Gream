@@ -13,6 +13,7 @@ import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.member.repository.MemberRepository;
 import com.project.gream.domain.order.entity.OrderItem;
+import com.project.gream.domain.order.repository.OrderItemRepository;
 import com.project.gream.domain.post.dto.*;
 import com.project.gream.domain.post.entity.Comment;
 import com.project.gream.domain.post.entity.Likes;
@@ -59,6 +60,7 @@ public class PostServiceImpl implements PostService{
     private final ItemRepository itemRepository;
     private final JPAQueryFactory queryFactory;
     private final CommentRepository commentRepository;
+    private final OrderItemRepository orderItemRepository;
     private final S3Config s3Config;
 
     @Transactional
@@ -69,18 +71,18 @@ public class PostServiceImpl implements PostService{
 
         Item reviewTargetItem = reviewDto.getItemDto().toEntity();
         Member member = reviewDto.toEntity().getMember();
+        Review review = reviewRepository.save(reviewDto.toEntity());
 
         if(!imgPaths.isEmpty()) {
             reviewDto.setThumbnail(imgPaths.get(0));
-        }
-
-        Review review = reviewRepository.save(reviewDto.toEntity());
-        for(String imgPath : imgPaths) {
-            imgRepository.save(Img.builder()
-                    .url(imgPath)
-                    .item(review.getItem())
-                    .review(review)
-                    .build());
+            for(String imgPath : imgPaths) {
+                imgRepository.save(Img.builder()
+                        .url(imgPath)
+                        .item(review.getItem())
+                        .review(review)
+                        .build());
+            }
+            member.addPoint(2000);
         }
 
         OrderItem orderedItem = queryFactory.selectFrom(orderItem)
@@ -88,6 +90,7 @@ public class PostServiceImpl implements PostService{
                         orderItem.orderHistory.member.eq(member))
                 .fetchOne();
         orderedItem.updateState(OrderState.REVIEWED);
+        orderItemRepository.save(orderedItem);
     }
 
     @Override
@@ -144,7 +147,6 @@ public class PostServiceImpl implements PostService{
             response.setLikeCount(likeCount);
         }
         reviewDto.setCommentList(responseList);
-
         return reviewDto;
     }
     @Override
@@ -326,6 +328,8 @@ public class PostServiceImpl implements PostService{
                         .thumbnailUrl(Post.getThumbnailUrl())
                         .postType(PostType.NOTICE)
                         .memberDto(MemberDto.fromEntity(Post.getMember()))
+                        .createdTime(Post.getCreatedTime())
+                        .modifiedTime(Post.getModifiedTime())
                         .build());
     }
 
@@ -360,10 +364,12 @@ public class PostServiceImpl implements PostService{
         return "공지사항 등록 완료";
     }
 
+    @Transactional
     @Override
     public PostResponseDto getNoticeDetail(Long noticeId) {
 
         Post post =  postRepository.findById(noticeId).orElseThrow();
+        post.updateHits();
         List<String> imgUrlList = Optional.ofNullable(imgRepository.findAllByPost_Id(noticeId))
                 .orElse(Collections.emptyList())
                 .stream()
@@ -427,13 +433,16 @@ public class PostServiceImpl implements PostService{
 
         log.info("------------------------- QnA img upload to S3");
 
-        if (imgList.size() == 0) {
+        if (isImgListEmpty(imgList)) {
             return Collections.emptyList();
         } else {
             return s3Config.imgUpload(dto, imgList);
         }
     }
 
+    private boolean isImgListEmpty(List<MultipartFile> imgList) {
+        return imgList.get(0).getOriginalFilename().equals("");
+    }
     private void saveQnaImgUrlToDB(Post post, List<String> imgUrlList, Long itemId) {
 
         log.info("------------------------- QNA img url save to DB");

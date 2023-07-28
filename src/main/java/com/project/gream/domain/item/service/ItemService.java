@@ -20,8 +20,8 @@ import java.util.Optional;
 
 public interface ItemService {
     List<ItemDto> selectAllItems();
-    List<ItemDto> selectMenItems();
-    List<ItemDto> selectWomenItems();
+    Page<ItemDto> selectMenItems(Pageable pageable);
+    Page<ItemDto> selectWomenItems(Pageable pageable);
     List<ItemDto> sortItemByCategory(String sortBy);
     void registerItemAndImgs(ItemRequestDto itemRequestDto) throws Exception;
     void saveEntities(Item item, List<String> imgPaths) throws Exception;
@@ -35,7 +35,7 @@ public interface ItemService {
     void updateItemStock(KakaoPayDto kakaoPayDto, OrderHistory orderHistory);
     List<Long> getLikedItemIds(String memberId);
     List<ItemDto> getLikedItemListForMypage(List<Long> itemIds);
-    List<ItemDto> getLikedItemListByMemberId(String memberId);
+    Page<ItemDto> getLikedItemListByMemberId(String memberId, Pageable pabeable);
     boolean itemStockCheck(OrderRequestDto requestDto);
 
     //    List<ImgDto> getImgsByItemId(Long itemId);
