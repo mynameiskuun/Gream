@@ -96,6 +96,9 @@
             data: noticeId,
             contentType: 'TEXT',
             dataType: 'TEXT',
+            beforeSend: function(xhr) {
+              xhr.setRequestHeader(header, token)
+            },
             success(result) {
               alert(result);
               location.href = '/post/notice';

@@ -151,9 +151,9 @@
 
         fetch(url, {
             method: 'POST',
-            // headers: {
-            //     'Content-Type': 'multipart/form-data'
-            // },
+            headers : {
+                "X-CSRF-Token" : token
+            },
             body: formData
         })
             .then(response => {

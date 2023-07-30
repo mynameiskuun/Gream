@@ -45,4 +45,6 @@ public interface PostService {
     Page<PostDto> searchNoticeByCondition(PostRequestDto requestDto, Pageable pageable);
 
     CommentDto.Response saveReviewComment(CommentDto.Request request);
+
+    CommentDto.Response updateComment(CommentDto.Request request);
 }

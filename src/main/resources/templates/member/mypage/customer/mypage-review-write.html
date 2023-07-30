@@ -271,6 +271,9 @@
                     // 따라서 processData: false를 통해 파일을 원시 데이터 형태 그대로 전송.
                     // ajax를 사용해서 비동기적으로 form 데이터와 이미지를 동시에 전송해야 할 때 이를 사용한다.
                     data: formData,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(header, token)
+                    },
                     success: function(result) {
                         console.log(result);
                     },

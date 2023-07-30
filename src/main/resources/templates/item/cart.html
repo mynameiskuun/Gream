@@ -188,6 +188,9 @@
                 contentType: 'application/json',
                 dataType: 'text',
                 data: JSON.stringify(hiddenValueArray),
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(header, token)
+                },
                 success(data) {
                     alert(data);
                     checkedDomArray.forEach((dom) => {dom.remove()})
@@ -210,6 +213,9 @@
             contentType: 'text',
             dataType: 'text',
             data: cartItemId,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success: function(data) {
                 console.log("result : " + data);
                 targetDom.remove();
@@ -248,6 +254,9 @@
             data: JSON.stringify(req),
             contentType: 'application/json; charset=UTF-8',
             dataType: 'text',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success: function(result) {
                 alert(result);
                 console.log(result);

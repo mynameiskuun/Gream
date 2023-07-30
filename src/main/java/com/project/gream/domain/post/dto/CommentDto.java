@@ -64,15 +64,18 @@ public class CommentDto {
     public static class Request {
         private Long id;
         private String content;
+        private String modifyContent;
+
         private MemberDto memberDto;
         private Long postId;
         private Long reviewId;
 
         @Builder
-        public Request(Long id, String content, MemberDto memberDto,
-                       Long postId, Long reviewId) {
+        public Request(Long id, String content, String modifyContent,
+                       MemberDto memberDto, Long postId, Long reviewId) {
             this.id = id;
             this.content = content;
+            this.modifyContent = modifyContent;
             this.memberDto = memberDto;
             this.postId = postId;
             this.reviewId = reviewId;

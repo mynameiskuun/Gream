@@ -23,7 +23,6 @@
     flex-wrap: wrap;
     width: 1300px;
     display: flex;
-    float: left;
 }
 .item-cards {
     width: 30%;

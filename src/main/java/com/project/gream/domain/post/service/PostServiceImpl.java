@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
 
 import static com.project.gream.domain.post.entity.QLikes.likes;
 import static com.project.gream.domain.post.entity.QPost.post;
-import static com.project.gream.domain.post.entity.QComment.comment;
 import static com.project.gream.domain.order.entity.QOrderItem.orderItem;
 
 
@@ -589,9 +588,34 @@ public class PostServiceImpl implements PostService{
                 .member(request.getMemberDto().toEntity())
                 .build();
 
-        commentRepository.save(comment);
+        Comment responseComment = commentRepository.save(comment);
         return CommentDto.Response.builder()
+                .id(responseComment.getId())
+                .content(responseComment.getContent())
+                .memberDto(MemberDto.fromEntity(responseComment.getMember()))
+                .likeCount(0L)
+                .depth(0)
                 .message("댓글 등록에 성공했습니다.")
+                .createdTime(responseComment.getCreatedTime())
+                .modifiedTime(responseComment.getModifiedTime())
+                .build();
+    }
+
+    @Override
+    public CommentDto.Response updateComment(CommentDto.Request request) {
+
+        Comment comment = commentRepository.findById(request.getId()).orElseThrow();
+        comment.updateContent(request.getContent());
+        Comment updatedComment = commentRepository.save(comment);
+
+        return new CommentDto.Response().builder()
+                .id(updatedComment.getId())
+                .content(updatedComment.getContent())
+                .memberDto(MemberDto.fromEntity(updatedComment.getMember()))
+                .depth(updatedComment.getDepth())
+                .message("댓글 업데이트 완료")
+                .createdTime(updatedComment.getCreatedTime())
+                .modifiedTime(updatedComment.getModifiedTime())
                 .build();
     }
 }

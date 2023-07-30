@@ -387,7 +387,7 @@
       }
 
       fetch(url, {
-        method: 'GET'
+        method: 'GET',
        })
               .then(response => response.json())
               .then(data => {
@@ -646,6 +646,7 @@
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
+          "X-CSRF-Token" : token
         },
         body: JSON.stringify(data),
       })
@@ -753,7 +754,10 @@
         type:'POST'
         ,url:'/order/kakaopay'
         ,data: JSON.stringify(data)
-        ,contentType: "application/json; charset=UTF-8"
+        ,contentType: "application/json; charset=UTF-8",
+                beforeSend: function(xhr) {
+                  xhr.setRequestHeader(header, token)
+                }
         ,success:function(response){
           console.log(response);
           location.href = response.next_redirect_pc_url;

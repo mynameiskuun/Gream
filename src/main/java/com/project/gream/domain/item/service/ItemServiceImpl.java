@@ -52,11 +52,6 @@ public class ItemServiceImpl implements ItemService{
     private final ItemRepository itemRepository;
     private final ImgRepository imgRepository;
     private final CartItemRepository cartItemRepository;
-    private final CouponRepository couponRepository;
-    private final MemberRepository memberRepository;
-    private final UserCouponRepository userCouponRepository;
-    private final OrderHistoryRepository orderHistoryRepository;
-    private final JPAQueryFactory queryFactory;
     private final EntityManager em;
 
     @Override

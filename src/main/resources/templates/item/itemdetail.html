@@ -8,6 +8,20 @@
     <title>Document</title>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <th:block th:replace="main/config :: config"></th:block>
+    <style>
+        .comment-option-btns {
+            display: flex;
+            justify-content: space-evenly;
+        }
+        .comment-update-btn {
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .comment-delete-btn {
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
 <!-- header start-->
@@ -36,7 +50,7 @@
                 <div id="item-price-box" th:text="${'판매가격 : ' + #numbers.formatInteger(item.getPrice(), 3, 'COMMA') + ' 원'} "></div>
                 <div id="order-button-box">
                     <button class="btn btn-outline-secondary" id="orderBtn">주문하기</button>
-                    <button class="btn btn-outline-secondary" id="cartBtn" onclick="cartBtn()">장바구니 추가</button>
+                    <button class="btn btn-outline-secondary" id="cartBtn">장바구니 추가</button>
                     <div class="item-like-box" th:if="${session.loginMember eq null}" style="background: white">
                         <div class="item-thumbs-up"></div>
                         <div class="like-title">좋아요</div>
@@ -225,15 +239,21 @@
                                     <div class="comment-cards" th:each="comment : ${review.commentList}">
                                         <div class="comment-center-box">
                                             <div class="comment-writer-id" th:text="${comment.memberDto.id}"></div>
-                                            <div class="comment-context-box" th:text="${comment.content}">
-                                            </div>
+                                            <div class="comment-content-box" th:text="${comment.content}"></div>
                                         </div>
                                         <div class="comment-like-box">
                                             <div class="comment-thumbs-up"></div>
                                             <div class="comment-like-counts" th:text="${comment.likeCount}"></div>
                                             <input type="hidden" th:value="${comment.id}" />
                                         </div>
-                                        <div class="comment-created-time" th:text="${#strings.substring(comment.createdTime, 0, 10)}"></div>
+                                        <div>
+                                            <div class="comment-created-time" th:text="${#strings.substring(comment.createdTime, 0, 10)}"></div>
+                                            <div class="comment-option-btns" th:if="${session.loginMember.id eq comment.memberDto.id}">
+                                                <a class="comment-update-btn"><div>수정</div></a>
+                                                <a class="comment-delete-btn"><div>삭제</div></a>
+                                                <input type="hidden" th:value="${comment.id}" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -358,6 +378,8 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
 
+    var header = $("meta[name='_csrf_header']").attr('content');
+    var token = $("meta[name='_csrf']").attr('content');
 
     /* 구매수량 변화 감지, 남은 재고수량 이상으로 장바구니 혹은 결제 안되게 뷰단에서 처리 */
     // 페이지에 나와있는 상품 재고 초과하여 카운트 up 시 alert 출력
@@ -374,40 +396,63 @@
         }
     });
 
-    // 장바구니 추가 버튼 메소드
-    function cartBtn() {
-
-        if([[${session.loginMember}]] == null) {
-            alert('로그인을 해주세요')
-            location.href='/login';
-        }
-
+    $('#cartBtn').on('click', function() {
         let cartItem = {
             itemDto : [[${item}]],
             quantity : document.getElementById('orderQuantity').value
         };
 
         $.ajax({
-            url: '/cart',
-            type: 'POST',
+            url: "/cart",
+            type: "POST",
             data: JSON.stringify(cartItem),
             contentType: 'application/json; charset=UTF-8',
             dataType: 'text',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success: function(result) {
-                document.getElementById("cartText").innerText = result;
-                const modal = new bootstrap.Modal(document.querySelector('.cart-modal'));
-                modal.show();
+                alert(result);
+                // document.getElementById("cartText").innerText = result;
+                // const modal = new bootstrap.Modal(document.querySelector('.cart-modal'));
+                // modal.show();
             }
         })
+    })
+    // 장바구니 추가 버튼 메소드
+    function cartBtn() {
+
+        // if([[${session.loginMember}]] == null) {
+        //     alert('로그인을 해주세요')
+        //     location.href='/login';
+        // }
+
+        // let cartItem = {
+        //     itemDto : [[${item}]],
+        //     quantity : document.getElementById('orderQuantity').value
+        // };
+        //
+        // $.ajax({
+        //     url: "/cart",
+        //     type: "POST",
+        //     data: JSON.stringify(cartItem),
+        //     contentType: 'application/json; charset=UTF-8',
+        //     dataType: 'text',
+        //     success: function(result) {
+        //         // document.getElementById("cartText").innerText = result;
+        //         // const modal = new bootstrap.Modal(document.querySelector('.cart-modal'));
+        //         // modal.show();
+        //     }
+        // })
     }
 
     // 개별상품 주문 이벤트 메소드
     $('#orderBtn').click(function () {
 
-        if([[${session.loginMember}]] == null) {
-            alert('로그인을 해주세요')
-            location.href = '/login';
-        }
+        // if([[${session.loginMember}]] == null) {
+        //     alert('로그인을 해주세요')
+        //     location.href = '/login';
+        // }
 
         let data = {
             quantity : $('#orderQuantity').val(),
@@ -420,6 +465,9 @@
             contentType: "application/JSON; charset=UTF-8;",
             data: JSON.stringify(data),
             dataType: "text",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success: function (itemStockFlag) {
                 if (itemStockFlag) {
                     location.href="/order?itemId=" + data.itemDto.id + "&quantity=" + data.quantity;
@@ -528,6 +576,9 @@
             contentType: 'application/json; charset=UTF-8;',
             data: JSON.stringify(data),
             dataType: 'text',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success(data) {
                 console.log(data);
                 alert(data);
@@ -568,6 +619,9 @@
             contentType: 'application/json; charset=UTF-8',
             dataType : 'JSON',
             data: JSON.stringify(data),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success(result) {
                 console.log(result);
                 clickedElement.parent().find('div.like-counts').html(result.count);
@@ -634,6 +688,71 @@
                     </tr>`)
     }
 
+    function createCommentRow(responseData) {
+        let commentCardsDom = $('<div class="comment-cards"></div>')
+        
+        let centerBoxDom = $('<div class="comment-center-box"></div>')
+        let likeBoxDom = $('<div class="comment-like-box"></div>')
+        let btnDom = $('<div></div>')
+
+        let createdTimeDom = $('<div class="comment-created-time"></div>')
+        let optionBtnDom = $('<div class="comment-option-btns"></div>')
+        let writerIdDom = $('<div class="comment-writer-id"></div>')
+        let contentBoxDom = $('<div class="comment-content-id"></div>')
+
+        let updateBtnDom = $('<div class="comment-update-btn"></div>')
+        let deleteBtnDom = $('<div class="comment-delete-btn"></div>')
+        let thumbsUpDom = $('<div class="comment-thumbs-up"></div>')
+        let likeCountsDom = $('<div class="comment-like-counts"></div>')
+        let commentIdDom = $('<input type="hidden" />')
+
+        let updateBtn = $('<a>수정</a>')
+        let deleteBtn = $('<a>삭제</a>')
+
+        //     < div
+        // className = "comment-created-time"
+        // th:text = "${#strings.substring(comment.createdTime, 0, 10)}" > < /div>
+
+        // <div className="comment-option-btns" th:if="${session.loginMember.id eq comment.memberDto.id}">
+        //     <a className="comment-update-btn">
+        //         <div>수정</div>
+        //     </a>
+        //     <a className="comment-delete-btn">
+        //         <div>삭제</div>
+        //     </a>
+        //     <input type="hidden" th:value="${comment.id}"/>
+        // </div>
+
+        writerIdDom.html(responseData.memberDto.id);
+        contentBoxDom.html(responseData.content);
+        likeCountsDom.html(responseData.likeCount);
+        commentIdDom.val(responseData.id);
+
+        updateBtnDom.append(updateBtn);
+        deleteBtnDom.append(deleteBtn);
+
+        optionBtnDom.append(updateBtnDom, deleteBtnDom);
+
+        centerBoxDom.append(writerIdDom, contentBoxDom);
+        likeBoxDom.append(thumbsUpDom, likeCountsDom, commentIdDom);
+        btnDom.append(createdTimeDom, optionBtnDom);
+
+        commentCardsDom.append(centerBoxDom, likeBoxDom, btnDom);
+        return commentCardsDom;
+
+        // <div className="comment-cards" th:each="comment : ${review.commentList}">
+        //     <div className="comment-center-box">
+        //         <div className="comment-writer-id" th:text="${comment.memberDto.id}"></div>
+        //         <div className="comment-content-box" th:text="${comment.content}"></div>
+        //     </div>
+        //     <div className="comment-like-box">
+        //         <div className="comment-thumbs-up"></div>
+        //         <div className="comment-like-counts" th:text="${comment.likeCount}"></div>
+        //         <input type="hidden" th:value="${comment.id}"/></div>
+        //     <div className="comment-created-time" th:text="${#strings.substring(comment.createdTime, 0, 10)}"></div>
+        // </div>
+    }
+
     // 댓글 작성 이벤트
     $('.comment-write-btn').on('click', function() {
         let loginMember = [[${session.loginMember}]];
@@ -643,30 +762,96 @@
             location.href = "/login";
         }
 
-        let content = $(this).prev().val();
+        let inputDom = $(this).prev();
         let reviewId = $(this).parent().find('input[type="hidden"]').val();
         let data = {
             memberDto : loginMember,
-            content : content,
+            content : inputDom.val(),
             reviewId: reviewId
         }
         const url = "/review/comment"
         fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type' : 'application/json'
+                'Content-Type' : 'application/json',
+                "X-CSRF-Token" : token
             },
             body: JSON.stringify(data)
         })
             .then(response => {
                 if (response.status === 200) {
-                    alert(data.message);
-                    location.reload();
+                    return response.json();
                 } else {
                     new Promise.reject();
                 }
             })
+            .then(data => {
+                inputDom.val('');
+                $('.comment-output-container').prepend(createCommentRow(data));
+            })
     })
+
+    // 댓글 수정 이벤트
+    $('.comment-update-btn').on('click', function() {
+        let eventDom = $(this);
+        let commentCardDom = $(this).parent().parent().parent();
+        let originContent = commentCardDom.find('div[class="comment-content-box"]').html();
+
+        eventDom.parent().prepend($('<a style="text-decoration: none; cursor: pointer" id="comment-update-btn">수정하기</a>'))
+        eventDom.remove();
+
+        commentCardDom.find('div[class="comment-content-box"]').remove();
+        commentCardDom.children().first().append($('<textarea type="textarea" class="form-control comment-modify-area" name="content" onfocus="commentAreaToggle()">' + originContent + '</textarea>'))
+    })
+
+    $(document).on('click', '#comment-update-btn', function() {
+
+
+        const url = '/review/comment'
+        let eventDom = $(this);
+        let modifyContent = $(this).parent().parent().parent().find('textarea[class="comment-modify-area"]').val()
+        let commentId = $(this).parent().find('input[type="hidden"]').val();
+        if (modifyContent === null || modifyContent === '') {
+            alert('내용을 입력 해 주세요');
+            return;
+        }
+
+        fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRF-Token' : token
+            },
+            body: JSON.stringify({
+                'id' : commentId,
+                "modifyContent" : modifyContent
+            })
+        })
+            .then(result => {
+                if (result.status === 200) {
+                    alert(result.message);
+                    return result.json();
+                }
+                console.log(result);
+            })
+            .then(data => {
+                eventDom.parent().parent().parent().find('textarea[class="comment-modify-area"]').remove();
+                eventDom.parent().parent().parent().children().first().append($('<div class="comment-content-box">' + data.content + '</div>'))
+            })
+    })
+
+    // 댓글 삭제 이벤트
+    $('.comment-delete-btn').on('click', function() {
+
+    })
+    // comment-modify-area focus out
+    function isGuest() {
+        const loginMember = [[${session.loginMember}]];
+
+        if (loginMember === null) {
+            alert('로그인을 해주세요');
+        }
+    }
 </script>
 </body>
 </html>
