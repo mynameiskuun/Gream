@@ -138,6 +138,9 @@
                 data: JSON.stringify(data),
                 contentType: 'application/json',
                 dataType: 'JSON',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(header, token)
+                },
                 success: function(result) {
                     alert(result.message);
                     location.reload();
@@ -171,6 +174,9 @@
                     contentType: "application/JSON",
                     data: JSON.stringify(data),
                     dataType: "JSON",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(header, token)
+                    },
                     success: function(result) {
                         if (!result.isSuccess) {
                             alert('현재 비밀번호가 일치하지 않습니다.');

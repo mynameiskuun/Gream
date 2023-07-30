@@ -16,7 +16,8 @@
     <link rel="stylesheet" th:href="@{/css/header.css}" />
     <link rel="stylesheet" th:href="@{/css/itemdetail.css}" />
 
-
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <meta name="_csrf" th:content="${_csrf.token}">
     <!-- jQuery -->
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 

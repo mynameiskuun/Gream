@@ -9,6 +9,7 @@ import com.project.gream.common.enumlist.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -34,18 +35,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                .cors().disable()
-                .csrf().disable()
+//                .cors().disable()
+//                .csrf().disable()
                 .headers().addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)).frameOptions().disable(); // h2DB 사용 위하여
 
         http
                 .authorizeRequests()
                 .antMatchers("/h2-console/**", "/", "/lib/**", "/item/**", "/login", "/join", "/test/**", "/profile", "/error", "/post/notice/", "/post/notice/**").permitAll()
                 .antMatchers("/admin/**").hasRole(Role.ADMIN.name())
-                .antMatchers("/member/**").hasRole(Role.MEMBER.name())
+//                .antMatchers("/member/**", "/cart", "/cart/**", "/order","/order/**").hasRole(Role.MEMBER.name())
                 .anyRequest().authenticated();
 
         http
+
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/formLogin")

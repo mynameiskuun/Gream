@@ -66,12 +66,12 @@
                         </div>
                     </a>
                 </th:block>
-                <div id="item-footer">
-                    <div id="paging-btn-box">
-                        <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
-                            <a th:if="${page != nowPage}" th:href="@{/item/men(page=${page - 1})}" th:text="${page}"></a>
-                            <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
-                        </div>
+            </div>
+            <div id="item-footer">
+                <div id="paging-btn-box">
+                    <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
+                        <a th:if="${page != nowPage}" th:href="@{/item/men(page=${page - 1})}" th:text="${page}"></a>
+                        <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
                     </div>
                 </div>
             </div>
@@ -91,6 +91,9 @@
             data: sortBy,
             contentType: 'TEXT',
             dataType: 'json',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success(sortedItems) {
                 console.log('ajax success')
                 console.log('sortedItems : ', sortedItems);

@@ -25,7 +25,10 @@
                     <a th:href="@{/login}">LOG IN</a>
                 </div>
                 <div class="upper-header-btn" th:if="${session.loginMember != null}">
-                    <a th:href="@{/logout}">LOG OUT</a>
+                    <form method="POST" enctype="multipart/form-data" action="/logout">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                        <button style="padding: 0 0 0; color: #747474; background: none; border: none;">LOG OUT</button>
+                    </form>
                 </div>
             </div>
             <div id="lower-header">
@@ -54,6 +57,7 @@
             </div>
         </div>
     </section>
+
 </th:block>
 </body>
 </html>

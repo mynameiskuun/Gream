@@ -4,6 +4,7 @@ import com.project.gream.common.enumlist.CommentTargetType;
 import com.project.gream.common.enumlist.converter.CommentTargetTypeConverter;
 import com.project.gream.common.util.BaseTimeEntity;
 import com.project.gream.domain.member.entity.Member;
+import com.querydsl.core.util.StringUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,5 +42,12 @@ public class Comment extends BaseTimeEntity {
         this.member = member;
         this.post = post;
         this.review = review;
+    }
+
+    public void updateContent(String content) {
+        if (StringUtils.isNullOrEmpty(content)) {
+            return;
+        }
+        this.content = content;
     }
 }

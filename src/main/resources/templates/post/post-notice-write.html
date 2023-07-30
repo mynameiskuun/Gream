@@ -132,6 +132,9 @@
           contentType: false,
           data: formData,
           dataType: 'text',
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader(header, token)
+          },
           success: function (result) {
             alert(result)
             $('#notice-title').val("");

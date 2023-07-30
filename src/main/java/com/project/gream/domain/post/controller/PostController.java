@@ -179,4 +179,14 @@ public class PostController {
         header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
         return new ResponseEntity(response, header, HttpStatus.OK);
     }
+
+    @PatchMapping("/review/comment")
+    public ResponseEntity<CommentDto.Response> updateReviewComment(@RequestBody CommentDto.Request request) {
+
+        CommentDto.Response response = postService.updateComment(request);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        return new ResponseEntity<>(response, header, HttpStatus.OK);
+        // 수정하기
+    }
 }
