@@ -100,6 +100,7 @@
                 <form action="/cart/order" method="POST">
                     <input type="submit" id="orderBtn" class="btn btn-outline-danger" value="주문하기" />
                     <input type="hidden" id="checkedItemIds" name="cartItemIds"/>
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                 </form>
                 <!-- 주문하면 주문창으로 -->
             </div>
@@ -112,6 +113,9 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
+
+    var header = $("meta[name='_csrf_header']").attr('content');
+    var token = $("meta[name='_csrf']").attr('content');
 
     // 숫자에서 콤마 제거하는 메소드
     function removeCommaAndGetNumber(price) {

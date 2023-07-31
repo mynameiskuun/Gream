@@ -13,4 +13,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "WHERE c.review.id = :reviewId " +
             "ORDER BY c.createdTime DESC")
     List<Comment> getReviewComments(Long reviewId);
+
+    List<Comment> findAllByReview_Id(Long reviewId);
 }

@@ -8,9 +8,12 @@ import com.querydsl.core.util.StringUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 
+@DynamicUpdate
 @NoArgsConstructor
 @Getter
 @Entity
@@ -23,13 +26,13 @@ public class Comment extends BaseTimeEntity {
     private String content;
     @Column(columnDefinition = "integer default 0", nullable = false)
     private int depth;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     public Member member;
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     public Post post;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
     public Review review;
 

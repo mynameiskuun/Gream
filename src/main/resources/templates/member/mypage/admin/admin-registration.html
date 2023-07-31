@@ -99,7 +99,9 @@
         <input class="form-control" type="file" id="prdImg" name="imgFiles" multiple="multiple">
     </div>
     <div class="col-12 text-center">
-        <input type="submit" class="btn btn-secondary" value="상품등록"/><!--id="submitbtn"-->
+        <input type="submit" class="btn btn-secondary" value="상품등록"/>
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+        <!--id="submitbtn"-->
     </div>
 </form>
 </div>

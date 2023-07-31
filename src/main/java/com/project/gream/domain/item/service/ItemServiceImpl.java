@@ -273,7 +273,8 @@ public class ItemServiceImpl implements ItemService{
         return queryFactory
                 .select(likes.item.id)
                 .from(likes)
-                .where(likes.member.id.eq(memberId))
+                .where(likes.member.id.eq(memberId),
+                        likes.item.id.isNotNull())
                 .fetch();
     }
 

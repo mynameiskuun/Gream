@@ -204,6 +204,7 @@
     line-height: 130px;
 }
 #review-container {
+    padding-bottom: 40px;
     margin: 0px 40px 40px 40px;
     border: 1px solid lightgray;
 }
@@ -272,7 +273,7 @@
     padding: 0 30px;
 }
 .review-comment-box div {
-    margin-bottom: 20px;
+    /*margin-bottom: 20px;*/
 }
 .item-thumbs-up {
     background-color: steelblue;
@@ -403,7 +404,7 @@
     width: 90%;
     align-items: center;
     justify-content: end;
-    display: flex;
+    /*display: flex;*/
     min-height: 80px;
     margin: 0 auto;
 }

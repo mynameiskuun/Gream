@@ -38,7 +38,11 @@
     </div>
   </div>
 
-  <script>
+  <script th:inline="javascript">
+
+    var header = $("meta[name='_csrf_header']").attr('content');
+    var token = $("meta[name='_csrf']").attr('content');
+
     $('.register-btn').on('click', function() {
 
       let address = $('#addressBox').val();

@@ -68,18 +68,21 @@
                 </th:block>
             </div>
             <div id="item-footer">
-                <div id="paging-btn-box">
-                    <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
-                        <a th:if="${page != nowPage}" th:href="@{/item/men(page=${page - 1})}" th:text="${page}"></a>
-                        <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
-                    </div>
-                </div>
+<!--                <div id="paging-btn-box">-->
+<!--                    <div th:each="page : ${#numbers.sequence(startPage, endPage)}">-->
+<!--                        <a th:if="${page != nowPage}" th:href="@{/item/men(page=${page - 1})}" th:text="${page}"></a>-->
+<!--                        <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>-->
+<!--                    </div>-->
+<!--                </div>-->
             </div>
         </div>
     </div>
 </section>
 
 <script th:inline="javascript">
+
+    var header = $("meta[name='_csrf_header']").attr('content');
+    var token = $("meta[name='_csrf']").attr('content');
 
     $('.sort-btn').on('click', function() {
         let sortBy = $(this).find('input[type="hidden"]').val();
