@@ -64,7 +64,7 @@
                     </th:block>
                 </div>
                 <div id="mypage-likelist-footer">
-                    <div id="paging-btn-box">
+                    <div id="paging-btn-box" th:if="${!likedItemList.isEmpty()}">
                         <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
                             <a th:if="${page != nowPage}" th:href="@{/like/{memberId}(memberId=${session.loginMember.id}, page=${page - 1})}" th:text="${page}"></a>
                             <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>

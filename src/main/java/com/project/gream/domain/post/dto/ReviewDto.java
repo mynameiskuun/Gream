@@ -23,25 +23,19 @@ public class ReviewDto {
     private int qualityScore;
     private int deliveryScore;
     private int repurchaseScore;
-    private int likesCount;
+    private Long likesCount;
     private String content;
     private String thumbnail;
     private MemberDto memberDto;
     private ItemDto itemDto;
+    private Long orderItemId;
     private List<CommentDto.Response> commentList;
-
-//    @JsonSerialize(using = LocalDateTimeSerializer.class)
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdTime;
-//    @JsonSerialize(using = LocalDateTimeSerializer.class)
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime modifiedTime;
 
     @Builder
-    public ReviewDto(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore,
-                     int likesCount, String content, String thumbnail, MemberDto memberDto, ItemDto itemDto, List<CommentDto.Response> commentList) {
+    public ReviewDto(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore, Long likesCount,
+                     String content, String thumbnail, MemberDto memberDto, ItemDto itemDto, Long orderItemId, List<CommentDto.Response> commentList) {
         this.id = id;
         this.starValue = starValue;
         this.priceScore = priceScore;
@@ -53,6 +47,7 @@ public class ReviewDto {
         this.thumbnail = thumbnail;
         this.memberDto = memberDto;
         this.itemDto = itemDto;
+        this.orderItemId = orderItemId;
         this.commentList = commentList;
     }
 
@@ -85,7 +80,5 @@ public class ReviewDto {
                 .itemDto(ItemDto.fromEntity(review.getItem()))
                 .build();
     }
-
-
 
 }

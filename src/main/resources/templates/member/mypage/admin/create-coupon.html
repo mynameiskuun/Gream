@@ -104,7 +104,10 @@
     </div>
 </div>
 
-<script>
+<script th:inline="javascript">
+
+    var header = $("meta[name='_csrf_header']").attr('content');
+    var token = $("meta[name='_csrf']").attr('content');
 
     $('#couponBtn').on('click', function() {
 
@@ -149,6 +152,7 @@
             },
             success : function(result) {
                 console.log(result);
+                location.reload();
                 // location.href = '/admin/coupon';
             },
             error: function (error) {

@@ -209,6 +209,9 @@
   <script th:inline="javascript">
     /*<![CDATA[*/
 
+    var header = $("meta[name='_csrf_header']").attr('content');
+    var token = $("meta[name='_csrf']").attr('content');
+
     $('#to-cart-btn').click(function () {
       location.href = '/cart';
     })

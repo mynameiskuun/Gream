@@ -119,6 +119,10 @@
         </div>
 
     <script th:inline="javascript">
+
+        var header = $("meta[name='_csrf_header']").attr('content');
+        var token = $("meta[name='_csrf']").attr('content');
+
         $('#search-btn').on('click', function() {
 
             let period = $('#set-search-period').val();

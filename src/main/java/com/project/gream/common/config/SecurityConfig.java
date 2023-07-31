@@ -43,11 +43,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/h2-console/**", "/", "/lib/**", "/item/**", "/login", "/join", "/test/**", "/profile", "/error", "/post/notice/", "/post/notice/**").permitAll()
                 .antMatchers("/admin/**").hasRole(Role.ADMIN.name())
-//                .antMatchers("/member/**", "/cart", "/cart/**", "/order","/order/**").hasRole(Role.MEMBER.name())
+                .antMatchers("/member/**", "/mypage", "/mypage/**", "/review", "/review/**", "/cart", "/cart/**", "/order","/order/**").hasRole(Role.MEMBER.name())
                 .anyRequest().authenticated();
 
         http
-
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/formLogin")

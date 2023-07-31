@@ -65,7 +65,6 @@ public class CommentDto {
         private Long id;
         private String content;
         private String modifyContent;
-
         private MemberDto memberDto;
         private Long postId;
         private Long reviewId;
@@ -89,19 +88,19 @@ public class CommentDto {
         private Long id;
         private String content;
         private MemberDto memberDto;
-        private Long likeCount;
+        private Long likesCount;
         private int depth;
         private String message;
         private LocalDateTime createdTime;
         private LocalDateTime modifiedTime;
 
         @Builder
-        public Response(Long id, String content, MemberDto memberDto, Long likeCount, int depth,
+        public Response(Long id, String content, MemberDto memberDto, Long likesCount, int depth,
                         String message, LocalDateTime createdTime, LocalDateTime modifiedTime) {
             this.id = id;
             this.content = content;
             this.memberDto = memberDto;
-            this.likeCount = likeCount;
+            this.likesCount = likesCount;
             this.depth = depth;
             this.message = message;
             this.createdTime = createdTime;

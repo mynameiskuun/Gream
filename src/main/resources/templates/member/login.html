@@ -28,6 +28,7 @@
               </div>
               <!--                    <input type="button" value="LOG IN" id="login-btn" onclick="memberLogin()"/>-->
               <input type="submit" value="LOG IN" id="login-btn" />
+              <input type="hidden" th:name="_csrf" th:value="${_csrf.token}" />
               <div id="social-login-box">
                 <div id="google-login-box">
                   <a href="/oauth2/authorization/google" id="google-btn" class="btn btn-secondary active snsbtn" role="button">GOOGLE LOGIN

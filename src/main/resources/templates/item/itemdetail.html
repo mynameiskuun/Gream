@@ -10,6 +10,7 @@
     <th:block th:replace="main/config :: config"></th:block>
     <style>
         .comment-option-btns {
+            width: 100px;
             display: flex;
             justify-content: space-evenly;
         }
@@ -20,6 +21,31 @@
         .comment-delete-btn {
             cursor: pointer;
             text-decoration: none;
+        }
+        .comment-content-box {
+            margin-top: 30px;
+        }
+        .comment-like-box {
+            display: flex;
+            justify-content: space-evenly;
+            width: 130px;
+            height: 35px;
+            align-items: center;
+            border-radius: 20px;
+            border: 1px solid lightgray;
+            margin: 45px 30px;
+        }
+        .paging-btn-box {
+            display: flex;
+            margin: 0 auto;
+        }
+        .paging-btn-box div {
+            display: flex;
+            width: 30px;
+            height: 30px;
+            border: 1px solid lightGray;
+            justify-content: center;
+            align-items: center;
         }
     </style>
 </head>
@@ -58,7 +84,7 @@
                         <input type="hidden" class="target" value="ITEM" />
                         <div class="like-counts" th:text="${likes.itemLikesCount}"></div>
                     </div>
-                    <div class="item-like-box" th:style="'background: ' + ${likes.itemLikeBackgroundColorMap.get(session.loginMember.id)}" th:unless="${session.loginMember eq null} ">
+                    <div class="item-like-box"  th:unless="${session.loginMember eq null}" th:style="'background: ' + ${likes.itemLikeBackgroundColorMap.get(session.loginMember.id)}">
                         <div class="item-thumbs-up"></div>
                         <div class="like-title">좋아요</div>
                         <input type="hidden" th:value="${item.id}"/>
@@ -158,12 +184,12 @@
                             <div></div>
                         </div>
                     </div>
-                    <div th:if="${reviewList.size() eq 0}" th:id="cards-wrapper">
+                    <div th:if="${reviewList.isEmpty()}" th:id="cards-wrapper">
                         <div id="empty-review-msg-box">
                             <h6> 등록된 후기가 없습니다. </h6>
                         </div>
                     </div>
-                    <div th:unless="${reviewList.size() eq 0}" th:id="cards-wrapper">
+                    <div th:unless="${reviewList.isEmpty()}" th:id="cards-wrapper">
                         <div id="review-container" th:each="review : ${reviewList}">
                             <div class="review-cards">
                                 <div class="review-top">회원 리뷰</div>
@@ -173,7 +199,7 @@
                                             <span th:text="${'작성자 : ' + review.memberDto.name}"></span><span th:text="${#strings.substring(review.createdTime, 0, 10)}"></span>
                                         </div>
                                         <div class="order-item-detail" style="display: flex">
-                                            <div class="item-img" th:style="'background-image: url('+ ${review.itemDto.thumbnailUrl} + ');'"></div>
+                                            <div class="item-img" th:if="${review.itemDto.thumbnailUrl ne null}" th:style="'background-image: url('+ ${review.itemDto.thumbnailUrl} + ');'"></div>
                                             <div class="like-item-name" th:text="${review.itemDto.name}"></div>
                                         </div>
                                         <div class="customer-star-rating-box">
@@ -184,37 +210,44 @@
                                         </div>
                                         <div class="review-text" th:text="${review.content}"></div>
                                         <div class="review-features-container">
-                                            <div class="review-item-features text-secondary review-item-price-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                            <div class="review-item-features text-secondary review-item-price-score" style="border: 1px solid; border-radius: 10px; width: 160px; text-align: center;">
                                                 <span class="feature-title">상품 가격</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 1}">비싸요</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 2}">보통이에요</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 3}">저렴해요</span>
                                             </div>
-                                            <div class="review-item-features text-secondary review-item-quality-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                            <div class="review-item-features text-secondary review-item-quality-score" style="border: 1px solid; border-radius: 10px; width: 160px; text-align: center;">
                                                 <span class="feature-title">상품 품질</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 1}">나빠요</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 2}">보통이에요</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 3}">좋아요</span>
                                             </div>
-                                            <div class="review-item-features text-secondary review-item-delivery-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                            <div class="review-item-features text-secondary review-item-delivery-score" style="border: 1px solid; border-radius: 10px; width: 160px; text-align: center;">
                                                 <span class="feature-title">상품 배송</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 1}">느려요</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 2}">보통이에요</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 3}">빨라요</span>
                                             </div>
-                                            <div class="review-item-features text-secondary review-item-repurchase-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                            <div class="review-item-features text-secondary review-item-repurchase-score" style="border: 1px solid; border-radius: 10px; width: 160px; text-align: center;">
                                                 <span class="feature-title">재구매 의사</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 1}">없어요</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 2}">보통이에요</span>
                                                 <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 3}">있어요</span>
                                             </div>
                                         </div>
-                                        <div class="review-like-box">
+                                        <div class="review-like-box" th:if="${session.loginMember eq null}">
                                             <div class="review-thumbs-up"></div>
                                             <div class="like-title">도움돼요</div>
-                                            <input type="hidden" th:value="${review.id}"/>
-                                            <div class="like-counts"></div>
-                                            <input type="hidden" class="target" value="REVIEW" />
+                                            <div class="like-counts" th:text="${review.likesCount}"></div>
+                                            <input type="hidden" class="review-id" th:value="${review.id}"/>
+<!--                                            <input type="hidden" class="target" value="REVIEW" />-->
+                                        </div>
+                                        <div class="review-like-box" th:unless="${session.loginMember eq null}" th:style="'background: ' + ${likes.reviewLikeBgColorMapList.get(review.id)}">
+                                            <div class="review-thumbs-up"></div>
+                                            <div class="like-title">도움돼요</div>
+                                            <div class="like-counts" th:text="${review.likesCount}"></div>
+                                            <input type="hidden" class="review-id" th:value="${review.id}"/>
+<!--                                            <input type="hidden" class="target" value="REVIEW" />-->
                                         </div>
                                     </div>
                                     <div class="review-right-box">
@@ -241,20 +274,36 @@
                                             <div class="comment-writer-id" th:text="${comment.memberDto.id}"></div>
                                             <div class="comment-content-box" th:text="${comment.content}"></div>
                                         </div>
-                                        <div class="comment-like-box">
+                                        <div class="comment-like-box" th:if="${session.loginMember eq null}">
                                             <div class="comment-thumbs-up"></div>
-                                            <div class="comment-like-counts" th:text="${comment.likeCount}"></div>
-                                            <input type="hidden" th:value="${comment.id}" />
+                                            <div class="comment-title-box">좋아요</div>
+                                            <div class="comment-like-counts" th:text="${comment.likesCount}"></div>
+                                            <input type="hidden" class="comment-id" th:value="${comment.id}" />
                                         </div>
-                                        <div>
+                                        <div class="comment-like-box" th:unless="${session.loginMember eq null}" th:style="'background: ' + ${likes.commentLikeBgColorMapList.get(comment.id)}">
+                                            <div class="comment-thumbs-up"></div>
+                                            <div class="comment-title-box">좋아요</div>
+                                            <div class="comment-like-counts" th:text="${comment.likesCount}"></div>
+                                            <input type="hidden" class="comment-id" th:value="${comment.id}" />
+                                        </div>
+                                        <div style="display: flex; align-items: center; justify-content: space-evenly">
                                             <div class="comment-created-time" th:text="${#strings.substring(comment.createdTime, 0, 10)}"></div>
-                                            <div class="comment-option-btns" th:if="${session.loginMember.id eq comment.memberDto.id}">
+
+                                            <div class="comment-option-btns" th:if="${session.loginMember ne null && session.loginMember.id eq comment.memberDto.id}">
                                                 <a class="comment-update-btn"><div>수정</div></a>
                                                 <a class="comment-delete-btn"><div>삭제</div></a>
                                                 <input type="hidden" th:value="${comment.id}" />
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div th:if="${!reviewList.isEmpty()}" class="paging-btn-box">
+                                <div th:each="reviewPage : ${#numbers.sequence(reviewStartPage, reviewEndPage)}">
+                                    <a style="cursor: pointer" th:if="${reviewPage != reviewNowPage}" th:onclick="|location.href='@{/item/}' + ${item.id} + '?review_page=' + ${reviewPage - 1} + '#review-container' |" th:text="${reviewPage}"></a>
+                                    <strong th:if="${reviewPage == reviewNowPage}" style="color:black" th:text="${reviewPage}"></strong>
                                 </div>
                             </div>
                         </div>
@@ -310,7 +359,12 @@
                         <a id="qna-write-btn" style="cursor: pointer" onclick="showQnaPopUp()" target = "_blank">상품 문의하기</a>
                     </div>
                     <div id="qna-paging-area">
-
+                        <div th:if="${!qnaList.isEmpty()}" class="paging-btn-box">
+                            <div th:each="qnaPage : ${#numbers.sequence(qnaStartPage, qnaEndPage)}">
+                                <a th:if="${qnaPage != qnaNowPage}" style="cursor: pointer" th:onclick="|location.href='@{/item/}' + ${item.id} + '?qna_page=' + ${qnaPage - 1} + '#qna-container' |" th:text="${qnaPage}"></a>
+                                <strong th:if="${qnaPage == qnaNowPage}" style="color:black" th:text="${qnaPage}"></strong>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -599,14 +653,14 @@
         // 좋아요 타겟(리뷰? 아이템?)
 
         let clickedElement = $(this);
-        let memberDto;
+        let memberDto = [[${session.loginMember}]];
         // let itemId = $(this).parent().find('input[type="hidden"]').val();
 
         if ([[${session.loginMember}]] == null) {
             alert('로그인을 해주세요');
             location.href = '/login';
-        } else
-            memberDto = [[${session.loginMember}]]
+            return;
+        }
 
         let data = {
             "itemDto" : [[${item}]],
@@ -693,21 +747,22 @@
         
         let centerBoxDom = $('<div class="comment-center-box"></div>')
         let likeBoxDom = $('<div class="comment-like-box"></div>')
-        let btnDom = $('<div></div>')
+        let btnDom = $('<div style="display: flex; align-items: center; justify-content: space-evenly"></div>')
 
-        let createdTimeDom = $('<div class="comment-created-time"></div>')
+        let createdTimeDom = $('<div class="comment-created-time"> ' + responseData.createdTime.slice(0,10) + '</div>')
         let optionBtnDom = $('<div class="comment-option-btns"></div>')
         let writerIdDom = $('<div class="comment-writer-id"></div>')
-        let contentBoxDom = $('<div class="comment-content-id"></div>')
+        let contentBoxDom = $('<div class="comment-content-box"></div>')
 
-        let updateBtnDom = $('<div class="comment-update-btn"></div>')
-        let deleteBtnDom = $('<div class="comment-delete-btn"></div>')
+        let updateBtnDom = $('<a class="comment-update-btn"></a>')
+        let deleteBtnDom = $('<a class="comment-delete-btn"></a>')
         let thumbsUpDom = $('<div class="comment-thumbs-up"></div>')
+        let titleDom = $('<div class="comment-title-box">' + '좋아요' + '</div>')
         let likeCountsDom = $('<div class="comment-like-counts"></div>')
-        let commentIdDom = $('<input type="hidden" />')
+        let commentIdDom = $('<input type="hidden" class="comment-id"/>')
 
-        let updateBtn = $('<a>수정</a>')
-        let deleteBtn = $('<a>삭제</a>')
+        let updateBtn = $('<div>수정</div>')
+        let deleteBtn = $('<div>삭제</div>')
 
         //     < div
         // className = "comment-created-time"
@@ -725,7 +780,8 @@
 
         writerIdDom.html(responseData.memberDto.id);
         contentBoxDom.html(responseData.content);
-        likeCountsDom.html(responseData.likeCount);
+        likeCountsDom.html(responseData.likesCount);
+        titleDom.html('좋아요');
         commentIdDom.val(responseData.id);
 
         updateBtnDom.append(updateBtn);
@@ -734,7 +790,7 @@
         optionBtnDom.append(updateBtnDom, deleteBtnDom);
 
         centerBoxDom.append(writerIdDom, contentBoxDom);
-        likeBoxDom.append(thumbsUpDom, likeCountsDom, commentIdDom);
+        likeBoxDom.append(thumbsUpDom, titleDom, likeCountsDom, commentIdDom);
         btnDom.append(createdTimeDom, optionBtnDom);
 
         commentCardsDom.append(centerBoxDom, likeBoxDom, btnDom);
@@ -747,7 +803,7 @@
         //     </div>
         //     <div className="comment-like-box">
         //         <div className="comment-thumbs-up"></div>
-        //         <div className="comment-like-counts" th:text="${comment.likeCount}"></div>
+        //         <div className="comment-like-counts" th:text="${comment.likesCount}"></div>
         //         <input type="hidden" th:value="${comment.id}"/></div>
         //     <div className="comment-created-time" th:text="${#strings.substring(comment.createdTime, 0, 10)}"></div>
         // </div>
@@ -792,7 +848,7 @@
     })
 
     // 댓글 수정 이벤트
-    $('.comment-update-btn').on('click', function() {
+    $(document).on('click', '.comment-update-btn', function() {
         let eventDom = $(this);
         let commentCardDom = $(this).parent().parent().parent();
         let originContent = commentCardDom.find('div[class="comment-content-box"]').html();
@@ -801,16 +857,20 @@
         eventDom.remove();
 
         commentCardDom.find('div[class="comment-content-box"]').remove();
-        commentCardDom.children().first().append($('<textarea type="textarea" class="form-control comment-modify-area" name="content" onfocus="commentAreaToggle()">' + originContent + '</textarea>'))
+        commentCardDom.children().first().append($('<textarea type="textarea" class="form-control comment-modify-area" name="modifyContent" onfocus="commentAreaToggle()">' + originContent + '</textarea>'))
     })
 
+    // 댓글 수정 이벤트 2
     $(document).on('click', '#comment-update-btn', function() {
 
-
-        const url = '/review/comment'
+        const url = '/review/comment';
         let eventDom = $(this);
-        let modifyContent = $(this).parent().parent().parent().find('textarea[class="comment-modify-area"]').val()
+        let modifyContent = eventDom.parent().parent().parent().find('textarea').val();
         let commentId = $(this).parent().find('input[type="hidden"]').val();
+
+        console.log('eventDom : ', eventDom);
+        console.log("modifyContent : ", modifyContent);
+
         if (modifyContent === null || modifyContent === '') {
             alert('내용을 입력 해 주세요');
             return;
@@ -829,27 +889,132 @@
         })
             .then(result => {
                 if (result.status === 200) {
-                    alert(result.message);
                     return result.json();
                 }
                 console.log(result);
             })
             .then(data => {
-                eventDom.parent().parent().parent().find('textarea[class="comment-modify-area"]').remove();
+                alert(data.message);
+                $('.comment-modify-area').remove();
+                eventDom.parent().prepend($('<a class="comment-update-btn"><div>수정</div></a>'));
                 eventDom.parent().parent().parent().children().first().append($('<div class="comment-content-box">' + data.content + '</div>'))
+                eventDom.remove();
             })
     })
 
     // 댓글 삭제 이벤트
     $('.comment-delete-btn').on('click', function() {
 
-    })
-    // comment-modify-area focus out
-    function isGuest() {
-        const loginMember = [[${session.loginMember}]];
+        let agreeToDelete = confirm('댓글을 삭제 하시겠습니까?');
 
-        if (loginMember === null) {
+        if (!agreeToDelete) {
+            return;
+        }
+
+        const eventDom = $(this);
+        const url = '/review/comment'
+        let commentId = eventDom.parent().find('input[type="hidden"]').val();
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRF-Token' : token
+            },
+            body: JSON.stringify({
+                'id' : commentId
+            })
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                alert(data.message)
+                let commentId = data.id;
+                eventDom.parent().parent().parent().remove();
+            })
+    })
+
+
+    // 리뷰 좋아요 이벤트
+    $('.review-thumbs-up').on('click', function() {
+
+        let clickedElement = $(this);
+        let memberDto = [[${session.loginMember}]];
+
+        if (memberDto === null) {
             alert('로그인을 해주세요');
+            location.href = '/login';
+        }
+
+        let reviewId = $(this).parent().find('input[class="review-id"]').val()
+        console.log("reviewDto : ", reviewId);
+
+        const url = '/item/like';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRF-Token' : token
+            },
+            body: JSON.stringify({
+                'memberDto' : memberDto,
+                'reviewId' : reviewId
+            })
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                clickedElement.parent().find('div.like-counts').html(data.count);
+                clickedElement.parent().css('background-color', data.backgroundColor);
+            })
+    })
+
+    // 댓글 좋아요 이벤트
+    $(document).on('click', '.comment-thumbs-up', function() {
+
+        let clickedElement = $(this);
+        let commentId = clickedElement.parent().find('input.comment-id').val();
+        let memberDto = [[${session.loginMember}]];
+        const url = '/item/like'
+
+        fetch(url, {
+            method : 'POST',
+            headers : {
+                'Content-Type' : 'application/json',
+                'X-CSRF-Token' : token
+            },
+            body: JSON.stringify({
+                'memberDto' : memberDto,
+                'commentId' : commentId
+            })
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                clickedElement.next().next().html(data.count);
+                clickedElement.parent().css('background-color', data.backgroundColor);
+            })
+    })
+
+    window.onload = function() {
+        const url = window.location.href;
+        let reviewId;
+
+        if (url.includes("qna-container")) {
+            // let startIndex = url.indexOf('=')
+            // reviewId = url.slice(startIndex + 1);
+            let scrollTarget = document.getElementById('qna-container');
+            scrollTarget.scrollIntoView();
         }
     }
 </script>

@@ -17,6 +17,7 @@ import com.project.gream.domain.post.repository.ReviewRepository;
 import com.project.gream.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -57,28 +58,37 @@ public class ItemController {
     @GetMapping("/item/{itemId}")
     public ModelAndView toItemDetail(@PathVariable("itemId") Long itemId,
                                      @LoginMember MemberDto memberDto,
-                                     Pageable pageable) {
+                                     @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) @Qualifier("qna") Pageable qnaPageable,
+                                     @PageableDefault(page = 0, size = 2, sort = "id", direction = Sort.Direction.DESC) @Qualifier("review") Pageable reviewPageable) {
         log.info("------------------------------- 상품 디테일 페이지 진입");
 
         ModelAndView mav = new ModelAndView();
 
         List<CouponDto> couponList = discountService.getUsableCouponList(itemId);
-        List<ReviewDto> reviewList = postService.getReviewListByItemId(itemId);
         Map<Integer, Integer> starValMap = postService.getReviewScoreByItemId(itemId);
         ItemDto itemDto = itemService.getItemById(itemId);
         LikesResponseDto likes = postService.checkLike(itemId, memberDto);
-        Page<Post> qnaList = postService.getQnaListByItemId(itemId, pageable);
+        Page<ReviewDto> reviewList = postService.getReviewListByItemId(itemId, reviewPageable);
+        Page<Post> qnaList = postService.getQnaListByItemId(itemId, qnaPageable);
+
+        int reviewNowPage = reviewList.getPageable().getPageNumber() + 1;
+        int reviewStartPage = Math.max(reviewNowPage - 4, 1);
+        int reviewEndPage = Math.min(reviewNowPage + 9, reviewList.getTotalPages());
 
         int qnaNowPage = qnaList.getPageable().getPageNumber() + 1;
         int qnaStartPage = Math.max(qnaNowPage - 4, 1);
         int qnaEndPage = Math.min(qnaNowPage + 9, qnaList.getTotalPages());
 
-        log.info("reviewList.size : " + reviewList.size());
+        log.info("reviewList.size : " + reviewList.getSize());
         log.info("qnaList.size : " + qnaList.stream().count());
 
-        mav.addObject("nowPage", qnaNowPage);
-        mav.addObject("startPage", qnaStartPage);
-        mav.addObject("endPage", qnaEndPage);
+        mav.addObject("reviewNowPage", reviewNowPage);
+        mav.addObject("reviewStartPage", reviewStartPage);
+        mav.addObject("reviewEndPage", reviewEndPage);
+
+        mav.addObject("qnaNowPage", qnaNowPage);
+        mav.addObject("qnaStartPage", qnaStartPage);
+        mav.addObject("qnaEndPage", qnaEndPage);
 
         mav.addObject("qnaList", qnaList);
         mav.addObject("couponList", couponList);
