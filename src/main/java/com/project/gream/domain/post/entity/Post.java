@@ -30,6 +30,7 @@ public class Post extends BaseTimeEntity {
     @Column(name = "post_id")
     private Long id;
     private String title;
+    @Column(length = 500)
     private String content;
     private int hits;
     @Convert(converter = QnaTypeConverter.class)
