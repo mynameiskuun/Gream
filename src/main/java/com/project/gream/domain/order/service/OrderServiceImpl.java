@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
     @Value("${kakaopay.adminKey}")
     private String adminKey;
     private final String kakaoPayLocalUrl = "http://localhost:9999";
-    private final String kakaoPayRealUrl = "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com:8080";
+    private final String kakaoPayRealUrl = "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com";
     public static final String ePw = createKey(); // 회원가입 인증, 비밀번호 변경 등 기능 추가시 사용
     private final JavaMailSender emailSender;
     private final HttpSession session;
@@ -88,9 +88,9 @@ public class OrderServiceImpl implements OrderService {
         parameters.add("quantity", String.valueOf(request.getSize()));
         parameters.add("total_amount", String.valueOf(request.getFinalPaymentAmount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", kakaoPayLocalUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
-        parameters.add("cancel_url", kakaoPayLocalUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
-        parameters.add("fail_url", kakaoPayLocalUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
+        parameters.add("approval_url", kakaoPayRealUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
+        parameters.add("cancel_url", kakaoPayRealUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
+        parameters.add("fail_url", kakaoPayRealUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
 
         log.info("--------------------- 결제준비 parameters : " + parameters);
 
