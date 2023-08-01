@@ -10,6 +10,8 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
 
     boolean existsByItem_IdAndMember_Id(Long itemId, String memberId);
     boolean existsByReview_IdAndMember_Id(Long reviewId, String memberId);
+    boolean existsByComment_IdAndMember_Id(Long commentId, String memberId);
+    void deleteAllByComment_Id(Long commentId);
     Long countByItem_Id(long itemId);
     Long countByReview_Id(long reviewId);
     Long countByComment_Id(long commentId);

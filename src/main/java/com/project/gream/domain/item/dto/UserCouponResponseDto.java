@@ -5,13 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.project.gream.common.enumlist.CouponStatus;
-import com.project.gream.domain.item.entity.UserCoupon;
 import com.project.gream.domain.member.dto.MemberDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -52,4 +50,37 @@ public class UserCouponResponseDto {
 
     }
 
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class CouponApplyRequest {
+
+        private Long itemId;
+        private Long couponId;
+
+        @Builder
+        public CouponApplyRequest(Long itemId, Long couponId) {
+            this.itemId = itemId;
+            this.couponId = couponId;
+        }
+    }
+
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class CouponApplyResponse {
+
+        private int originPrice;
+        private int discountAmount;
+        private int afterDiscountPrice;
+        private String message;
+
+        @Builder
+        public CouponApplyResponse(int originPrice, int discountAmount, int afterDiscountPrice, String message) {
+            this.originPrice = originPrice;
+            this.discountAmount = discountAmount;
+            this.afterDiscountPrice = afterDiscountPrice;
+            this.message = message;
+        }
+    }
 }

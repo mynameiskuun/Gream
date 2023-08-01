@@ -3,9 +3,12 @@ package com.project.gream.domain.member.controller;
 import com.project.gream.domain.item.dto.CouponDto;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.repository.CouponRepository;
+import com.project.gream.domain.item.service.DiscountService;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.member.repository.MemberRepository;
+import com.project.gream.domain.order.dto.OrderHistoryDto;
+import com.project.gream.domain.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,12 +29,14 @@ import java.util.List;
 public class AdminPageController {
 
     private final ItemService itemService;
+    private final OrderService orderService;
+    private final DiscountService discountService;
 
     @GetMapping("/main")
     public ModelAndView toAdmin() {
         ModelAndView mav = new ModelAndView();
-        List<ItemDto> itemList = itemService.selectAllItems();
-        mav.addObject("itemList", itemList);
+        List<OrderHistoryDto> orderHistoryList = orderService.findTop5OrderByCreatedTimeDesc();
+        mav.addObject("orderHistoryList", orderHistoryList);
         mav.setViewName("member/mypage/admin/admin-main");
         return mav;
     }
@@ -77,7 +82,7 @@ public class AdminPageController {
     @GetMapping("/coupon")
     public ModelAndView toCouponManage(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<CouponDto> couponList = itemService.getCouponList(pageable);
+        Page<CouponDto> couponList = discountService.getCouponList(pageable);
         ModelAndView mav = new ModelAndView();
         int nowPage = couponList.getPageable().getPageNumber() + 1;
         int startPage =  Math.max(nowPage - 4, 1);
@@ -104,7 +109,7 @@ public class AdminPageController {
     @DeleteMapping("/coupon/{couponId}")
     public String deleteCoupon(@PathVariable Long couponId) {
         log.info("couponId : " + couponId);
-        return itemService.deleteCoupon(couponId);
+        return discountService.deleteCoupon(couponId);
     }
 
 }

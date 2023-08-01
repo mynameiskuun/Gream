@@ -32,15 +32,19 @@ public class Review extends BaseTimeEntity {
     private String content;
     @Column(name = "review_thumbnail")
     private String thumbnail;
+//    @Column(nullable = false)
+//    private Long likesCount;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
     @Builder
-    public Review(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore, String content, String thumbnail, Member member, Item item) {
+    public Review(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore,
+                  String content, String thumbnail, Long likesCount, Member member, Item item) {
         this.id = id;
         this.starValue = starValue;
         this.priceScore = priceScore;
@@ -49,7 +53,15 @@ public class Review extends BaseTimeEntity {
         this.repurchaseScore = repurchaseScore;
         this.content = content;
         this.thumbnail = thumbnail;
+//        this.likesCount = likesCount;
         this.member = member;
         this.item = item;
     }
+
+    public void setThumbnail(String path) {
+        this.thumbnail = path;
+    }
+//    public void setLikesCount(int LikesCount) {
+//        this.likesCount += 1;
+//    }
 }

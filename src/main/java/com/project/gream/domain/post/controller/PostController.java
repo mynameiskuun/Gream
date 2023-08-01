@@ -8,22 +8,24 @@ import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.dto.*;
-import com.project.gream.domain.post.entity.Post;
 import com.project.gream.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 @Slf4j
@@ -34,21 +36,24 @@ public class PostController {
     private final PostService postService;
     private final S3Config s3Config;
     private final ItemService itemService;
+
     @PostMapping("/review")
-    public String saveReview(@RequestPart("reviewDto") ReviewDto reviewDto,
+    public ResponseEntity<String> saveReview(@RequestPart("reviewDto") ReviewDto reviewDto,
                              @RequestPart("imgFiles") List<MultipartFile> imgFiles) throws Exception {
 
         log.info("------------------------ review data 전송 완료.");
 
         List<String> imgPaths = s3Config.imgUpload(reviewDto.getClass(), imgFiles);
-        postService.saveReview(reviewDto, imgPaths);
+        PostResponseDto response = postService.saveReview(reviewDto, imgPaths);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        return "";
+        return new ResponseEntity(response, header, HttpStatus.OK);
     }
 
     @PostMapping("/item/like")
-    public LikesResponseDto itemLike(@RequestBody LikesVO likesVO) {
-        return postService.saveOrDeleteItemLike(likesVO);
+    public LikesResponseDto itemLike(@RequestBody LikesDto.Request request) {
+        return postService.saveOrDeleteItemLike(request);
     }
 
     @GetMapping("/post/notice")
@@ -75,18 +80,24 @@ public class PostController {
     }
 
     @PostMapping("/post/notice/search")
-    public String searchPosts(@RequestBody PostRequestDto postRequestDto) {
-
+    public ModelAndView searchPosts(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                    PostRequestDto postRequestDto) {
         log.info("-------------------- 게시글 검색 start");
-        log.info("period : " + postRequestDto.getSearchPeriod());
-        log.info("target : " + postRequestDto.getSearchTarget());
-        log.info("keywords : " + postRequestDto.getSearchKeyWords());
 
-        if (postRequestDto.getSearchPeriod() == null || postRequestDto.getSearchTarget() == null) {
+        ModelAndView mav = new ModelAndView();
+        Page<PostDto> searchResults = postService.searchNoticeByCondition(postRequestDto, pageable);
 
-            return "둘 중 하나 null";
-        }
-        return "성공";
+        int nowPage = searchResults.getPageable().getPageNumber() + 1;
+        int startPage = Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, searchResults.getTotalPages());
+
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
+        mav.addObject("noticeList", searchResults);
+        mav.setViewName("post/post-notice");
+
+        return mav;
     }
 
     @GetMapping("/post/notice/write")
@@ -123,7 +134,7 @@ public class PostController {
     public ModelAndView toNoticeModify(@PathVariable Long noticeId, @LoginMember MemberDto memberDto) {
         ModelAndView mav = new ModelAndView();
         if (memberDto.getRole() != Role.ADMIN) {
-            mav.setViewName("/main/mainpage");
+            mav.setViewName("main/mainpage");
             return mav;
         }
         PostResponseDto response = postService.getNoticeDetail(noticeId);
@@ -134,13 +145,13 @@ public class PostController {
     }
 
     @DeleteMapping("/post/notice/{noticeId}")
-    public String deleteNotice(@PathVariable Long noticeId, @AuthenticationPrincipal CustomUserDetails user) {
+    public String deleteNotice(@PathVariable("noticeId") Long noticeId, @AuthenticationPrincipal CustomUserDetails user) {
 
         return postService.deleteNotice(noticeId, user);
     }
 
     @GetMapping("/item/{itemId}/inquiries/form")
-    public ModelAndView toQnaWrite(@PathVariable Long itemId) {
+    public ModelAndView toQnaWrite(@PathVariable("itemId") Long itemId) {
         ModelAndView mav = new ModelAndView();
         ItemDto itemDto = itemService.getItemById(itemId);
 
@@ -150,18 +161,42 @@ public class PostController {
     }
 
     @PostMapping("/post/qna")
-    public String saveQna(@RequestPart("qnaRequestDto") PostRequestDto.QnaRequestDto postQnaDto,
-                          @RequestPart("qnaImgs") List<MultipartFile> qnaImgs,
-                          @LoginMember MemberDto memberDto) throws Exception {
+    public ResponseEntity<PostResponseDto> saveQna(@RequestPart("qnaRequestDto") PostRequestDto.QnaRequestDto postQnaDto,
+                                                                @RequestPart("qnaImgs") List<MultipartFile> qnaImgs,
+                                                                @LoginMember MemberDto memberDto) throws Exception {
 
         log.info("------------------------ saveQna request start");
+        PostResponseDto response = postService.saveQna(postQnaDto, qnaImgs, memberDto);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        return postService.saveQna(postQnaDto, qnaImgs, memberDto);
+        return new ResponseEntity(response, header, HttpStatus.OK);
     }
 
-//    @GetMapping("/item/inquiries/{qnaId}")
-//    public PostResponseDto getQnaDetail(@PathVariable("qnaId") Long qnaId) {
-//
-//        return postService.getQnaDetail(qnaId);
-//    }
+    @PostMapping("/review/comment")
+    public ResponseEntity<CommentDto.Response> saveReviewComment(@RequestBody CommentDto.Request request) {
+        CommentDto.Response response = postService.saveReviewComment(request);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        return new ResponseEntity(response, header, HttpStatus.OK);
+    }
+
+    @PatchMapping("/review/comment")
+    public ResponseEntity<CommentDto.Response> updateReviewComment(@RequestBody CommentDto.Request request) {
+
+        CommentDto.Response response = postService.updateComment(request);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        return new ResponseEntity<>(response, header, HttpStatus.OK);
+        // 수정하기
+    }
+
+    @DeleteMapping("/review/comment")
+    public ResponseEntity<CommentDto.Response> deleteReviewComment(@RequestBody CommentDto.Request request) {
+
+        CommentDto.Response response = postService.deleteComment(request);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        return new ResponseEntity<>(response, header, HttpStatus.OK);
+    }
 }

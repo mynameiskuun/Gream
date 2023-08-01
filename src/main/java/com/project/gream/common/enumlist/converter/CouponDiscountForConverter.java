@@ -16,7 +16,7 @@ public class CouponDiscountForConverter implements AttributeConverter<List<Strin
             return attribute.get(0);
         }
 
-        return String.join(",", attribute);
+        return String.join(", ", attribute);
     }
 
     @Override
@@ -25,12 +25,12 @@ public class CouponDiscountForConverter implements AttributeConverter<List<Strin
             return null;
         }
 
-        if (!dbData.contains(",")) {
+        if (!dbData.contains(", ")) {
             List<String> attribute = new ArrayList<>();
             attribute.add(dbData);
             return attribute;
         } else {
-            String[] array = dbData.split(",");
+            String[] array = dbData.split(", ");
             return new ArrayList<>(Arrays.asList(array));
         }
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.project.gream.common.enumlist.OrderState;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.order.entity.OrderItem;
 import lombok.Builder;
@@ -22,7 +23,7 @@ public class OrderItemDto {
     private Long id;
     private int quantity;
     private int totalPrice;
-    private String state;
+    private OrderState state;
     private ItemDto itemDto;
     private OrderHistoryDto orderHistoryDto;
 
@@ -36,7 +37,7 @@ public class OrderItemDto {
     private LocalDateTime modifiedTime;
 
     @Builder
-    public OrderItemDto(Long id, int quantity, int totalPrice, String state, ItemDto itemDto,
+    public OrderItemDto(Long id, int quantity, int totalPrice, OrderState state, ItemDto itemDto,
                         OrderHistoryDto orderHistoryDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.quantity = quantity;

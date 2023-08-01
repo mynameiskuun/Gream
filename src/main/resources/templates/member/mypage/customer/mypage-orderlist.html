@@ -36,6 +36,7 @@
                 <section id="main-header">
                     <div class="orderlist-header">
                         <h3>주문목록</h3>
+                        배송 완료 혹은 주문 확정 단계 이후 리뷰 작성이 가능합니다.
                     </div>
                     <div class="main-header-upper">
                         <div class="main-header-btn">
@@ -55,6 +56,10 @@
                                 <a class="text-secondary sort-btn">구매 확정</a>
                                 <input type="hidden" value="CONFIRMED"/>
                             </div>
+                            <div class="order-status-btn">
+                                <a class="text-secondary sort-btn">리뷰 작성 완료</a>
+                                <input type="hidden" value="REVIEWED"/>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -73,9 +78,9 @@
                             <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
                                 <th scope="row">
                                     <div class="item-information">
-                                        <div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div>
+                                        <a th:href="@{/item/{id}(id=${orderItemList.itemDto.id})}"><div class="order-item-image" th:style="'background-image: url('+ ${orderItemList.itemDto.thumbnailUrl} + ');'"></div></a>
                                         <div class="order-item-detail">
-                                            <div class="item-name" th:text="${orderItemList.itemDto.name}"></div>
+                                            <a th:href="@{/item/{id}(id=${orderItemList.itemDto.id})}"><div class="item-name" th:text="${orderItemList.itemDto.name}"></div></a>
                                         </div>
                                     </div>
                                 </th>
@@ -87,15 +92,15 @@
                                     <div th:text="${orderItemList.quantity + ' 개'}"></div>
                                 </td>
                                 <td>
-                                    <div th:text="${orderItemList.state}"></div>
+                                    <div th:text="${orderItemList.state.value}"></div>
                                 </td>
                                 <td>
-                                    <div th:if="${orderItemList.state.equals('배송 완료') || orderItemList.state.equals('구매 확정')}"><a class="reviewBtn btn-secondary button" th:href="@{/review/{orderItemId}(orderItemId=${orderItemList.id})}">리뷰 작성</a></div>
+                                    <div th:if="${orderItemList.state.value.equals('배송 완료') || orderItemList.state.value.equals('구매 확정')}"><a class="reviewBtn btn-secondary button" th:href="@{/review/{orderItemId}(orderItemId=${orderItemList.id})}">리뷰 작성</a></div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                        <div id="paging-btn-box">
+                        <div id="paging-btn-box" th:if="${!orderItemList.isEmpty()}">
                             <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
                                 <a th:if="${page != nowPage}" th:href="@{/orderlist/{memberId}(memberId=${session.loginMember.id}, page=${page - 1})}" th:text="${page}"></a>
                                 <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
@@ -144,7 +149,7 @@
     function createRows(sortedItem) {
 
         console.log('------------ createRows function start')
-
+        console.log("sortedItem : ", sortedItem)
         // var row = $('<tr class="purchased-item-rows"></tr>');
         var row = $('<tr class="purchased-item-rows"></tr>');
         var th = $('<th></th>').attr('scope', 'row');
@@ -177,18 +182,37 @@
         row.append(td2);
 
         var td3 = $('<td></td>');
-        var stateDiv = $('<div></div>').html(sortedItem.state);
+        var stateDiv = $('<div></div>').html(getEnumValueFromName(sortedItem));
         td3.append(stateDiv);
         row.append(td3);
 
         var td4 = $('<td></td>');
-        if (sortedItem.state === '배송 완료' || sortedItem.state === '구매 확정') {
+        if (sortedItem.state === 'ARRIVED' || sortedItem.state === 'CONFIRMED') {
             var anchor = $('<a></a>').addClass('reviewBtn btn-secondary button').attr('href', '/review/' + sortedItem.id).text('리뷰 작성');
             td4.append(anchor);
         }
         row.append(td4);
 
         return row;
+    }
+
+    function getEnumValueFromName(sortedItem) {
+        if (sortedItem.state === 'PREPARE') {
+            return '배송 준비중';
+        }
+        if (sortedItem.state === 'ONPROGRESS') {
+            return '배송중';
+        }
+        if (sortedItem.state === 'ARRIVED') {
+            return '배송 완료';
+        }
+        if (sortedItem.state === 'CONFIRMED') {
+            return '구매 확정';
+        }
+        if (sortedItem.state === 'REVIEWED') {
+            return '리뷰 작성 완료';
+        }
+
     }
 </script>
 </div>

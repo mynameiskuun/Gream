@@ -3,6 +3,7 @@ package com.project.gream.domain.item.service;
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.Category;
+import com.project.gream.common.enumlist.CouponStatus;
 import com.project.gream.common.enumlist.Gender;
 import com.project.gream.common.util.EnumValueUtil;
 import com.project.gream.domain.item.dto.*;
@@ -18,8 +19,10 @@ import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.member.repository.MemberRepository;
 import com.project.gream.domain.order.dto.KakaoPayDto;
+import com.project.gream.domain.order.dto.OrderHistoryDto;
 import com.project.gream.domain.order.dto.OrderRequestDto;
 import com.project.gream.domain.order.entity.OrderHistory;
+import com.project.gream.domain.order.repository.OrderHistoryRepository;
 import com.project.gream.domain.post.entity.QLikes;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -34,6 +37,11 @@ import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.project.gream.domain.order.entity.QOrderHistory.orderHistory;
+import static com.project.gream.domain.item.entity.QUserCoupon.userCoupon;
+import static com.project.gream.domain.item.entity.QCoupon.coupon;
+import static com.project.gream.domain.member.entity.QMember.member;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -44,9 +52,6 @@ public class ItemServiceImpl implements ItemService{
     private final ItemRepository itemRepository;
     private final ImgRepository imgRepository;
     private final CartItemRepository cartItemRepository;
-    private final CouponRepository couponRepository;
-    private final MemberRepository memberRepository;
-    private final UserCouponRepository userCouponRepository;
     private final EntityManager em;
 
     @Override
@@ -55,14 +60,30 @@ public class ItemServiceImpl implements ItemService{
                 .map(ItemDto::fromEntity).collect(Collectors.toList());
     }
     @Override
-    public List<ItemDto> selectMenItems() {
-        return itemRepository.findByGender(Gender.MAN).stream()
-                .map(ItemDto::fromEntity).collect(Collectors.toList());
+    public Page<ItemDto> selectMenItems(Pageable pageable) {
+        return itemRepository.findByGender(Gender.MAN, pageable).map(item -> ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .price(item.getPrice())
+                .detail(item.getDetail())
+                .itemStock(item.getItemStock())
+                .thumbnailUrl(item.getThumbnailUrl())
+                .category(item.getCategory())
+                .gender(item.getGender())
+                .build());
     }
     @Override
-    public List<ItemDto> selectWomenItems() {
-        return itemRepository.findByGender(Gender.WOMAN).stream()
-                .map(ItemDto::fromEntity).collect(Collectors.toList());
+    public Page<ItemDto> selectWomenItems(Pageable pageable) {
+        return itemRepository.findByGender(Gender.WOMAN, pageable).map(item -> ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .price(item.getPrice())
+                .detail(item.getDetail())
+                .itemStock(item.getItemStock())
+                .thumbnailUrl(item.getThumbnailUrl())
+                .category(item.getCategory())
+                .gender(item.getGender())
+                .build());
     }
 
     @Override
@@ -76,7 +97,7 @@ public class ItemServiceImpl implements ItemService{
 //                .get();
 
         if (sortBy.equals("ALL")) {
-            return itemRepository.findByGender(Gender.MAN).stream()
+            return itemRepository.getByGender(Gender.MAN).stream()
                     .map(ItemDto::fromEntity)
                     .collect(Collectors.toList());
         }
@@ -87,15 +108,15 @@ public class ItemServiceImpl implements ItemService{
                 .map(ItemDto::fromEntity)
                 .collect(Collectors.toList());
     }
-    @Override
-    public ItemDto selectItemById(Long itemId) {
-        return ItemDto.fromEntity(itemRepository.findById(itemId).orElseThrow());
-    }
+//    @Override
+//    public ItemDto selectItemById(Long itemId) {
+//        return ItemDto.fromEntity(itemRepository.findById(itemId).orElseThrow());
+//    }
 
-    @Override
-    public void deleteItem(Long itemId) {
-        itemRepository.deleteById(itemId);
-    }
+//    @Override
+//    public void deleteItem(Long itemId) {
+//        itemRepository.deleteById(itemId);
+//    }
 
     @Transactional
     @Override
@@ -123,20 +144,20 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public List<ImgDto> getImgsByItemId(Long itemId) {
-        return imgRepository.findItemImgs(itemId).stream()
-                .map(ImgDto::fromEntityForItem).collect(Collectors.toList());
-    }
+//    public List<ImgDto> getImgsByItemId(Long itemId) {
+//        return imgRepository.findItemImgs(itemId).stream()
+//                .map(ImgDto::fromEntityForItem).collect(Collectors.toList());
+//    }
 
     public ItemDto getItemById(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow();
         return ItemDto.fromEntity(item);
     }
 
-    @Override
-    public void deleteImg(Long imgId) {
-
-    }
+//    @Override
+//    public void deleteImg(Long imgId) {
+//
+//    }
 
     @Transactional
     @Override
@@ -252,7 +273,8 @@ public class ItemServiceImpl implements ItemService{
         return queryFactory
                 .select(likes.item.id)
                 .from(likes)
-                .where(likes.member.id.eq(memberId))
+                .where(likes.member.id.eq(memberId),
+                        likes.item.id.isNotNull())
                 .fetch();
     }
 
@@ -268,11 +290,18 @@ public class ItemServiceImpl implements ItemService{
     }
 
     @Override
-    public List<ItemDto> getLikedItemListByMemberId(String memberId) {
+    public Page<ItemDto> getLikedItemListByMemberId(String memberId, Pageable pageable) {
 
-        return itemRepository.findAllById(this.getLikedItemIds(memberId)).stream()
-                .map(ItemDto::fromEntity)
-                .collect(Collectors.toList());
+        return itemRepository.findAllByIdIn(this.getLikedItemIds(memberId), pageable).map(item -> ItemDto.builder()
+                        .id(item.getId())
+                        .category(item.getCategory())
+                        .gender(item.getGender())
+                        .name(item.getName())
+                        .price(item.getPrice())
+                        .detail(item.getDetail())
+                        .itemStock(item.getItemStock())
+                        .thumbnailUrl(item.getThumbnailUrl())
+                        .build());
     }
 
     @Override
@@ -280,113 +309,4 @@ public class ItemServiceImpl implements ItemService{
         Item item = itemRepository.findById(requestDto.getItemDto().getId()).orElseThrow();
         return item.getItemStock() > 0;
     }
-
-    @Override
-    public String createCoupon(CouponRequestDto requestDto) {
-        log.info("-------------------------- 쿠폰 생성");
-
-        String discountFor = String.join(",", requestDto.getDiscountFor());
-        try {
-            Coupon coupon = Coupon.builder()
-                    .type(requestDto.getType())
-                    .name(requestDto.getName())
-                    .discountRate(requestDto.getDiscountRate())
-                    .expireDate(requestDto.getExpireDate())
-                    .stock(requestDto.getStock())
-                    .minOrderPrice(requestDto.getMinOrderPrice())
-                    .discountFor(discountFor)
-                    .build();
-            couponRepository.save(coupon);
-            return "success";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "fail";
-        }
-    }
-
-    @Override
-    public Page<CouponDto> getCouponList(Pageable pageable) {
-        return couponRepository.findAll(pageable).map(Coupon -> CouponDto.builder()
-                .id(Coupon.getId())
-                .type(Coupon.getType())
-                .name(Coupon.getName())
-                .discountRate(Coupon.getDiscountRate())
-                .expireDate(Coupon.getExpireDate())
-                .stock(Coupon.getStock())
-                .minOrderPrice(Coupon.getMinOrderPrice())
-                .discountFor(Coupon.getDiscountFor())
-                .createdTime(Coupon.getCreatedTime())
-                .modifiedTime(Coupon.getModifiedTime())
-                .build());
-    }
-
-    @Override
-    public String deleteCoupon(Long couponId) {
-        try {
-            couponRepository.deleteById(couponId);
-        } catch(Exception e) {
-            e.printStackTrace();
-            return "오류 발생";
-        }
-        return "쿠폰 삭제 완료.";
-    }
-
-    @Override
-    public List<CouponDto> getUsableCouponList(Long itemId) {
-        Item item = itemRepository.findById(itemId).orElseThrow();
-        return couponRepository.findCouponsByDiscountForContaining(String.valueOf(item.getCategory())).stream()
-                .map(CouponDto::fromEntity)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public String saveUsableCoupon(CouponRequestDto requestDto) {
-
-        Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow();
-        String memberId = member.getId();
-        List<Long> couponIdList = requestDto.getCouponIdList();
-
-        if (memberId == null || couponIdList == null) {
-            return "쿠폰 저장에 실패했습니다.";
-        }
-
-        List<Coupon> couponList = requestDto.getCouponIdList().stream()
-                .filter(couponId -> !userCouponRepository.existsByMember_IdAndCouponId(memberId,couponId))
-                .map(couponRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-        for (Coupon coupon : couponList) {
-            UserCoupon userCoupon = UserCoupon.builder()
-                    .coupon(coupon)
-                    .member(member)
-                    .build();
-            log.info(String.valueOf(userCoupon.getCoupon().getId()));
-            userCouponRepository.save(userCoupon);
-        }
-
-        return "쿠폰 저장 완료(사용완료, 수령완료 쿠폰 제외)";
-    }
-
-    @Override
-    public List<UserCouponResponseDto> getMemberCoupon(Member member) {
-
-        List<UserCoupon> couponList = userCouponRepository.getByMember_Id(member.getId());
-        return couponList.stream()
-                .map(UserCouponVO::fromEntity)
-                .map(UserCouponResponseDto::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<UserCouponResponseDto> getMemberCouponForMypage(String memberId) {
-
-        return userCouponRepository.getTop4ByMember_IdOrderByCreatedTimeAsc(memberId).stream()
-                .map(UserCouponVO::fromEntity)
-                .map(UserCouponResponseDto::new)
-                .collect(Collectors.toList());
-    }
-
-
 }

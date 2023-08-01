@@ -4,10 +4,12 @@ import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.domain.item.dto.CouponDto;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.dto.UserCouponResponseDto;
+import com.project.gream.domain.item.service.DiscountService;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.Member;
+import com.project.gream.domain.member.service.MemberService;
 import com.project.gream.domain.order.dto.OrderItemDto;
 import com.project.gream.domain.order.entity.OrderItem;
 import com.project.gream.domain.order.repository.OrderItemRepository;
@@ -20,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,12 +39,14 @@ public class MemberPageController {
     private final OrderService orderService;
     private final PostService postService;
     private final OrderItemRepository orderItemRepository;
+    private final MemberService memberService;
+    private final DiscountService discountService;
 
     @GetMapping("/mypage/{memberId}")
     public ModelAndView toBuyer(@PathVariable("memberId") String memberId) {
         List<OrderItemDto> userOrderItemList = orderService.findOrderItemForMypage(memberId);
         List<ItemDto> userLikeItems = itemService.getLikedItemListForMypage(itemService.getLikedItemIds(memberId));
-        List<UserCouponResponseDto> userCouponList = itemService.getMemberCouponForMypage(memberId);
+        List<UserCouponResponseDto> userCouponList = discountService.getMemberCouponForMypage(memberId);
         List<PostDto> userQnaList = postService.getQnaListForMyPage(memberId);
 
         ModelAndView mav = new ModelAndView();
@@ -71,10 +77,18 @@ public class MemberPageController {
     }
 
     @GetMapping("/like/{memberId}")
-    public ModelAndView toMemberLikeList(@PathVariable("memberId") String memberId) {
+    public ModelAndView toMemberLikeList(@PathVariable("memberId") String memberId,
+                                         @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         ModelAndView mav = new ModelAndView();
 
-        List<ItemDto> likedItemList = itemService.getLikedItemListByMemberId(memberId);
+        Page<ItemDto> likedItemList = itemService.getLikedItemListByMemberId(memberId, pageable);
+        int nowPage = likedItemList.getPageable().getPageNumber() + 1;
+        int startPage = Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, likedItemList.getTotalPages());
+
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
         mav.addObject("likedItemList", likedItemList);
         mav.setViewName("member/mypage/customer/mypage-like-list");
         return mav;
@@ -185,11 +199,26 @@ public class MemberPageController {
 
         log.info("------------------------------ 유저가 가지고 있는 쿠폰 조회");
         ModelAndView mav = new ModelAndView();
-        List<UserCouponResponseDto> userCouponList = itemService.getMemberCoupon(memberDto.toEntity());
+        List<UserCouponResponseDto> userCouponList = discountService.getMemberCoupon(memberDto.toEntity());
 
         log.info("userCouponList : " + userCouponList);
         mav.addObject("userCouponList", userCouponList);
-        mav.setViewName("/member/mypage/customer/mypage-customer-coupon");
+        mav.setViewName("member/mypage/customer/mypage-customer-coupon");
+        return mav;
+    }
+
+    @GetMapping("/member/{memberId}/information/edit")
+    public ModelAndView toMemberInformation(@LoginMember MemberDto memberDto) {
+        ModelAndView mav = new ModelAndView();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authClass = String.valueOf(authentication.getClass());
+        boolean isOauthLogin = authClass.contains("OAuth2AuthenticationToken");
+
+        log.info("isOauthLogin : " + isOauthLogin);
+        mav.addObject("isOauthLogin", isOauthLogin);
+        mav.addObject("loginMember", memberDto);
+        mav.setViewName("member/mypage/customer/mypage-information-edit");
         return mav;
     }
 }

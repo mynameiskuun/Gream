@@ -22,7 +22,7 @@
               <th scope="col">발급일</th>
               <th scope="col">유효 기간</th>
               <th scope="col">사용 여부</th>
-              <th scope="col"></th>
+<!--              <th scope="col"></th>-->
             </tr>
           </thead>
           <tbody>
@@ -33,7 +33,7 @@
               <td th:text="${#strings.substring(coupon.couponDto.createdTime, 0, 10)}"></td>
               <td th:text="${#strings.substring(coupon.couponDto.expireDate, 0, 10)}"></td>
               <td th:text="${coupon.status.value}"></td>
-              <td th:href="@{/}">사용 가능 품목 보기</td>
+<!--              <td th:href="@{/}">사용 가능 품목 보기</td>-->
             </tr>
           </tbody>
         </table>

@@ -27,6 +27,18 @@
             background-position: center;
             cursor: pointer;
         }
+        #paging-btn-box {
+            display: flex;
+            margin: 0 auto;
+        }
+        #paging-btn-box div {
+            display: flex;
+            width: 30px;
+            height: 30px;
+            border: 1px solid lightGray;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -38,10 +50,10 @@
                     <h3>좋아요 한 상품</h3>
                 </div>
                 <div class="mypage-likelist-body row row-cols-1 row-cols-md-3 g-4">
-                    <th:block th:if="${likedItemList.size() == 0}">
+                    <th:block th:if="${likedItemList.getSize() == 0}">
                         <h5>좋아요 한 상품이 없습니다</h5>
                     </th:block>
-                    <th:block th:unless="${likedItemList.size() == 0}">
+                    <th:block th:unless="${likedItemList.getSize() == 0}">
                         <div class="like-item-card" th:each="likeItems : ${likedItemList}">
                             <a th:href="@{/item/{id}(id=${likeItems.id})}"><div class="like-item-img-box" th:style="'background-image: url('+ ${likeItems.thumbnailUrl} + ');'"></div></a>
                             <div class="like-item-detail">
@@ -50,6 +62,14 @@
                             </div>
                         </div>
                     </th:block>
+                </div>
+                <div id="mypage-likelist-footer">
+                    <div id="paging-btn-box" th:if="${!likedItemList.isEmpty()}">
+                        <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
+                            <a th:if="${page != nowPage}" th:href="@{/like/{memberId}(memberId=${session.loginMember.id}, page=${page - 1})}" th:text="${page}"></a>
+                            <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

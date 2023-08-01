@@ -7,12 +7,9 @@ import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.dto.*;
 import com.project.gream.domain.post.entity.Likes;
 import com.project.gream.domain.post.entity.Post;
-import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -20,17 +17,16 @@ import java.util.Map;
 
 public interface PostService {
 
-    void saveReview(ReviewDto reviewDto, List<String> imgPaths);
+    PostResponseDto saveReview(ReviewDto reviewDto, List<String> imgPaths);
     Map<Integer, Integer> getReviewScoreByItemId(Long itemId);
-    List<ReviewDto> getReviewListByItemId(Long itemId);
-    Likes isAlreadyLiked(LikesVO likesVO);
-    LikesResponseDto saveOrDeleteItemLike(LikesVO likesVO);
+    Page<ReviewDto> getReviewListByItemId(Long itemId, Pageable pageable);
+    LikesResponseDto saveOrDeleteItemLike(LikesDto.Request request);
     LikesResponseDto checkLike(Long itemId, @LoginMember MemberDto memberDto);
     Page<PostDto> getAllNoticePosts(Pageable pageable);
     String saveNotice(PostRequestDto requestDto, List<MultipartFile> noticeImgs, MemberDto memberDto) throws Exception;
     PostResponseDto getNoticeDetail(Long noticeId);
     String deleteNotice(Long noticeId, CustomUserDetails user);
-    String saveQna(PostRequestDto.QnaRequestDto postQnaDto,
+    PostResponseDto saveQna(PostRequestDto.QnaRequestDto postQnaDto,
                    List<MultipartFile> qnaImgs,
                    @LoginMember MemberDto memberDto) throws Exception;
 
@@ -41,4 +37,13 @@ public interface PostService {
     Page<Post> getQnaListByMemberId(String memberId, PostType postType, Pageable pageable);
 
     List<PostDto> getQnaListForMyPage(String memberId);
+
+    Page<PostDto> searchNoticeByCondition(PostRequestDto requestDto, Pageable pageable);
+
+    CommentDto.Response saveReviewComment(CommentDto.Request request);
+
+    CommentDto.Response updateComment(CommentDto.Request request);
+
+    @Transactional
+    CommentDto.Response deleteComment(CommentDto.Request request);
 }

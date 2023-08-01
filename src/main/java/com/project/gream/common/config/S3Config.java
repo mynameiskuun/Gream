@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,6 +51,10 @@ public class S3Config {
     public <T> List<String> imgUpload(Class<T> dto, List<MultipartFile> multipartFiles) throws Exception {
 
         log.info("------------------------------- S3 이미지 업로드");
+
+        if (multipartFiles.get(0).getOriginalFilename().equals("")) {
+            return Collections.emptyList();
+        }
 
         List<String> imgUrlList = new ArrayList<>();
 

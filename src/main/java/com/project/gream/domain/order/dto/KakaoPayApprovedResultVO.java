@@ -24,7 +24,7 @@ public class KakaoPayApprovedResultVO {
 
     @Getter
     @Setter
-    public class Amount {
+    public static class Amount {
 
         private int total;
         private int tax_free;

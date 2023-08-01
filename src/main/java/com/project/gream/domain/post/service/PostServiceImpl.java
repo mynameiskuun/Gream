@@ -3,9 +3,7 @@ package com.project.gream.domain.post.service;
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.auth.dto.CustomUserDetails;
 import com.project.gream.common.config.S3Config;
-import com.project.gream.common.enumlist.PostType;
-import com.project.gream.common.enumlist.QnaType;
-import com.project.gream.common.enumlist.Role;
+import com.project.gream.common.enumlist.*;
 import com.project.gream.common.util.StringToEnumUtil;
 import com.project.gream.domain.item.entity.Img;
 import com.project.gream.domain.item.entity.Item;
@@ -14,30 +12,44 @@ import com.project.gream.domain.item.repository.ItemRepository;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.member.repository.MemberRepository;
+import com.project.gream.domain.order.entity.OrderItem;
+import com.project.gream.domain.order.repository.OrderItemRepository;
 import com.project.gream.domain.post.dto.*;
+import com.project.gream.domain.post.entity.Comment;
 import com.project.gream.domain.post.entity.Likes;
 import com.project.gream.domain.post.entity.Post;
 import com.project.gream.domain.post.entity.Review;
+import com.project.gream.domain.post.repository.CommentRepository;
 import com.project.gream.domain.post.repository.LikesRepository;
 import com.project.gream.domain.post.repository.PostRepository;
 import com.project.gream.domain.post.repository.ReviewRepository;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.StringUtils;
 
-import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.project.gream.domain.post.entity.QLikes.likes;
 import static com.project.gream.domain.post.entity.QPost.post;
+import static com.project.gream.domain.order.entity.QOrderItem.orderItem;
+import static com.project.gream.domain.item.entity.QItem.item;
+import static com.project.gream.domain.post.entity.QReview.review;
+import static com.project.gream.domain.post.entity.QComment.comment;
+
+
 
 
 @Slf4j
@@ -51,27 +63,44 @@ public class PostServiceImpl implements PostService{
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
-    private final EntityManager em;
+    private final JPAQueryFactory queryFactory;
+    private final CommentRepository commentRepository;
+    private final OrderItemRepository orderItemRepository;
     private final S3Config s3Config;
 
     @Transactional
     @Override
-    public void saveReview(ReviewDto reviewDto, List<String> imgPaths) {
+    public PostResponseDto saveReview(ReviewDto reviewDto, List<String> imgPaths) {
 
         log.info("---------------------------- 리뷰 및 리뷰 이미지 DB 저장");
 
+        Member member = reviewDto.toEntity().getMember();
+        Review review = reviewRepository.save(reviewDto.toEntity());
+
         if(!imgPaths.isEmpty()) {
-            reviewDto.setThumbnail(imgPaths.get(0));
+            review.setThumbnail(imgPaths.get(0));
+            for(String imgPath : imgPaths) {
+                imgRepository.save(Img.builder()
+                        .url(imgPath)
+                        .item(review.getItem())
+                        .review(review)
+                        .build());
+            }
+            member.addPoint(2000);
         }
 
-        Review review = reviewRepository.save(reviewDto.toEntity());
-        for(String imgPath : imgPaths) {
-            imgRepository.save(Img.builder()
-                    .url(imgPath)
-                    .item(review.getItem())
-                    .review(review)
-                    .build());
-        }
+        OrderItem orderedItem = queryFactory.selectFrom(orderItem)
+                .where(orderItem.id.eq(reviewDto.getOrderItemId()),
+                        orderItem.orderHistory.member.eq(member))
+                .fetchOne();
+        orderedItem.updateState(OrderState.REVIEWED);
+        orderItemRepository.save(orderedItem);
+
+        return new PostResponseDto().builder()
+                .message("리뷰 작성이 완료되었습니다.")
+                .itemDto(reviewDto.getItemDto())
+                .reviewId(review.getId())
+                .build();
     }
 
     @Override
@@ -98,49 +127,84 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<ReviewDto> getReviewListByItemId(Long itemId) {
-        List<Review> reviews = Optional.ofNullable(reviewRepository.findAllByItem_Id(itemId))
+    public Page<ReviewDto> getReviewListByItemId(Long itemId, Pageable pageable) {
+        Page<Review> reviews = Optional.ofNullable(reviewRepository.findAllByItem_Id(itemId, pageable))
                 .orElseThrow(() -> new NoSuchElementException(String.format("itemId [%s]의 리뷰는 존재하지 않습니다", itemId)));
 
         if (reviews == null) {
-            return Collections.emptyList();
+            return Page.empty();
         }
 
-        return reviews.stream()
-                .map(ReviewDto::fromEntity)
-                .collect(Collectors.toList());
+        // 리뷰 id로 commentRepository를 탐색한다.
+        // targetId를 해당 리뷰 id로 갖는 모든 코멘트를 가져와서 reviewDto에 담는다.
+
+//        Page<ReviewDto> reviewDtoList = reviews.stream()
+//                .map(ReviewDto::fromEntity)
+//                .map(dto -> {
+//                    dto.setLikesCount(queryFactory.select(likes.count())
+//                            .from(likes)
+//                            .where(likes.review.id.eq(dto.getId()))
+//                            .fetchOne());
+//                    return dto;
+//                })
+//                .collect(Collectors.toList());
+//        reviewDtoList.forEach(this::addCommentListToReview);
+//        return reviewDtoList;
+
+        Page<ReviewDto> list = reviews.map(review -> {
+            ReviewDto dto = ReviewDto.fromEntity(review);
+            dto.setLikesCount(queryFactory.select(likes.count())
+                    .from(likes)
+                    .where(likes.review.id.eq(dto.getId()))
+                    .fetchOne());
+            return dto;
+        });
+
+        list.forEach(this::addCommentListToReview);
+        return list;
     }
 
-    @Override
-    public Likes isAlreadyLiked(LikesVO likesVO) {
+    private ReviewDto addCommentListToReview(ReviewDto reviewDto) {
+        List<CommentDto.Response> responseList = commentRepository.getReviewComments(reviewDto.getId()).stream()
+                .map(CommentDto::fromEntity)
+                .map(CommentDto.Response::new)
+                .collect(Collectors.toList());
+        for (CommentDto.Response response : responseList) {
+            long likesCount = likesRepository.countByComment_Id(response.getId());
+            response.setLikesCount(likesCount);
+        }
+        reviewDto.setCommentList(responseList);
+        return reviewDto;
+    }
+    private Likes isAlreadyLiked(LikesDto.Request request) {
 
         // 어떤 fk가 들어있는지 확인하고, 해당 fk에 따라 다른 repository에서 탐색
 
         log.info("-------------------------- 회원이 이미 좋아한 게시물인지 확인");
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         Likes like = new Likes();
 
-        if (likesVO.getItemDto() != null) {
+        if (request.getItemDto() != null) {
             like = queryFactory
                     .selectFrom(likes)
-                    .where(likes.member.id.eq(likesVO.getMemberDto().getId()).and(likes.item.id.eq(likesVO.getItemDto().getId())))
+                    .where(likes.member.id.eq(request.getMemberDto().getId()).and(likes.item.id.eq(request.getItemDto().getId())))
                     .fetchOne();
-        } else if (likesVO.getReviewDto() != null) {
+        } else if (request.getReviewId() != null) {
             like =  queryFactory
                     .selectFrom(likes)
-                    .where(likes.member.id.eq(likesVO.getMemberDto().getId()).and(likes.review.id.eq(likesVO.getReviewDto().getId())))
+                    .where(likes.member.id.eq(request.getMemberDto().getId()).and(likes.review.id.eq(request.getReviewId())))
                     .fetchOne();
-        } else if (likesVO.getCommentDto() != null) {
+        } else if (request.getCommentId() != null) {
             like =  queryFactory
                     .selectFrom(likes)
-                    .where(likes.member.id.eq(likesVO.getMemberDto().getId()).and(likes.comment.id.eq(likesVO.getCommentDto().getId())))
+                    .where(likes.member.id.eq(request.getMemberDto().getId()).and(likes.comment.id.eq(request.getCommentId())))
                     .fetchOne();
-        } else if (likesVO.getPostDto() != null) {
+        } else if (request.getPostDto() != null) {
             like =  queryFactory
                     .selectFrom(likes)
-                    .where(likes.member.id.eq(likesVO.getMemberDto().getId()).and(likes.post.id.eq(likesVO.getPostDto().getId())))
+                    .where(likes.member.id.eq(request.getMemberDto().getId()).and(likes.post.id.eq(request.getPostDto().getId())))
                     .fetchOne();
         }
         return like;
@@ -148,32 +212,34 @@ public class PostServiceImpl implements PostService{
 
     @Transactional
     @Override
-    public LikesResponseDto saveOrDeleteItemLike(LikesVO likesVO) {
+    public LikesResponseDto saveOrDeleteItemLike(LikesDto.Request request) {
 
         log.info("-------------------------- 좋아요 db 저장 or 삭제");
-        Likes likes = this.isAlreadyLiked(likesVO);
+        Likes likes = this.isAlreadyLiked(request);
         String backgroundColor;
 
         if (likes == null) {
-            if (likesVO.getItemDto() != null) {
+            if (request.getItemDto() != null) {
                 likesRepository.save(Likes.builder()
-                        .item(likesVO.getItemDto().toEntity())
-                        .member(likesVO.getMemberDto().toEntity())
+                        .item(request.getItemDto().toEntity())
+                        .member(request.getMemberDto().toEntity())
                         .build());
-            } else if (likesVO.getReviewDto() != null) {
+            } else if (request.getReviewId() != null) {
+                Review review = reviewRepository.findById(request.getReviewId()).orElseThrow();
+                Likes newLike = likesRepository.save(Likes.builder()
+                        .review(review)
+                        .member(request.getMemberDto().toEntity())
+                        .build());
+            } else if (request.getCommentId() != null) {
+                Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow();
                 likesRepository.save(Likes.builder()
-                        .review(likesVO.getReviewDto().toEntity())
-                        .member(likesVO.getMemberDto().toEntity())
+                        .comment(comment)
+                        .member(request.getMemberDto().toEntity())
                         .build());
-            } else if (likesVO.getCommentDto() != null) {
-                likesRepository.save(Likes.builder()
-//                        .comment(likesVO.getCommentDto().toEntity())
-                        .member(likesVO.getMemberDto().toEntity())
-                        .build());
-            } else if (likesVO.getPostDto() != null) {
+            } else if (request.getPostDto() != null) {
                 likesRepository.save(Likes.builder()
 //                        .post(likesVO.getPostDto().toEntity())
-                        .member(likesVO.getMemberDto().toEntity())
+                        .member(request.getMemberDto().toEntity())
                         .build());
             }
             backgroundColor = "lightcoral";
@@ -182,8 +248,8 @@ public class PostServiceImpl implements PostService{
             backgroundColor = "white";
         }
 
-        Long likeCount = this.getLikeCount(likesVO);
-        return new LikesResponseDto(likeCount, backgroundColor);
+        Long likesCount = this.getLikeCount(request);
+        return new LikesResponseDto(likesCount, backgroundColor);
     }
 
     @Override
@@ -191,11 +257,11 @@ public class PostServiceImpl implements PostService{
 
         log.info("------------------------- 상품 상세페이지의 좋아요 갯수 반환");
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         Map<String, String> itemLikeBackgroundColorMap = new HashMap<>();
         Map<Long, Long> reviewLikeCountsMap = new HashMap<>();
-        Map<String, String> reviewLikeBackgroundColorMap = new HashMap<>();
-
+//        Map<String, String> reviewLikeBackgroundColorMap = new HashMap<>();
+        Map<Long, String> reviewLikeBgColorMapList = new HashMap<>();
         // 상품 좋아요 갯수
         Long itemLikesCount = queryFactory.select(likes.count())
                                 .from(likes)
@@ -249,35 +315,59 @@ public class PostServiceImpl implements PostService{
                 reviewLikeCountsMap.put(reviewId, reviewLikeCount);
 
                 if (likesRepository.existsByReview_IdAndMember_Id(reviewId, memberDto.getId())) {
-                    reviewLikeBackgroundColorMap.put(memberDto.getId(), "lightcoral");
+                    reviewLikeBgColorMapList.put(reviewId, "lightcoral");
                 } else {
-                    reviewLikeBackgroundColorMap.put(memberDto.getId(), "white");
+                    reviewLikeBgColorMapList.put(reviewId, "white");
                 }
             }
         }
+
+        Map<Long, String> commentLikesBgColorMap = this.getCommentBgColorMap(itemId, memberDto.getId());
         return LikesResponseDto.builder()
                 .itemLikeBackgroundColorMap(itemLikeBackgroundColorMap)
                 .itemLikesCount(itemLikesCount)
-                .reviewLikeCountsMap(reviewLikeCountsMap)
-                .reviewLikeBackgroundColorMap(reviewLikeBackgroundColorMap)
+//                .reviewLikeCountsMap(reviewLikeCountsMap)
+                .reviewLikeBgColorMapList(reviewLikeBgColorMapList)
+                .commentLikeBgColorMapList(commentLikesBgColorMap)
                 .build();
     }
 
-    private Long getLikeCount(LikesVO likesVO) {
+    private Map<Long, String> getCommentBgColorMap(Long itemId, String memberId) {
 
-        Long likeCount = 0L;
+        Map<Long, String> commentLikeBgColorMap = new HashMap<>();
+        List<Review> reviewList = reviewRepository.findAllByItem_Id(itemId);
+        List<Long> commentIdList = reviewList.stream()
+                .map(Review::getId)
+                .map(commentRepository::findAllByReview_Id)
+                .flatMap(List::stream)
+                .map(Comment::getId)
+                .collect(Collectors.toList());
 
-        if (likesVO.getItemDto() != null) {
-            likeCount = likesRepository.countByItem_Id(likesVO.getItemDto().getId());
-        } else if (likesVO.getReviewDto() != null) {
-            likeCount = likesRepository.countByReview_Id(likesVO.getReviewDto().getId());
-        } else if (likesVO.getCommentDto() != null) {
-            likeCount = likesRepository.countByComment_Id(likesVO.getCommentDto().getId());
-        } else if (likesVO.getPostDto() != null) {
-            likeCount = likesRepository.countByPost_Id(likesVO.getPostDto().getId());
+        for (Long commentId : commentIdList) {
+            if (likesRepository.existsByComment_IdAndMember_Id(commentId, memberId)) {
+                commentLikeBgColorMap.put(commentId, "lightcoral");
+            } else {
+                commentLikeBgColorMap.put(commentId, "white");
+            }
         }
-        return likeCount;
+        return commentLikeBgColorMap;
     }
+    private Long getLikeCount(LikesDto.Request request) {
+
+        Long likesCount = 0L;
+
+        if (request.getItemDto() != null) {
+            likesCount = likesRepository.countByItem_Id(request.getItemDto().getId());
+        } else if (request.getReviewId() != null) {
+            likesCount = likesRepository.countByReview_Id(request.getReviewId());
+        } else if (request.getCommentId() != null) {
+            likesCount = likesRepository.countByComment_Id(request.getCommentId());
+        } else if (request.getPostDto() != null) {
+            likesCount = likesRepository.countByPost_Id(request.getPostDto().getId());
+        }
+        return likesCount;
+    }
+
 
     @Override
     public Page<PostDto> getAllNoticePosts(Pageable pageable) {
@@ -290,6 +380,8 @@ public class PostServiceImpl implements PostService{
                         .thumbnailUrl(Post.getThumbnailUrl())
                         .postType(PostType.NOTICE)
                         .memberDto(MemberDto.fromEntity(Post.getMember()))
+                        .createdTime(Post.getCreatedTime())
+                        .modifiedTime(Post.getModifiedTime())
                         .build());
     }
 
@@ -314,6 +406,7 @@ public class PostServiceImpl implements PostService{
 
         log.info(String.valueOf(noticeImgs.isEmpty()));
 
+
         if (noticeImgs.size() != 0) {
             List<String> imgUrlList = s3Config.imgUpload(PostRequestDto.class, noticeImgs);
             post.setThumbnailUrl(imgUrlList.get(0));
@@ -323,10 +416,12 @@ public class PostServiceImpl implements PostService{
         return "공지사항 등록 완료";
     }
 
+    @Transactional
     @Override
     public PostResponseDto getNoticeDetail(Long noticeId) {
 
         Post post =  postRepository.findById(noticeId).orElseThrow();
+        post.updateHits();
         List<String> imgUrlList = Optional.ofNullable(imgRepository.findAllByPost_Id(noticeId))
                 .orElse(Collections.emptyList())
                 .stream()
@@ -357,14 +452,16 @@ public class PostServiceImpl implements PostService{
 
     @Transactional
     @Override
-    public String saveQna(PostRequestDto.QnaRequestDto postQnaDto,
+    public PostResponseDto saveQna(PostRequestDto.QnaRequestDto postQnaDto,
                           List<MultipartFile> qnaImgs,
                           @LoginMember MemberDto memberDto) throws Exception {
 
         log.info("------------------------- QNA save");
 
         if (postQnaDto == null) {
-            return "문의사항 접수에 실패했습니다.";
+            return new PostResponseDto().builder()
+                    .message("문의 저장에 실패했습니다")
+                    .build();
         }
 
         Member member = memberRepository.findById(memberDto.getId()).orElseThrow();
@@ -383,20 +480,25 @@ public class PostServiceImpl implements PostService{
         List<String> imgUrlList = this.saveQnaImagesToS3Bucket(PostRequestDto.QnaRequestDto.class, qnaImgs);
         this.saveQnaImgUrlToDB(qna, imgUrlList, postQnaDto.getItemDto().getId());
 
-        return "문의사항 접수가 완료되었습니다.";
+        return new PostResponseDto().builder()
+                .message("문의 저장 완료되었습니다.")
+                .build();
     }
 
     private <T> List<String> saveQnaImagesToS3Bucket(Class<T> dto, List<MultipartFile> imgList) throws Exception {
 
         log.info("------------------------- QnA img upload to S3");
 
-        if (imgList.size() == 0) {
+        if (isImgListEmpty(imgList)) {
             return Collections.emptyList();
         } else {
             return s3Config.imgUpload(dto, imgList);
         }
     }
 
+    private boolean isImgListEmpty(List<MultipartFile> imgList) {
+        return imgList.get(0).getOriginalFilename().equals("");
+    }
     private void saveQnaImgUrlToDB(Post post, List<String> imgUrlList, Long itemId) {
 
         log.info("------------------------- QNA img url save to DB");
@@ -421,7 +523,7 @@ public class PostServiceImpl implements PostService{
 
         log.info("------------------------- Get All Qna List");
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         QueryResults<Post> results = queryFactory.selectFrom(post)
                 .where(
@@ -440,7 +542,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public PostResponseDto getQnaDetail(Long qnaId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         Post qna = queryFactory.selectFrom(post)
                 .where(post.id.eq(qnaId))
                 .fetchOne();
@@ -459,7 +561,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public List<PostDto> getQnaListForMyPage(String memberId) {
 
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+//        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
         return queryFactory.selectFrom(post)
                 .where(post.member.id.eq(memberId),
@@ -469,5 +571,123 @@ public class PostServiceImpl implements PostService{
                 .stream()
                 .map(PostDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<PostDto> searchNoticeByCondition(PostRequestDto requestDto, Pageable pageable) {
+
+        String searchPeriod = requestDto.getSearchPeriod();
+        String searchTarget = requestDto.getSearchTarget();
+        String searchKeyWords = requestDto.getSearchKeyWords();
+
+        log.info("searchPeriod : " + searchPeriod);
+        log.info("searchTarget : " + searchTarget);
+        log.info("searchKeyWords : " + searchKeyWords);
+
+//        QueryResults<Post> searchResults = queryFactory.selectFrom(post)
+//                .where(eqPeriod(searchPeriod),
+//                        eqTarget(searchTarget, searchKeyWords))
+//                .orderBy(post.createdTime.desc())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+
+        List<PostDto> postList =  queryFactory.selectFrom(post)
+                .where(eqPeriod(searchPeriod),
+                        eqTarget(searchTarget, searchKeyWords),
+                        post.postType.eq(PostType.NOTICE))
+                .orderBy(post.createdTime.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch().stream()
+                .map(PostDto::fromEntity)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(postList, pageable, postList.size());
+    }
+
+    private BooleanExpression eqPeriod(String searchPeriod) {
+        if (StringUtils.isEmpty(searchPeriod)) {
+            return null;
+        }
+        if (StringUtils.equals(searchPeriod, "ALL")) {
+            return null;
+        }
+        if (StringUtils.equals(searchPeriod, "LAST_SIX_MONTH")) {
+            return post.createdTime.after(LocalDateTime.now().minusMonths(6));
+        }
+        if (StringUtils.equals(searchPeriod, "LAST_ONE_YEAR")) {
+            return post.createdTime.after(LocalDateTime.now().minusYears(1));
+        }
+        return null;
+    }
+
+    private BooleanExpression eqTarget(String searchTarget, String searchKeyWord) {
+        if (StringUtils.isEmpty(searchTarget)) {
+            return null;
+        }
+        if (StringUtils.equals(searchTarget, "TITLE_AND_CONTENT")) {
+            return post.content.like(searchKeyWord).or(post.title.like(searchKeyWord));
+        }
+        if (StringUtils.equals(searchTarget, "WRITER")) {
+            return post.member.id.like(searchKeyWord);
+        }
+        return null;
+    }
+
+    @Override
+    public CommentDto.Response saveReviewComment(CommentDto.Request request) {
+        Review review = reviewRepository.findById(request.getReviewId()).orElseThrow();
+        Comment comment = Comment.builder()
+                .content(request.getContent())
+                .depth(0)
+                .review(review)
+                .member(request.getMemberDto().toEntity())
+                .build();
+
+        Comment responseComment = commentRepository.save(comment);
+        return CommentDto.Response.builder()
+                .id(responseComment.getId())
+                .content(responseComment.getContent())
+                .memberDto(MemberDto.fromEntity(responseComment.getMember()))
+                .likesCount(0L)
+                .depth(0)
+                .message("댓글 등록에 성공했습니다.")
+                .createdTime(responseComment.getCreatedTime())
+                .modifiedTime(responseComment.getModifiedTime())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public CommentDto.Response updateComment(CommentDto.Request request) {
+
+        Comment comment = commentRepository.findById(request.getId()).orElseThrow();
+        comment.updateContent(request.getModifyContent());
+        commentRepository.saveAndFlush(comment);
+
+        return new CommentDto.Response().builder()
+                .id(comment.getId())
+                .content(request.getModifyContent())
+                .memberDto(MemberDto.fromEntity(comment.getMember()))
+                .depth(comment.getDepth())
+                .message("댓글 업데이트 완료")
+                .createdTime(comment.getCreatedTime())
+                .modifiedTime(LocalDateTime.now())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public CommentDto.Response deleteComment(CommentDto.Request request) {
+
+        Long commentId = request.getId();
+        likesRepository.deleteAllByComment_Id(commentId);
+        commentRepository.deleteById(request.getId());
+
+        return new CommentDto.Response().builder()
+                .id(request.getId())
+                .message("댓글이 삭제 되었습니다.")
+                .build();
     }
 }

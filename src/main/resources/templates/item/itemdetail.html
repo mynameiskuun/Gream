@@ -8,6 +8,46 @@
     <title>Document</title>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <th:block th:replace="main/config :: config"></th:block>
+    <style>
+        .comment-option-btns {
+            width: 100px;
+            display: flex;
+            justify-content: space-evenly;
+        }
+        .comment-update-btn {
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .comment-delete-btn {
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .comment-content-box {
+            margin-top: 30px;
+        }
+        .comment-like-box {
+            display: flex;
+            justify-content: space-evenly;
+            width: 130px;
+            height: 35px;
+            align-items: center;
+            border-radius: 20px;
+            border: 1px solid lightgray;
+            margin: 45px 30px;
+        }
+        .paging-btn-box {
+            display: flex;
+            margin: 0 auto;
+        }
+        .paging-btn-box div {
+            display: flex;
+            width: 30px;
+            height: 30px;
+            border: 1px solid lightGray;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
 <!-- header start-->
@@ -36,7 +76,7 @@
                 <div id="item-price-box" th:text="${'판매가격 : ' + #numbers.formatInteger(item.getPrice(), 3, 'COMMA') + ' 원'} "></div>
                 <div id="order-button-box">
                     <button class="btn btn-outline-secondary" id="orderBtn">주문하기</button>
-                    <button class="btn btn-outline-secondary" id="cartBtn" onclick="cartBtn()">장바구니 추가</button>
+                    <button class="btn btn-outline-secondary" id="cartBtn">장바구니 추가</button>
                     <div class="item-like-box" th:if="${session.loginMember eq null}" style="background: white">
                         <div class="item-thumbs-up"></div>
                         <div class="like-title">좋아요</div>
@@ -44,7 +84,7 @@
                         <input type="hidden" class="target" value="ITEM" />
                         <div class="like-counts" th:text="${likes.itemLikesCount}"></div>
                     </div>
-                    <div class="item-like-box" th:style="'background: ' + ${likes.itemLikeBackgroundColorMap.get(session.loginMember.id)}" th:unless="${session.loginMember eq null} ">
+                    <div class="item-like-box"  th:unless="${session.loginMember eq null}" th:style="'background: ' + ${likes.itemLikeBackgroundColorMap.get(session.loginMember.id)}">
                         <div class="item-thumbs-up"></div>
                         <div class="like-title">좋아요</div>
                         <input type="hidden" th:value="${item.id}"/>
@@ -144,95 +184,126 @@
                             <div></div>
                         </div>
                     </div>
-                    <div th:if="${reviewList.size() eq 0}" th:id="cards-wrapper">
+                    <div th:if="${reviewList.isEmpty()}" th:id="cards-wrapper">
                         <div id="empty-review-msg-box">
                             <h6> 등록된 후기가 없습니다. </h6>
                         </div>
                     </div>
-                    <div th:unless="${reviewList.size() eq 0}" th:id="cards-wrapper">
-                        <div id="review-container" th:each="reviewList : ${reviewList}">
+                    <div th:unless="${reviewList.isEmpty()}" th:id="cards-wrapper">
+                        <div id="review-container" th:each="review : ${reviewList}">
                             <div class="review-cards">
                                 <div class="review-top">회원 리뷰</div>
                                 <div class="review-contents">
                                     <div class="review-left-box">
                                         <div class="review-header" style="justify-content: space-between; display: flex">
-                                            <span th:text="${'작성자 : ' + reviewList.memberDto.name}"></span><span th:text="${#strings.substring(reviewList.createdTime, 0, 10)}"></span>
+                                            <span th:text="${'작성자 : ' + review.memberDto.name}"></span><span th:text="${#strings.substring(review.createdTime, 0, 10)}"></span>
                                         </div>
                                         <div class="order-item-detail" style="display: flex">
-                                            <div class="item-img" th:style="'background-image: url('+ ${reviewList.itemDto.thumbnailUrl} + ');'"></div>
-                                            <div class="like-item-name" th:text="${reviewList.itemDto.name}"></div>
+                                            <div class="item-img" th:if="${review.itemDto.thumbnailUrl ne null}" th:style="'background-image: url('+ ${review.itemDto.thumbnailUrl} + ');'"></div>
+                                            <div class="like-item-name" th:text="${review.itemDto.name}"></div>
                                         </div>
                                         <div class="customer-star-rating-box">
                                     <span class="star counted-stars text-primary">
                                         <span class="review-star-value"></span>
-                                        <input type="hidden" th:value="${reviewList.starValue}" />
+                                        <input type="hidden" th:value="${review.starValue}" />
                                     </span>
                                         </div>
-                                        <div class="review-text" th:text="${reviewList.content}"></div>
+                                        <div class="review-text" th:text="${review.content}"></div>
                                         <div class="review-features-container">
-                                            <div class="review-item-features text-secondary review-item-price-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                            <div class="review-item-features text-secondary review-item-price-score" style="border: 1px solid; border-radius: 10px; width: 160px; text-align: center;">
                                                 <span class="feature-title">상품 가격</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 1}">비싸요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 2}">보통이에요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.priceScore == 3}">저렴해요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 1}">비싸요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.priceScore == 3}">저렴해요</span>
                                             </div>
-                                            <div class="review-item-features text-secondary review-item-quality-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                            <div class="review-item-features text-secondary review-item-quality-score" style="border: 1px solid; border-radius: 10px; width: 160px; text-align: center;">
                                                 <span class="feature-title">상품 품질</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 1}">나빠요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 2}">보통이에요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.qualityScore == 3}">좋아요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 1}">나빠요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.qualityScore == 3}">좋아요</span>
                                             </div>
-                                            <div class="review-item-features text-secondary review-item-delivery-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                            <div class="review-item-features text-secondary review-item-delivery-score" style="border: 1px solid; border-radius: 10px; width: 160px; text-align: center;">
                                                 <span class="feature-title">상품 배송</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 1}">느려요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 2}">보통이에요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.deliveryScore == 3}">빨라요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 1}">느려요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.deliveryScore == 3}">빨라요</span>
                                             </div>
-                                            <div class="review-item-features text-secondary review-item-repurchase-score" style="border: 1px solid; border-radius: 10px; width: 150px; text-align: center;">
+                                            <div class="review-item-features text-secondary review-item-repurchase-score" style="border: 1px solid; border-radius: 10px; width: 160px; text-align: center;">
                                                 <span class="feature-title">재구매 의사</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 1}">없어요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 2}">보통이에요</span>
-                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${reviewList.repurchaseScore == 3}">있어요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 1}">없어요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 2}">보통이에요</span>
+                                                <span class="feature-evaluate text-dark" style="font-weight: 500" th:if="${review.repurchaseScore == 3}">있어요</span>
                                             </div>
                                         </div>
-                                        <div class="review-like-box">
+                                        <div class="review-like-box" th:if="${session.loginMember eq null}">
                                             <div class="review-thumbs-up"></div>
                                             <div class="like-title">도움돼요</div>
-                                            <input type="hidden" th:value="${reviewList.id}"/>
-                                            <div class="like-counts"></div>
-                                            <input type="hidden" class="target" value="REVIEW" />
+                                            <div class="like-counts" th:text="${review.likesCount}"></div>
+                                            <input type="hidden" class="review-id" th:value="${review.id}"/>
+<!--                                            <input type="hidden" class="target" value="REVIEW" />-->
+                                        </div>
+                                        <div class="review-like-box" th:unless="${session.loginMember eq null}" th:style="'background: ' + ${likes.reviewLikeBgColorMapList.get(review.id)}">
+                                            <div class="review-thumbs-up"></div>
+                                            <div class="like-title">도움돼요</div>
+                                            <div class="like-counts" th:text="${review.likesCount}"></div>
+                                            <input type="hidden" class="review-id" th:value="${review.id}"/>
+<!--                                            <input type="hidden" class="target" value="REVIEW" />-->
                                         </div>
                                     </div>
                                     <div class="review-right-box">
-                                        <div class="customer-review-img-box" th:style="'background-image: url('+ ${reviewList.thumbnail} + ');'"></div>
+                                        <div class="customer-review-img-box" th:style="'background-image: url('+ ${review.thumbnail} + ');'"></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="review-reply-box">
-                                <div class="review-reply-header">
+                            <div class="review-comment-box">
+                                <div class="review-comment-header">
                                     <span>댓글&nbsp;</span>
-                                    <span class="reply-counts text-secondary">2</span>
+                                    <span class="comment-counts text-secondary" th:text="${review.commentList.size()}"></span>
                                     <span class="text-secondary">개</span>
                                 </div>
-                                <div id="reply-input-container">
-                                    <div id="reply-input-box">
-                                        <textarea type="textarea" class="form-control" id="reply-input-area" onfocus="replyAreaToggle()"></textarea>
-                                        <input type="button" class="btn btn-outline-secondary" value="작성"/>
+                                <div class="comment-input-container">
+                                    <div id="comment-input-box">
+                                        <textarea type="textarea" class="form-control comment-input-area" onfocus="commentAreaToggle()"></textarea>
+                                        <input type="button" class="btn btn-outline-secondary comment-write-btn" value="작성"/>
+                                        <input type="hidden" th:value="${review.id}" />
                                     </div>
                                 </div>
-                                <div class="reply-output-container">
-                                    <div class="reply-cards">
-                                        <div class="reply-center-box">
-                                            <div class="reply-writer-id">id</div>
-                                            <div class="reply-context-box">
-                                                댓글내용 Lorem ipsum dolor sit amet consectetur adipisicing elit. Nece
+                                <div class="comment-output-container">
+                                    <div class="comment-cards" th:each="comment : ${review.commentList}">
+                                        <div class="comment-center-box">
+                                            <div class="comment-writer-id" th:text="${comment.memberDto.id}"></div>
+                                            <div class="comment-content-box" th:text="${comment.content}"></div>
+                                        </div>
+                                        <div class="comment-like-box" th:if="${session.loginMember eq null}">
+                                            <div class="comment-thumbs-up"></div>
+                                            <div class="comment-title-box">좋아요</div>
+                                            <div class="comment-like-counts" th:text="${comment.likesCount}"></div>
+                                            <input type="hidden" class="comment-id" th:value="${comment.id}" />
+                                        </div>
+                                        <div class="comment-like-box" th:unless="${session.loginMember eq null}" th:style="'background: ' + ${likes.commentLikeBgColorMapList.get(comment.id)}">
+                                            <div class="comment-thumbs-up"></div>
+                                            <div class="comment-title-box">좋아요</div>
+                                            <div class="comment-like-counts" th:text="${comment.likesCount}"></div>
+                                            <input type="hidden" class="comment-id" th:value="${comment.id}" />
+                                        </div>
+                                        <div style="display: flex; align-items: center; justify-content: space-evenly">
+                                            <div class="comment-created-time" th:text="${#strings.substring(comment.createdTime, 0, 10)}"></div>
+
+                                            <div class="comment-option-btns" th:if="${session.loginMember ne null && session.loginMember.id eq comment.memberDto.id}">
+                                                <a class="comment-update-btn"><div>수정</div></a>
+                                                <a class="comment-delete-btn"><div>삭제</div></a>
+                                                <input type="hidden" th:value="${comment.id}" />
                                             </div>
                                         </div>
-                                        <div class="reply-like-box">
-                                            <div class="reply-thumbs-up"></div>
-                                            <div class="reply-like-counts">2</div>
-                                        </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div th:if="${!reviewList.isEmpty()}" class="paging-btn-box">
+                                <div th:each="reviewPage : ${#numbers.sequence(reviewStartPage, reviewEndPage)}">
+                                    <a style="cursor: pointer" th:if="${reviewPage != reviewNowPage}" th:onclick="|location.href='@{/item/}' + ${item.id} + '?review_page=' + ${reviewPage - 1} + '#review-container' |" th:text="${reviewPage}"></a>
+                                    <strong th:if="${reviewPage == reviewNowPage}" style="color:black" th:text="${reviewPage}"></strong>
                                 </div>
                             </div>
                         </div>
@@ -267,7 +338,7 @@
                                 <td colspan="4" style="height: 100px"><h5>등록된 문의 사항이 없습니다.</h5></td>
                             </tr>
                             <tr th:unless="${qnaList.isEmpty()}" th:each="qna : ${qnaList}">
-                                <td th:text="${qna.qnaType}"></td>
+                                <td th:text="${qna.qnaType.value}"></td>
                                 <td class="qna-title-box">
                                         <input type="hidden" class="qnaId" th:value="${qna.id}" />
                                         <input type="hidden" class="qnaContent" th:value="${qna.content}" />
@@ -285,10 +356,15 @@
                 </div>
                 <div id="qna-footer">
                     <div id="qna-btns">
-                        <a id="qna-write-btn" onclick="showQnaPopUp()" target = "_blank">상품 문의하기</a>
+                        <a id="qna-write-btn" style="cursor: pointer" onclick="showQnaPopUp()" target = "_blank">상품 문의하기</a>
                     </div>
                     <div id="qna-paging-area">
-
+                        <div th:if="${!qnaList.isEmpty()}" class="paging-btn-box">
+                            <div th:each="qnaPage : ${#numbers.sequence(qnaStartPage, qnaEndPage)}">
+                                <a th:if="${qnaPage != qnaNowPage}" style="cursor: pointer" th:onclick="|location.href='@{/item/}' + ${item.id} + '?qna_page=' + ${qnaPage - 1} + '#qna-container' |" th:text="${qnaPage}"></a>
+                                <strong th:if="${qnaPage == qnaNowPage}" style="color:black" th:text="${qnaPage}"></strong>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -298,15 +374,14 @@
         <!--   footer end   -->
     </div>
 
-
     <!--  modal start  -->
         <div class="modal cart-modal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">장바구</h5>
-                        <bu니ton type="button" class="btn-close"
-                                data-bs-dismiss="modal"></bu니ton>
+                        <h5 class="modal-title">장바구니</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <p id="cartText">장바구니에 추가 되었습니다.</p>
@@ -353,10 +428,12 @@
         </div>
     <!--  modal end  -->
 
-<script src="/js/itemdetail.js"></script>
+<!--<script src="/js/itemdetail.js"></script>-->
 <script th:inline="javascript">
     /*<![CDATA[*/
 
+    var header = $("meta[name='_csrf_header']").attr('content');
+    var token = $("meta[name='_csrf']").attr('content');
 
     /* 구매수량 변화 감지, 남은 재고수량 이상으로 장바구니 혹은 결제 안되게 뷰단에서 처리 */
     // 페이지에 나와있는 상품 재고 초과하여 카운트 up 시 alert 출력
@@ -373,40 +450,63 @@
         }
     });
 
-    // 장바구니 추가 버튼 메소드
-    function cartBtn() {
-
-        if([[${session.loginMember}]] == null) {
-            alert('로그인을 해주세요')
-            location.href='/login';
-        }
-
+    $('#cartBtn').on('click', function() {
         let cartItem = {
             itemDto : [[${item}]],
             quantity : document.getElementById('orderQuantity').value
         };
 
         $.ajax({
-            url: '/cart',
-            type: 'POST',
+            url: "/cart",
+            type: "POST",
             data: JSON.stringify(cartItem),
             contentType: 'application/json; charset=UTF-8',
             dataType: 'text',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success: function(result) {
-                document.getElementById("cartText").innerText = result;
-                const modal = new bootstrap.Modal(document.querySelector('.cart-modal'));
-                modal.show();
+                alert(result);
+                // document.getElementById("cartText").innerText = result;
+                // const modal = new bootstrap.Modal(document.querySelector('.cart-modal'));
+                // modal.show();
             }
         })
+    })
+    // 장바구니 추가 버튼 메소드
+    function cartBtn() {
+
+        // if([[${session.loginMember}]] == null) {
+        //     alert('로그인을 해주세요')
+        //     location.href='/login';
+        // }
+
+        // let cartItem = {
+        //     itemDto : [[${item}]],
+        //     quantity : document.getElementById('orderQuantity').value
+        // };
+        //
+        // $.ajax({
+        //     url: "/cart",
+        //     type: "POST",
+        //     data: JSON.stringify(cartItem),
+        //     contentType: 'application/json; charset=UTF-8',
+        //     dataType: 'text',
+        //     success: function(result) {
+        //         // document.getElementById("cartText").innerText = result;
+        //         // const modal = new bootstrap.Modal(document.querySelector('.cart-modal'));
+        //         // modal.show();
+        //     }
+        // })
     }
 
     // 개별상품 주문 이벤트 메소드
     $('#orderBtn').click(function () {
 
-        if([[${session.loginMember}]] == null) {
-            alert('로그인을 해주세요')
-            location.href = '/login';
-        }
+        // if([[${session.loginMember}]] == null) {
+        //     alert('로그인을 해주세요')
+        //     location.href = '/login';
+        // }
 
         let data = {
             quantity : $('#orderQuantity').val(),
@@ -419,6 +519,9 @@
             contentType: "application/JSON; charset=UTF-8;",
             data: JSON.stringify(data),
             dataType: "text",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success: function (itemStockFlag) {
                 if (itemStockFlag) {
                     location.href="/order?itemId=" + data.itemDto.id + "&quantity=" + data.quantity;
@@ -430,8 +533,6 @@
                 console.log(error);
             }
         })
-
-
     })
 
     $('#usable-coupon-box').click(function() {
@@ -443,13 +544,13 @@
         location.href='/cart';
     })
 
-    $("#reply-input-container").on("focus", function () {
-        $("#reply-input-area").css("height", "100px");
+    $(".comment-input-container").on("focus", function () {
+        $(".comment-input-area").css("height", "100px");
     });
 
     // 댓글란 토글
-    function replyAreaToggle() {
-        $("#reply-input-area").css("height", "100px");
+    function commentAreaToggle() {
+        $(".comment-input-area").css("height", "100px");
     }
 
     // 상품 구매 후기 만족도 조사 이벤트
@@ -529,6 +630,9 @@
             contentType: 'application/json; charset=UTF-8;',
             data: JSON.stringify(data),
             dataType: 'text',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success(data) {
                 console.log(data);
                 alert(data);
@@ -549,14 +653,14 @@
         // 좋아요 타겟(리뷰? 아이템?)
 
         let clickedElement = $(this);
-        let memberDto;
+        let memberDto = [[${session.loginMember}]];
         // let itemId = $(this).parent().find('input[type="hidden"]').val();
 
         if ([[${session.loginMember}]] == null) {
             alert('로그인을 해주세요');
             location.href = '/login';
-        } else
-            memberDto = [[${session.loginMember}]]
+            return;
+        }
 
         let data = {
             "itemDto" : [[${item}]],
@@ -569,6 +673,9 @@
             contentType: 'application/json; charset=UTF-8',
             dataType : 'JSON',
             data: JSON.stringify(data),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token)
+            },
             success(result) {
                 console.log(result);
                 clickedElement.parent().find('div.like-counts').html(result.count);
@@ -592,7 +699,7 @@
             location.href = '/login';
         } else {
             let url = "/item/" + [[${item.id}]] + "/inquiries/form";
-            let name = "popup-test";
+            let name = "qna-popup";
             let option = "width = 800, height: 400, top = 100, left = 100, location = no";
 
             window.open(url, name, option);
@@ -631,35 +738,284 @@
                                 background-image: url(https://cdn.icon-icons.com/icons2/643/PNG/512/q-letter-single-brand-social-media_icon-icons.com_59312.png);'></span>
                                 <span style="margin-left: 100px">` + content + `</span>
                             </div>
-<!--                            <div style='display: flex' th:if="$\{session.loginMember.role eq 'ROLE_ADMIN'}">-->
-<!--                                <span class='answer-img' style='height: 80px;-->
-<!--                                width: 80px;-->
-<!--                                margin-left: 10px;-->
-<!--                                background-size: 100%;-->
-<!--                                background-repeat: no-repeat;-->
-<!--                                background-position: center;-->
-<!--                                background-image: url(https://cdn2.iconfinder.com/data/icons/pretty-office-part14-2/256/A_blue-1024.png);'></span>-->
-<!--                                <span>답변 내용</span>-->
-<!--                            </div>-->
                         </td>
                     </tr>`)
-        // $.ajax({
-        //     url: "/item/inquiries/" + qnaId,
-        //     type: "GET",
-        //     contentType: "TEXT",
-        //     data: qnaId,
-        //     dataType: "JSON",
-        //     success: function (result) {
-        //         console.log("success")
-        //         console.log("result : ", result);
-        //         console.log(targetDom)
-        //         targetDom.after();
-        //     },
-        //     error: function (request, status, error) {
-        //         console.log("error")
-        //         alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-        //     },
-        // })
+    }
+
+    function createCommentRow(responseData) {
+        let commentCardsDom = $('<div class="comment-cards"></div>')
+        
+        let centerBoxDom = $('<div class="comment-center-box"></div>')
+        let likeBoxDom = $('<div class="comment-like-box"></div>')
+        let btnDom = $('<div style="display: flex; align-items: center; justify-content: space-evenly"></div>')
+
+        let createdTimeDom = $('<div class="comment-created-time"> ' + responseData.createdTime.slice(0,10) + '</div>')
+        let optionBtnDom = $('<div class="comment-option-btns"></div>')
+        let writerIdDom = $('<div class="comment-writer-id"></div>')
+        let contentBoxDom = $('<div class="comment-content-box"></div>')
+
+        let updateBtnDom = $('<a class="comment-update-btn"></a>')
+        let deleteBtnDom = $('<a class="comment-delete-btn"></a>')
+        let thumbsUpDom = $('<div class="comment-thumbs-up"></div>')
+        let titleDom = $('<div class="comment-title-box">' + '좋아요' + '</div>')
+        let likeCountsDom = $('<div class="comment-like-counts"></div>')
+        let commentIdDom = $('<input type="hidden" class="comment-id"/>')
+
+        let updateBtn = $('<div>수정</div>')
+        let deleteBtn = $('<div>삭제</div>')
+
+        //     < div
+        // className = "comment-created-time"
+        // th:text = "${#strings.substring(comment.createdTime, 0, 10)}" > < /div>
+
+        // <div className="comment-option-btns" th:if="${session.loginMember.id eq comment.memberDto.id}">
+        //     <a className="comment-update-btn">
+        //         <div>수정</div>
+        //     </a>
+        //     <a className="comment-delete-btn">
+        //         <div>삭제</div>
+        //     </a>
+        //     <input type="hidden" th:value="${comment.id}"/>
+        // </div>
+
+        writerIdDom.html(responseData.memberDto.id);
+        contentBoxDom.html(responseData.content);
+        likeCountsDom.html(responseData.likesCount);
+        titleDom.html('좋아요');
+        commentIdDom.val(responseData.id);
+
+        updateBtnDom.append(updateBtn);
+        deleteBtnDom.append(deleteBtn);
+
+        optionBtnDom.append(updateBtnDom, deleteBtnDom);
+
+        centerBoxDom.append(writerIdDom, contentBoxDom);
+        likeBoxDom.append(thumbsUpDom, titleDom, likeCountsDom, commentIdDom);
+        btnDom.append(createdTimeDom, optionBtnDom);
+
+        commentCardsDom.append(centerBoxDom, likeBoxDom, btnDom);
+        return commentCardsDom;
+
+        // <div className="comment-cards" th:each="comment : ${review.commentList}">
+        //     <div className="comment-center-box">
+        //         <div className="comment-writer-id" th:text="${comment.memberDto.id}"></div>
+        //         <div className="comment-content-box" th:text="${comment.content}"></div>
+        //     </div>
+        //     <div className="comment-like-box">
+        //         <div className="comment-thumbs-up"></div>
+        //         <div className="comment-like-counts" th:text="${comment.likesCount}"></div>
+        //         <input type="hidden" th:value="${comment.id}"/></div>
+        //     <div className="comment-created-time" th:text="${#strings.substring(comment.createdTime, 0, 10)}"></div>
+        // </div>
+    }
+
+    // 댓글 작성 이벤트
+    $('.comment-write-btn').on('click', function() {
+        let loginMember = [[${session.loginMember}]];
+
+        if (loginMember === null) {
+            alert('로그인을 해주세요');
+            location.href = "/login";
+        }
+
+        let inputDom = $(this).prev();
+        let reviewId = $(this).parent().find('input[type="hidden"]').val();
+        let data = {
+            memberDto : loginMember,
+            content : inputDom.val(),
+            reviewId: reviewId
+        }
+        const url = "/review/comment"
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json',
+                "X-CSRF-Token" : token
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    new Promise.reject();
+                }
+            })
+            .then(data => {
+                inputDom.val('');
+                $('.comment-output-container').prepend(createCommentRow(data));
+            })
+    })
+
+    // 댓글 수정 이벤트
+    $(document).on('click', '.comment-update-btn', function() {
+        let eventDom = $(this);
+        let commentCardDom = $(this).parent().parent().parent();
+        let originContent = commentCardDom.find('div[class="comment-content-box"]').html();
+
+        eventDom.parent().prepend($('<a style="text-decoration: none; cursor: pointer" id="comment-update-btn">수정하기</a>'))
+        eventDom.remove();
+
+        commentCardDom.find('div[class="comment-content-box"]').remove();
+        commentCardDom.children().first().append($('<textarea type="textarea" class="form-control comment-modify-area" name="modifyContent" onfocus="commentAreaToggle()">' + originContent + '</textarea>'))
+    })
+
+    // 댓글 수정 이벤트 2
+    $(document).on('click', '#comment-update-btn', function() {
+
+        const url = '/review/comment';
+        let eventDom = $(this);
+        let modifyContent = eventDom.parent().parent().parent().find('textarea').val();
+        let commentId = $(this).parent().find('input[type="hidden"]').val();
+
+        console.log('eventDom : ', eventDom);
+        console.log("modifyContent : ", modifyContent);
+
+        if (modifyContent === null || modifyContent === '') {
+            alert('내용을 입력 해 주세요');
+            return;
+        }
+
+        fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRF-Token' : token
+            },
+            body: JSON.stringify({
+                'id' : commentId,
+                "modifyContent" : modifyContent
+            })
+        })
+            .then(result => {
+                if (result.status === 200) {
+                    return result.json();
+                }
+                console.log(result);
+            })
+            .then(data => {
+                alert(data.message);
+                $('.comment-modify-area').remove();
+                eventDom.parent().prepend($('<a class="comment-update-btn"><div>수정</div></a>'));
+                eventDom.parent().parent().parent().children().first().append($('<div class="comment-content-box">' + data.content + '</div>'))
+                eventDom.remove();
+            })
+    })
+
+    // 댓글 삭제 이벤트
+    $('.comment-delete-btn').on('click', function() {
+
+        let agreeToDelete = confirm('댓글을 삭제 하시겠습니까?');
+
+        if (!agreeToDelete) {
+            return;
+        }
+
+        const eventDom = $(this);
+        const url = '/review/comment'
+        let commentId = eventDom.parent().find('input[type="hidden"]').val();
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRF-Token' : token
+            },
+            body: JSON.stringify({
+                'id' : commentId
+            })
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                alert(data.message)
+                let commentId = data.id;
+                eventDom.parent().parent().parent().remove();
+            })
+    })
+
+
+    // 리뷰 좋아요 이벤트
+    $('.review-thumbs-up').on('click', function() {
+
+        let clickedElement = $(this);
+        let memberDto = [[${session.loginMember}]];
+
+        if (memberDto === null) {
+            alert('로그인을 해주세요');
+            location.href = '/login';
+        }
+
+        let reviewId = $(this).parent().find('input[class="review-id"]').val()
+        console.log("reviewDto : ", reviewId);
+
+        const url = '/item/like';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json',
+                'X-CSRF-Token' : token
+            },
+            body: JSON.stringify({
+                'memberDto' : memberDto,
+                'reviewId' : reviewId
+            })
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                clickedElement.parent().find('div.like-counts').html(data.count);
+                clickedElement.parent().css('background-color', data.backgroundColor);
+            })
+    })
+
+    // 댓글 좋아요 이벤트
+    $(document).on('click', '.comment-thumbs-up', function() {
+
+        let clickedElement = $(this);
+        let commentId = clickedElement.parent().find('input.comment-id').val();
+        let memberDto = [[${session.loginMember}]];
+        const url = '/item/like'
+
+        fetch(url, {
+            method : 'POST',
+            headers : {
+                'Content-Type' : 'application/json',
+                'X-CSRF-Token' : token
+            },
+            body: JSON.stringify({
+                'memberDto' : memberDto,
+                'commentId' : commentId
+            })
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                clickedElement.next().next().html(data.count);
+                clickedElement.parent().css('background-color', data.backgroundColor);
+            })
+    })
+
+    window.onload = function() {
+        const url = window.location.href;
+        let reviewId;
+
+        if (url.includes("qna-container")) {
+            // let startIndex = url.indexOf('=')
+            // reviewId = url.slice(startIndex + 1);
+            let scrollTarget = document.getElementById('qna-container');
+            scrollTarget.scrollIntoView();
+        }
     }
 </script>
 </body>

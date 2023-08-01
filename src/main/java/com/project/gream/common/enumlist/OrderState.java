@@ -10,7 +10,8 @@ public enum OrderState implements EnumBase{
     PREPARE("배송 준비중"),
     ONPROGRESS("배송중"),
     ARRIVED("배송 완료"),
-    CONFIRMED("구매 확정");
+    CONFIRMED("구매 확정"),
+    REVIEWED("리뷰 작성 완료");
 
     private final String value;
     public String getValue() {

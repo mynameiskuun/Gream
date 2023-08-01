@@ -10,6 +10,7 @@ import com.project.gream.domain.post.entity.Review;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,33 +23,32 @@ public class ReviewDto {
     private int qualityScore;
     private int deliveryScore;
     private int repurchaseScore;
+    private Long likesCount;
     private String content;
     private String thumbnail;
     private MemberDto memberDto;
     private ItemDto itemDto;
-
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private Long orderItemId;
+    private List<CommentDto.Response> commentList;
     private LocalDateTime createdTime;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime modifiedTime;
 
     @Builder
-    public ReviewDto(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore,
-                     int repurchaseScore, String content, String thumbnail, MemberDto memberDto, ItemDto itemDto) {
+    public ReviewDto(Long id, int starValue, int priceScore, int qualityScore, int deliveryScore, int repurchaseScore, Long likesCount,
+                     String content, String thumbnail, MemberDto memberDto, ItemDto itemDto, Long orderItemId, List<CommentDto.Response> commentList) {
         this.id = id;
         this.starValue = starValue;
         this.priceScore = priceScore;
         this.qualityScore = qualityScore;
         this.deliveryScore = deliveryScore;
         this.repurchaseScore = repurchaseScore;
+        this.likesCount = likesCount;
         this.content = content;
         this.thumbnail = thumbnail;
         this.memberDto = memberDto;
         this.itemDto = itemDto;
+        this.orderItemId = orderItemId;
+        this.commentList = commentList;
     }
 
     public Review toEntity() {
@@ -80,7 +80,5 @@ public class ReviewDto {
                 .itemDto(ItemDto.fromEntity(review.getItem()))
                 .build();
     }
-
-
 
 }

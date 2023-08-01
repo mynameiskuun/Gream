@@ -66,6 +66,7 @@ public class OrderController {
         log.info("itemIdArray : " + request.getItemIds().toString());
         log.info("itemQtyArrays : " + request.getItemQtys().toString());
         log.info("cartItemIdArrays : " + request.getCartItemIds().toString());
+        log.info("usedCouponArrays : " + request.getUsedCouponIds().toString());
 
         model.addAttribute("kakaoPayDto", request);
         model.addAttribute("tid", response.getTid());
@@ -79,24 +80,26 @@ public class OrderController {
 
         KakaoPayApprovedResultVO response = orderService.payApprove(tid, pgToken, request);
         orderService.updateDataBaseAfterPayment(request, memberDto);
-        orderService.sendPaymentReceiptEmail(response, memberDto);
+        orderService.sendPaymentReceiptEmail(response, memberDto, request.getCouponDiscountAmount());
 
         log.info("------------------------------------ orderResult ===> " + String.valueOf(response));
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("order/order-success");
         mav.addObject("orderResult", response);
+        mav.addObject("totalDiscount", request.getCouponDiscountAmount());
 
         return mav;
     }
 
-    @GetMapping("/order/pay/cancel")
+    @GetMapping("/order/kakaopay/cancel")
     public String toResult() {
         return "order/order-cancel";
     }
 
-    @GetMapping("/order/pay/fail")
+    @GetMapping("/order/kakaopay/fail")
     public String toCancel() {
         return "order/order-fail";
     }
+
 }
