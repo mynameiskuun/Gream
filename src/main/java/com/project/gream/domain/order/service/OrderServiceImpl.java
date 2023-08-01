@@ -6,6 +6,8 @@ import com.project.gream.common.util.StringToEnumUtil;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.item.repository.ItemRepository;
+import com.project.gream.domain.item.repository.UserCouponRepository;
+import com.project.gream.domain.item.service.DiscountService;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.Member;
@@ -36,10 +38,14 @@ import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
+import java.text.NumberFormat;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+
+import static com.project.gream.domain.order.entity.QOrderHistory.orderHistory;
 
 @Validated
 @RequiredArgsConstructor
@@ -62,13 +68,15 @@ public class OrderServiceImpl implements OrderService {
     private final ItemRepository itemRepository;
     private final ItemService itemService;
     private final MemberService memberService;
+    private final DiscountService discountService;
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public KakaoPayRequestVO kakaoPayReady(KakaoPayDto request) {
 
         log.info("cid : " + cid);
-        session.setAttribute("size", request.getSize());
-        session.setAttribute("itemName", request.getItemName());
+//        session.setAttribute("size", request.getSize());
+//        session.setAttribute("itemName", request.getItemName());
 
         String orderId = this.getItemName(request);
 
@@ -80,9 +88,9 @@ public class OrderServiceImpl implements OrderService {
         parameters.add("quantity", String.valueOf(request.getSize()));
         parameters.add("total_amount", String.valueOf(request.getFinalPaymentAmount()));
         parameters.add("tax_free_amount", "0");
-        parameters.add("approval_url", kakaoPayRealUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
-        parameters.add("cancel_url", kakaoPayRealUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
-        parameters.add("fail_url", kakaoPayRealUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
+        parameters.add("approval_url", kakaoPayLocalUrl + "/order/kakaopay/authorization"); // 결제승인시 넘어갈 url
+        parameters.add("cancel_url", kakaoPayLocalUrl + "/order/kakaopay/cancel"); // 결제취소시 넘어갈 url
+        parameters.add("fail_url", kakaoPayLocalUrl + "/order/kakaopay/fail"); // 결제 실패시 넘어갈 url
 
         log.info("--------------------- 결제준비 parameters : " + parameters);
 
@@ -126,7 +134,6 @@ public class OrderServiceImpl implements OrderService {
 
         // 결제 승인 시 외부 url 통신
         String url = "https://kapi.kakao.com/v1/payment/approve";
-
         KakaoPayApprovedResultVO kakaoPayApprovedResultVO = new RestTemplate().postForObject(url, requestEntity, KakaoPayApprovedResultVO.class);
         log.info("----------------------------- 응답객체 : " + kakaoPayApprovedResultVO);
 
@@ -140,10 +147,15 @@ public class OrderServiceImpl implements OrderService {
         log.info("---------------------- DB 업데이트 시작");
 
         OrderHistory orderHistory = this.saveOrderhistory(kakaoPayDto, memberDto);
-        this.saveOrderItems(kakaoPayDto, orderHistory);
+        Member member = memberRepository.findById(memberDto.getId()).orElseThrow();
 
+        member.resetPointAfterOrder(kakaoPayDto.getUsePoint(), kakaoPayDto.getPointRewardAmount());
+        this.saveOrderItems(kakaoPayDto, orderHistory);
         itemService.updateItemStock(kakaoPayDto, orderHistory);
         memberService.updateCartItems(kakaoPayDto);
+        discountService.updateUserCouponStatus(kakaoPayDto.getUsedCouponIds());
+
+        session.setAttribute("loginMember", MemberDto.fromEntity(member));
     }
 
     public OrderHistory saveOrderhistory(KakaoPayDto kakaoPayDto, MemberDto memberDto) {
@@ -195,7 +207,7 @@ public class OrderServiceImpl implements OrderService {
             OrderItem orderItem = OrderItem.builder()
                     .orderHistory(orderHistory)
                     .quantity(qtyArray.get(i))
-                    .state("배송 준비중")
+                    .state(OrderState.PREPARE)
                     .totalPrice(item.getPrice() * qtyArray.get(i))
                     .item(item)
                     .build();
@@ -206,19 +218,20 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public void sendPaymentReceiptEmail(KakaoPayApprovedResultVO result, MemberDto memberDto) throws Exception {
+    public void sendPaymentReceiptEmail(KakaoPayApprovedResultVO result, MemberDto memberDto, int totalDiscountAmount) throws Exception {
 
         log.info("----------------------- 결제내역 이메일 발송");
-        MimeMessage message = this.createOrderHistoryMessage(result, memberDto);
+        MimeMessage message = this.createOrderHistoryMessage(result, memberDto, totalDiscountAmount);
         emailSender.send(message);
     }
 
-    private MimeMessage createOrderHistoryMessage(KakaoPayApprovedResultVO result, MemberDto memberDto) throws Exception {
+    private MimeMessage createOrderHistoryMessage(KakaoPayApprovedResultVO result, MemberDto memberDto, int totalDiscountAmount) throws Exception {
         log.info("보내는 대상 : " + memberDto.getEmail());
 //        log.info("인증 번호 : " + ePw);
 
         MimeMessage message = emailSender.createMimeMessage();
 
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
         message.addRecipients(Message.RecipientType.TO, memberDto.getEmail()); // 보내는 대상
         message.setSubject(memberDto.getName() + " 님의 결제 내역"); // 제목
 
@@ -231,9 +244,9 @@ public class OrderServiceImpl implements OrderService {
         msgg += "<br>";
         msgg += "<div><span><h4>결제 수단</h4></span><span> " + result.getPayment_method_type() + "</span></div>";
         msgg += "<br>";
-        msgg += "<div><span><h4>결제 금액</h4></span><span> " + result.getAmount().getTotal() + "</span></div>";
+        msgg += "<div><span><h4>결제 금액</h4></span><span> " + numberFormat.format(result.getAmount().getTotal()) + "원</span></div>";
         msgg += "<br>";
-        msgg += "<div><span><h4>할인 금액</h4></span><span> " + result.getAmount().getDiscount() + "</span></div>";
+        msgg += "<div><span><h4>할인 금액</h4></span><span> " + numberFormat.format(totalDiscountAmount) + "원</span></div>";
         msgg += "<br>";
         msgg += "<div><span><h4>결제 승인 시각</h4></span><span> " + result.getApproved_at() + "</span></div>";
         msgg += "<br>";
@@ -278,14 +291,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderItemDto> sortByOrderState(String sortBy, MemberDto memberDto) {
-        String state = EnumSet.allOf(OrderState.class).stream()
-                .filter(c -> c.name().equals(sortBy))
-                .findAny()
-                .get()
-                .getValue();
+//        String state = EnumSet.allOf(OrderState.class).stream()
+//                .filter(c -> c.name().equals(sortBy))
+//                .findAny()
+//                .get()
+//                .name();
+
+        OrderState state = StringToEnumUtil.getEnumFromValue(OrderState.class, sortBy);
 
         return orderItemRepository.findAllByStateAndOrderHistory_Member(state, memberDto.toEntity()).stream()
                 .map(OrderItemDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderHistoryDto> findTop5OrderByCreatedTimeDesc() {
+
+        return queryFactory.selectFrom(orderHistory)
+                .orderBy(orderHistory.createdTime.desc())
+                .limit(5).stream()
+                .map(OrderHistoryDto::fromEntity)
                 .collect(Collectors.toList());
     }
 }

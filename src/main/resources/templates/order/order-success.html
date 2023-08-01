@@ -45,7 +45,9 @@
                     <span>결제 금액</span><span th:text="${#numbers.formatInteger(orderResult.amount.total, 3, 'COMMA') + ' 원 '}"></span>
                 </div>
                 <div id="discount-box">
-                    <span>할인 금액</span><span th:text="${orderResult.amount.discount + ' 원 '}"></span>
+                    <span>할인 금액</span>
+                    <span th:if="${totalDiscount <= 999}" th:text="${totalDiscount + ' 원 '}"></span>
+                    <span th:unless="${totalDiscount <= 999}" th:text="${#numbers.formatInteger(totalDiscount, 3, 'COMMA') + ' 원 '}"></span>
                 </div>
                 <div id="order-created-time-box">
                     <!--/*<span>결제 승인 시각</span><span th:text="${orderResult.approved_at}"></span>*/-->

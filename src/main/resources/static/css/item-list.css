@@ -2,7 +2,7 @@
     margin: 30px 30px 30px 30px;
 }
 #item-sidebar {
-    width: 300px;
+    min-width: 200px;
     margin-right: 50px;
 }
 #item-container {
@@ -23,7 +23,6 @@
     flex-wrap: wrap;
     width: 1300px;
     display: flex;
-    float: left;
 }
 .item-cards {
     width: 30%;
@@ -63,4 +62,16 @@
     background: lightgray;
     color: black;
     transition: 0.4s;
+}
+#paging-btn-box {
+    display: flex;
+    margin: 0 auto;
+}
+#paging-btn-box div {
+    display: flex;
+    width: 30px;
+    height: 30px;
+    border: 1px solid lightGray;
+    justify-content: center;
+    align-items: center;
 }

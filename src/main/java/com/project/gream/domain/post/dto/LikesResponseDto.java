@@ -15,21 +15,21 @@ public class LikesResponseDto {
     private Long itemLikesCount;
     private Map<Long, Long> reviewLikesMap;
     private Map<String, String> itemLikeBackgroundColorMap;
-    private Map<Long, Long> reviewLikeCountsMap;
-    private Map<String, String> reviewLikeBackgroundColorMap;
-    private Map<Long,Long> commentLikesMapList;
+//    private Map<Long, Long> reviewLikeCountsMap;
+    private Map<Long, String> reviewLikeBgColorMapList;
+//    private Map<Long,Long> commentLikesMapList;
+    private Map<Long, String> commentLikeBgColorMapList;
 
     @Builder
     public LikesResponseDto(long count, String backgroundColor, Long itemLikesCount, Map<Long, Long> reviewLikesMap, Map<String, String> itemLikeBackgroundColorMap,
-                            Map<Long, Long> reviewLikeCountsMap, Map<String, String> reviewLikeBackgroundColorMap, Map<Long, Long> commentLikesMapList) {
+                            Map<Long, String> reviewLikeBgColorMapList, Map<Long, String> commentLikeBgColorMapList) {
         this.count = count;
         this.backgroundColor = backgroundColor;
         this.itemLikesCount = itemLikesCount;
         this.reviewLikesMap = reviewLikesMap;
         this.itemLikeBackgroundColorMap = itemLikeBackgroundColorMap;
-        this.reviewLikeCountsMap = reviewLikeCountsMap;
-        this.reviewLikeBackgroundColorMap = reviewLikeBackgroundColorMap;
-        this.commentLikesMapList = commentLikesMapList;
+        this.reviewLikeBgColorMapList = reviewLikeBgColorMapList;
+        this.commentLikeBgColorMapList = commentLikeBgColorMapList;
     }
 
     public LikesResponseDto(long count, String backgroundColor) {

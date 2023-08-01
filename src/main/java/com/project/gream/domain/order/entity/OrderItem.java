@@ -1,5 +1,7 @@
 package com.project.gream.domain.order.entity;
 
+import com.project.gream.common.enumlist.OrderState;
+import com.project.gream.common.enumlist.converter.OrderStateConverter;
 import com.project.gream.common.util.BaseTimeEntity;
 import com.project.gream.domain.item.entity.Item;
 import lombok.Builder;
@@ -21,8 +23,9 @@ public class OrderItem extends BaseTimeEntity {
     private Long id;
     private int quantity;
     private int totalPrice;
+    @Convert(converter = OrderStateConverter.class)
     @Column(columnDefinition = "varchar (100) default '배송 준비중'") // 테이블 생성 시점에 DDL 생성. 실제 db에 업데이트 되는 시점에는 영향 X.
-    private String state;
+    private OrderState state;
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
@@ -31,12 +34,16 @@ public class OrderItem extends BaseTimeEntity {
     private OrderHistory orderHistory;
 
     @Builder
-    public OrderItem(Long id, int quantity, int totalPrice, String state, Item item, OrderHistory orderHistory) {
+    public OrderItem(Long id, int quantity, int totalPrice, OrderState state, Item item, OrderHistory orderHistory) {
         this.id = id;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.state = state;
         this.item = item;
         this.orderHistory = orderHistory;
+    }
+
+    public void updateState(OrderState state) {
+        this.state = state;
     }
 }

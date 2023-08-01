@@ -12,5 +12,4 @@ import java.util.List;
 public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long> {
 
     List<OrderHistory> findAllByMember_Id(String memberId);
-
 }

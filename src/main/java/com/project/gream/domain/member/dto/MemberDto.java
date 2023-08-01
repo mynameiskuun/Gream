@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.project.gream.common.enumlist.Gender;
+import com.project.gream.common.enumlist.Grade;
 import com.project.gream.common.enumlist.Role;
 import com.project.gream.domain.member.entity.Member;
 import lombok.Builder;
@@ -27,6 +28,7 @@ public class MemberDto {
     private int point;
     private Role role;
     private Gender gender;
+//    private Grade grade;
     private CartDto cartDto;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -46,8 +48,8 @@ public class MemberDto {
      *  */
 
     @Builder
-    public MemberDto(String id, String password, String name, String address, String email, int point,
-                     Role role, Gender gender, CartDto cartDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
+    public MemberDto(String id, String password, String name, String address, String email, int point, Role role,
+                     Gender gender, Grade grade, CartDto cartDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.password = password;
         this.name = name;
@@ -56,6 +58,7 @@ public class MemberDto {
         this.point = point;
         this.role = role;
         this.gender = gender;
+//        this.grade = grade;
         this.cartDto = cartDto;
         this.createdTime = createdTime;
         this.modifiedTime = modifiedTime;
@@ -71,6 +74,7 @@ public class MemberDto {
                 .point(point)
                 .role(role)
                 .gender(gender)
+//                .grade(grade)
                 .cart(cartDto.toEntity())
 //                .couponBox(couponBoxDto.toEntity())
                 .build();
@@ -86,8 +90,23 @@ public class MemberDto {
                 .point(member.getPoint())
                 .role(member.getRole())
                 .gender(member.getGender())
+//                .grade(member.getGrade())
                 .cartDto(CartDto.fromEntity(member.getCart()))
 //                .couponBoxDto(CouponBoxDto.fromEntity(member.getCouponBox()))
                 .build();
+    }
+
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class MemberResponseDto {
+        private String message;
+        private boolean isSuccess;
+
+        @Builder
+        public MemberResponseDto(String message, boolean isSuccess) {
+            this.message = message;
+            this.isSuccess = isSuccess;
+        }
     }
 }

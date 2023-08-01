@@ -239,6 +239,9 @@
 
     <script th:inline="javascript">
 
+        var header = $("meta[name='_csrf_header']").attr('content');
+        var token = $("meta[name='_csrf']").attr('content');
+
         $(document).ready(function() {
             $('#submitBtn').on('click', function() {
 
@@ -250,7 +253,8 @@
                     repurchaseScore : $('input[name=repurchaseScore]:checked').val(),
                     content : $('#review-content').val(),
                     memberDto : [[${session.loginMember}]],
-                    itemDto : [[${orderItemDetail.itemDto}]]
+                    itemDto : [[${orderItemDetail.itemDto}]],
+                    orderItemId : [[${orderItemDetail.id}]]
                 };
 
                 let form = $('#formData')[0]
@@ -261,23 +265,51 @@
 
                 console.log('data : ' + formData);
 
-                $.ajax({
-                    url: '/review',
-                    type: 'POST',
-                    processData: false,
-                    contentType: false,
-                    // 일반적으로 ajax 사용 시 데이터를 자동으로 처리 해 적절한 타입으로 설정하여 서버로 전송.
-                    // 하지만 @RequestPart 사용 시, 파일을 직렬화 하여 변환할 필요 없이 그대로 전송 시켜야 함.
-                    // 따라서 processData: false를 통해 파일을 원시 데이터 형태 그대로 전송.
-                    // ajax를 사용해서 비동기적으로 form 데이터와 이미지를 동시에 전송해야 할 때 이를 사용한다.
-                    data: formData,
-                    success: function(result) {
-                        console.log(result);
+                const url = '/review';
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        // 'Content-Type' : false,
+                        'X-CSRF-Token' : token,
+                        // 'processData' : false,
                     },
-                    error: function (error) {
-                        console.log(error);
-                    },
+                    body: formData
                 })
+                    .then(result => {
+                        if (result.status === 200) {
+                            return result.json();
+                        }
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        location.href="/item/" + data.itemDto.id + "?reviewId=" + data.reviewId;
+                    })
+                // $.ajax({
+                //     url: '/review',
+                //     type: 'POST',
+                //     processData: false,
+                //     contentType: false,
+                //     // 일반적으로 ajax 사용 시 데이터를 자동으로 처리 해 적절한 타입으로 설정하여 서버로 전송.
+                //     // 하지만 @RequestPart 사용 시, 파일을 직렬화 하여 변환할 필요 없이 그대로 전송 시켜야 함.
+                //     // 따라서 processData: false를 통해 파일을 원시 데이터 형태 그대로 전송.
+                //     // ajax를 사용해서 비동기적으로 form 데이터와 이미지를 동시에 전송해야 할 때 이를 사용한다.
+                //     data: formData,
+                //     dataType: 'json',
+                //     beforeSend: function(xhr) {
+                //         xhr.setRequestHeader(header, token)
+                //     },
+                //     success: function(result) {
+                //         console.log('result : ', result);
+                //         if (result.status === 200) {
+                //             alert(result.message)
+                //             location.href="/item/" + data.itemDto.id + "?reviewId=" + result.reviewId;
+                //         }
+                //     },
+                //     error: function (error) {
+                //         console.log(error);
+                //     },
+                // })
             })
         })
 

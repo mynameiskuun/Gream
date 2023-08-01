@@ -1,10 +1,5 @@
 package com.project.gream.domain.post.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.project.gream.common.enumlist.LikeTargetType;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.post.entity.Likes;
@@ -18,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class LikesVO {
+public class LikesDto {
 
     private Long id;
     private MemberDto memberDto;
@@ -27,18 +22,18 @@ public class LikesVO {
     private CommentDto commentDto;
     private PostDto postDto;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//    @JsonSerialize(using = LocalDateTimeSerializer.class)
+//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
 //    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdTime;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//    @JsonSerialize(using = LocalDateTimeSerializer.class)
+//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
 //    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime modifiedTime;
 
     @Builder
-    public LikesVO(Long id, MemberDto memberDto, ItemDto itemDto, ReviewDto reviewDto,
-                   CommentDto commentDto, PostDto postDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
+    public LikesDto(Long id, MemberDto memberDto, ItemDto itemDto, ReviewDto reviewDto,
+                    CommentDto commentDto, PostDto postDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.memberDto = memberDto;
         this.itemDto = itemDto;
@@ -60,8 +55,8 @@ public class LikesVO {
                 .build();
     }
 
-    public static LikesVO fromEntity(Likes likes) {
-        return LikesVO.builder()
+    public static LikesDto fromEntity(Likes likes) {
+        return LikesDto.builder()
                 .id(likes.getId())
                 .memberDto(MemberDto.fromEntity(likes.member))
                 .itemDto(ItemDto.fromEntity(likes.item))
@@ -70,4 +65,29 @@ public class LikesVO {
 //                .postDto(PostDto.fromEntity(likes.post))
                 .build();
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class Request {
+
+        private Long id;
+        private MemberDto memberDto;
+        private ItemDto itemDto;
+        private Long reviewId;
+        private Long commentId;
+        private PostDto postDto;
+
+        public Request(Long id, MemberDto memberDto, ItemDto itemDto, Long reviewId,
+                       Long commentId, PostDto postDto) {
+            this.id = id;
+            this.memberDto = memberDto;
+            this.itemDto = itemDto;
+            this.reviewId = reviewId;
+            this.commentId = commentId;
+            this.postDto = postDto;
+        }
+    }
+
+
 }

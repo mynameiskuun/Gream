@@ -108,6 +108,9 @@
     </div>
     <script th:inline="javascript">
 
+      var header = $("meta[name='_csrf_header']").attr('content');
+      var token = $("meta[name='_csrf']").attr('content');
+
       $('#write-btn').on('click', function() {
 
         let data = {
@@ -132,14 +135,16 @@
           contentType: false,
           data: formData,
           dataType: 'text',
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader(header, token)
+          },
           success: function (result) {
             alert(result)
             $('#notice-title').val("");
             tinymce.get("notice-content").setContent("");
           },
-          error: function(error) {
-            console.log("error");
-            console.log("error : ", error);
+          error: function (request, status, error) {
+            alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
           },
         })
       })

@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
@@ -42,6 +43,8 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
     public void resultRedirectStrategy(HttpServletRequest request, HttpServletResponse response, String email) throws IOException {
 
+        clearSession(request);
+
         Member member = memberRepository.findById(email).orElseThrow();
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         String targetUrl;
@@ -55,5 +58,12 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
     }
     private boolean checkBothNotNull(Member member) {
         return member.getAddress() != null && member.getGender() != null;
+    }
+
+    protected void clearSession(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        }
     }
 }

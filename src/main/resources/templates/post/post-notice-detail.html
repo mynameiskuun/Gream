@@ -71,8 +71,8 @@
           </div>
           <div id="notice-write-footer">
             <div class="btns-box">
-              <a id="modify-btn" th:href="@{/post/notice/{noticeId}/edit(noticeId=${notice.postDto.id})}" th:if="${session.loginMember.id eq 'admin'}"> 수정 </a>
-              <a id="delete-btn" th:if="${session.loginMember.id eq 'admin'}"> 삭제 </a>
+              <a id="modify-btn" th:href="@{/post/notice/{noticeId}/edit(noticeId=${notice.postDto.id})}" th:if="${session.loginMember != null && session.loginMember.id eq 'admin'}"> 수정 </a>
+              <a id="delete-btn" th:if="${session.loginMember != null && session.loginMember.id eq 'admin'}"> 삭제 </a>
               <a id="back-to-list-btn" th:href="@{/post/notice}">목록</a>
             </div>
           </div>
@@ -80,6 +80,9 @@
       </div>
     </div>
     <script th:inline="javascript">
+
+      var header = $("meta[name='_csrf_header']").attr('content');
+      var token = $("meta[name='_csrf']").attr('content');
 
       $(document).ready(function () {
         let noticeContent = [[${notice.postDto.content}]]
@@ -96,6 +99,9 @@
             data: noticeId,
             contentType: 'TEXT',
             dataType: 'TEXT',
+            beforeSend: function(xhr) {
+              xhr.setRequestHeader(header, token)
+            },
             success(result) {
               alert(result);
               location.href = '/post/notice';
