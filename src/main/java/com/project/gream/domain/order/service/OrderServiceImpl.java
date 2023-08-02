@@ -60,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
     private String cid;
     @Value("${kakaopay.adminKey}")
     private String adminKey;
-    private final String kakaoPayLocalUrl = "http://localhost:9999";
+    private final String kakaoPayLocalUrl = "http://localhost:8080";
     private final String kakaoPayRealUrl = "http://ec2-3-36-228-95.ap-northeast-2.compute.amazonaws.com";
     public static final String ePw = createKey(); // 회원가입 인증, 비밀번호 변경 등 기능 추가시 사용
     private final JavaMailSender emailSender;
