@@ -548,6 +548,21 @@
                       + '</h4>'));
     }
 
+    // 개별 상품 쿠폰 할인금액 출력 메소드
+    function getCouponDiscountMap() {
+      // return map => key : itemId, value : couponDiscountAmount
+
+      const map = new Map();
+
+        let orderItemCards = $('.order-items');
+        orderItemCards.each(orderItem => {
+          let itemId = orderItem.find('div.order-item-ids').val();
+          let discountAmount = orderItem.find('div.coupon-discount-amount').val();
+          map.set(itemId, discountAmount)
+        })
+      return map;
+      }
+
     function isOrderFromCart() {
       let orderQuantity = [[${orderQuantity}]];
       console.log("장바구니 주문? : " + orderQuantity === null);
@@ -710,6 +725,7 @@
       const tel = "010-1234-5678";
       let email = [[${session.loginMember.email}]];
       let usePoint = $('#use-point-amount').val();
+      let couponDiscountMap = getCouponDiscountMap();
       let couponDiscountAmount = $('#total-coupon-discount-amount').val();
       let pointRewardAmount = $('#final-reward-amount').val();
       let size = $('.order-items').length;
@@ -744,6 +760,7 @@
         tel : tel,
         email : email,
         usePoint : usePoint,
+        couponDiscountMap : couponDiscountMap,
         couponDiscountAmount : couponDiscountAmount,
         pointRewardAmount : pointRewardAmount,
         itemIds : itemIds,

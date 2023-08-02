@@ -221,4 +221,5 @@ public class MemberPageController {
         mav.setViewName("member/mypage/customer/mypage-information-edit");
         return mav;
     }
+
 }

@@ -38,6 +38,8 @@ public interface ItemService {
     Page<ItemDto> getLikedItemListByMemberId(String memberId, Pageable pabeable);
     boolean itemStockCheck(OrderRequestDto requestDto);
 
+    List<ItemDto> sortItemByGenderAndCategory(String genderStr, String sortBy);
+
     //    List<ImgDto> getImgsByItemId(Long itemId);
     //    ItemDto selectItemById(Long itemId);
     //    void deleteImg(Long imgId);

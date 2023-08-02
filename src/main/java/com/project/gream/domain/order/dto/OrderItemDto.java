@@ -23,6 +23,7 @@ public class OrderItemDto {
     private Long id;
     private int quantity;
     private int totalPrice;
+    private Long couponDiscountAmount;
     private OrderState state;
     private ItemDto itemDto;
     private OrderHistoryDto orderHistoryDto;
@@ -37,11 +38,12 @@ public class OrderItemDto {
     private LocalDateTime modifiedTime;
 
     @Builder
-    public OrderItemDto(Long id, int quantity, int totalPrice, OrderState state, ItemDto itemDto,
-                        OrderHistoryDto orderHistoryDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
+    public OrderItemDto(Long id, int quantity, int totalPrice, Long couponDiscountAmount, OrderState state,
+                        ItemDto itemDto, OrderHistoryDto orderHistoryDto, LocalDateTime createdTime, LocalDateTime modifiedTime) {
         this.id = id;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
+        this.couponDiscountAmount = couponDiscountAmount;
         this.state = state;
         this.itemDto = itemDto;
         this.orderHistoryDto = orderHistoryDto;
@@ -54,6 +56,7 @@ public class OrderItemDto {
                 .id(id)
                 .quantity(quantity)
                 .totalPrice(totalPrice)
+                .couponDiscountAmount(couponDiscountAmount)
                 .state(state)
                 .item(itemDto.toEntity())
                 .orderHistory(orderHistoryDto.toEntity())
@@ -65,6 +68,7 @@ public class OrderItemDto {
                 .id(orderItem.getId())
                 .quantity(orderItem.getQuantity())
                 .totalPrice(orderItem.getTotalPrice())
+                .couponDiscountAmount(orderItem.getCouponDiscountAmount())
                 .state(orderItem.getState())
                 .itemDto(ItemDto.fromEntity(orderItem.getItem()))
                 .orderHistoryDto(OrderHistoryDto.fromEntity(orderItem.getOrderHistory()))

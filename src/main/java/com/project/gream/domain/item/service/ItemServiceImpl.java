@@ -3,26 +3,20 @@ package com.project.gream.domain.item.service;
 import com.project.gream.common.annotation.LoginMember;
 import com.project.gream.common.config.S3Config;
 import com.project.gream.common.enumlist.Category;
-import com.project.gream.common.enumlist.CouponStatus;
 import com.project.gream.common.enumlist.Gender;
 import com.project.gream.common.util.EnumValueUtil;
+import com.project.gream.common.util.StringToEnumUtil;
 import com.project.gream.domain.item.dto.*;
 import com.project.gream.domain.item.entity.*;
-import com.project.gream.domain.item.repository.CouponRepository;
 import com.project.gream.domain.item.repository.ImgRepository;
 import com.project.gream.domain.item.repository.ItemRepository;
-import com.project.gream.domain.item.repository.UserCouponRepository;
 import com.project.gream.domain.member.dto.CartItemDto;
 import com.project.gream.domain.member.dto.MemberDto;
 import com.project.gream.domain.member.entity.CartItem;
-import com.project.gream.domain.member.entity.Member;
 import com.project.gream.domain.member.repository.CartItemRepository;
-import com.project.gream.domain.member.repository.MemberRepository;
 import com.project.gream.domain.order.dto.KakaoPayDto;
-import com.project.gream.domain.order.dto.OrderHistoryDto;
 import com.project.gream.domain.order.dto.OrderRequestDto;
 import com.project.gream.domain.order.entity.OrderHistory;
-import com.project.gream.domain.order.repository.OrderHistoryRepository;
 import com.project.gream.domain.post.entity.QLikes;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -37,10 +31,7 @@ import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.project.gream.domain.order.entity.QOrderHistory.orderHistory;
-import static com.project.gream.domain.item.entity.QUserCoupon.userCoupon;
-import static com.project.gream.domain.item.entity.QCoupon.coupon;
-import static com.project.gream.domain.member.entity.QMember.member;
+import static com.project.gream.domain.item.entity.QItem.item;
 
 
 @Slf4j
@@ -53,6 +44,7 @@ public class ItemServiceImpl implements ItemService{
     private final ImgRepository imgRepository;
     private final CartItemRepository cartItemRepository;
     private final EntityManager em;
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public List<ItemDto> selectAllItems() {
@@ -308,5 +300,27 @@ public class ItemServiceImpl implements ItemService{
     public boolean itemStockCheck(OrderRequestDto requestDto) {
         Item item = itemRepository.findById(requestDto.getItemDto().getId()).orElseThrow();
         return item.getItemStock() > 0;
+    }
+
+    @Override
+    public List<ItemDto> sortItemByGenderAndCategory(String genderStr, String sortBy) {
+
+        Gender gender = StringToEnumUtil.getEnumFromValue(Gender.class, genderStr);
+
+        if (sortBy.equals("ALL")) {
+            return itemRepository.getByGender(gender).stream()
+                    .map(ItemDto::fromEntity)
+                    .collect(Collectors.toList());
+        }
+
+        Category category = StringToEnumUtil.getEnumFromValue(Category.class, sortBy);
+
+        return queryFactory
+                    .selectFrom(item)
+                    .where(item.gender.eq(gender),
+                            item.category.eq(category))
+                    .fetch().stream()
+                    .map(ItemDto::fromEntity)
+                    .collect(Collectors.toList());
     }
 }

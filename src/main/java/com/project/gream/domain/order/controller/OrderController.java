@@ -13,14 +13,19 @@ import com.project.gream.domain.order.dto.*;
 import com.project.gream.domain.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 @Slf4j
-@SessionAttributes({"tid" , "kakaoPayDto"})
+@SessionAttributes({"tid", "kakaoPayDto"})
 @RequiredArgsConstructor
 @RestController
 public class OrderController {
@@ -76,7 +81,7 @@ public class OrderController {
 
     @GetMapping("/order/kakaopay/authorization")
     public ModelAndView paymentCompleted(@RequestParam("pg_token") String pgToken, @ModelAttribute("tid") String tid,
-                                   @ModelAttribute("kakaoPayDto") KakaoPayDto request, @LoginMember MemberDto memberDto) throws Exception {
+                                         @ModelAttribute("kakaoPayDto") KakaoPayDto request, @LoginMember MemberDto memberDto) throws Exception {
 
         KakaoPayApprovedResultVO response = orderService.payApprove(tid, pgToken, request);
         orderService.updateDataBaseAfterPayment(request, memberDto);
