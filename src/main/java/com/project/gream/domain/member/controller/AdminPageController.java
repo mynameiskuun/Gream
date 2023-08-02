@@ -8,18 +8,26 @@ import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.repository.CartItemRepository;
 import com.project.gream.domain.member.repository.MemberRepository;
 import com.project.gream.domain.order.dto.OrderHistoryDto;
+import com.project.gream.domain.order.dto.OrderRequestDto;
+import com.project.gream.domain.order.dto.OrderResponseDto;
 import com.project.gream.domain.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.Banner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.nio.charset.Charset;
 import java.util.List;
 
 @Slf4j
@@ -42,8 +50,23 @@ public class AdminPageController {
     }
 
     @GetMapping("/orderlist")
-    public ModelAndView toOrderList() {
+    public ModelAndView toOrderList(@PageableDefault(size = 10, page = 0, direction = Sort.Direction.DESC) Pageable pageable) {
         ModelAndView mav = new ModelAndView();
+
+        Page<OrderResponseDto> orderList = orderService.getAllOrderItemsForAdmin(pageable);
+        int nowPage = orderList.getPageable().getPageNumber() + 1;
+        int startPage = Math.max(nowPage - 4, 1);
+        int endPage = Math.min(nowPage + 9, orderList.getTotalPages());
+
+        log.info("nowPage : " + nowPage);
+        log.info("startPage : " + startPage);
+        log.info("endPage : " + endPage);
+        log.info("getTotalPages : " + orderList.getTotalPages());
+
+        mav.addObject("orderList", orderList);
+        mav.addObject("nowPage", nowPage);
+        mav.addObject("startPage", startPage);
+        mav.addObject("endPage", endPage);
 
         mav.setViewName("member/mypage/admin/admin-orderlist");
         return mav;
@@ -85,7 +108,7 @@ public class AdminPageController {
         Page<CouponDto> couponList = discountService.getCouponList(pageable);
         ModelAndView mav = new ModelAndView();
         int nowPage = couponList.getPageable().getPageNumber() + 1;
-        int startPage =  Math.max(nowPage - 4, 1);
+        int startPage = Math.max(nowPage - 4, 1);
         int endPage = Math.min(nowPage + 9, couponList.getTotalPages());
 
         for (CouponDto c : couponList) {
@@ -112,4 +135,12 @@ public class AdminPageController {
         return discountService.deleteCoupon(couponId);
     }
 
+    @PatchMapping("/order/status")
+    public ResponseEntity<OrderResponseDto> changeOrderStatus(@RequestBody OrderRequestDto request) {
+
+        OrderResponseDto response = orderService.changeOrderStatus(request);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+        return new ResponseEntity(response, header, HttpStatus.OK);
+    }
 }

@@ -179,23 +179,14 @@ public class ItemController {
         return itemList;
     }
 
-    @GetMapping("/item/men/{sortBy}")
-    public List<ItemDto> sortMenItemsByCategory(@PathVariable String sortBy,
-                                                @PageableDefault(size = 8, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    @GetMapping("/item/{gender}/{sortBy}")
+    public List<ItemDto> sortWomenItemsByCategory(@PathVariable("gender") String gender,
+                                                  @PathVariable("sortBy") String sortBy,
+                                                  @PageableDefault(size = 8, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
 
         log.info("------------------------------ 카테고리 별 상품 요청");
 
-//        int nowPage = manItemList.getPageable().getPageNumber() + 1;
-//        int startPage =  Math.max(nowPage - 4, 1);
-//        int endPage = Math.min(nowPage + 9, manItemList.getTotalPages());
-
-        ModelAndView mav = new ModelAndView();
-//        mav.addObject("nowPage", nowPage);
-//        mav.addObject("startPage", startPage);
-//        mav.addObject("endPage", endPage);
-//        log.info(itemService.sortItemByCategory(sortBy, pageable).toString());
-//        return itemService.sortItemByCategory(sortBy, pageable);
-        return itemService.sortItemByCategory(sortBy);
+        return itemService.sortItemByGenderAndCategory(gender, sortBy);
     }
 
     @GetMapping("/point/check/{inputPoint}")

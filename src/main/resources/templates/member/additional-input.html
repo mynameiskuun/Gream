@@ -73,7 +73,7 @@
         success: function(result) {
           if (result === "추가정보 입력 완료.") {
             alert(result + "다시 로그인 해주세요.")
-            location.href='/logout';
+            logout();
           } else {
             alert(result)
           }
@@ -83,6 +83,21 @@
         }
       })
     })
+
+    function logout() {
+      fetch('/logout', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-Token' : token
+        }
+      })
+              .then(response => {
+                if (response.ok) {
+                  console.log('logout successful');
+                  location.href="/";
+                }
+              })
+    }
   </script>
 </th:block>
 </body>

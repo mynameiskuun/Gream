@@ -21,8 +21,12 @@ public class OrderItem extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderitem_id")
     private Long id;
+    @Column(nullable = false)
     private int quantity;
+    @Column(nullable = false)
     private int totalPrice;
+    @Column(columnDefinition = "integer default 0")
+    private Long couponDiscountAmount;
     @Convert(converter = OrderStateConverter.class)
     @Column(columnDefinition = "varchar (100) default '배송 준비중'") // 테이블 생성 시점에 DDL 생성. 실제 db에 업데이트 되는 시점에는 영향 X.
     private OrderState state;
@@ -34,10 +38,12 @@ public class OrderItem extends BaseTimeEntity {
     private OrderHistory orderHistory;
 
     @Builder
-    public OrderItem(Long id, int quantity, int totalPrice, OrderState state, Item item, OrderHistory orderHistory) {
+    public OrderItem(Long id, int quantity, int totalPrice, Long couponDiscountAmount,
+                     OrderState state, Item item, OrderHistory orderHistory) {
         this.id = id;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
+        this.couponDiscountAmount = couponDiscountAmount;
         this.state = state;
         this.item = item;
         this.orderHistory = orderHistory;
