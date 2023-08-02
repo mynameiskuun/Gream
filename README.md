@@ -53,21 +53,22 @@
 * 쿠폰 발급, 삭제 -->
 
 ### ⭐️ 현재 구현중 기능
-* 관리자 배송처리.
 * 관리자 시기별 판매기록 조회, 매출현황 조회
 * 추후 발생 가능한 동시성 문제 해결
 * Spring Batch를 이용한 발급 쿠폰 기간만료 처리 기능
 
 
-## 주요 기능 설명
+## 프로젝트를 진행하며 경험하고 체득한 부분
 
 * 로그인(Spring Security)
 > [바로가기](https://trusting-judge-fc4.notion.site/Spring-security-92e97a7a8644419e9815d3845a119f89?pvs=4)<br>
 
-* DB 복잡도 최적화, Enum의 활용
+* Table을 대신하는 Enum을 통한 데이터 관리
 > [바로가기](https://trusting-judge-fc4.notion.site/DB-3039da4956ec4378ae1588f3a7cab9e3?pvs=4)<br>
 
-* 
+[//]: # (* CI / CD 구현을 통해 학습한 WAS)
+
+[//]: # (> [바로가기]&#40;https://notion.com/mynameiskuun&#41;)
 
 
 
