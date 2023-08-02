@@ -12,6 +12,18 @@
             height: 80px;
             border-bottom: 3px solid black;
         }
+        .paging-btn-box {
+            display: flex;
+            margin: 0 auto;
+        }
+        .paging-btn-box div {
+            display: flex;
+            width: 30px;
+            height: 30px;
+            border: 1px solid lightGray;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -23,12 +35,108 @@
                 <h3>주문 상품</h3>
             </div>
             <div class="admin-orderlist-body">
-                주문 상품 페이징처리
+                <table id="order-history-table" class="table align-middle text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">상품 주문 번호</th>
+                            <th scope="col">주문서 번호</th>
+                            <th scope="col">주문 상품명</th>
+                            <th scope="col">주문 상품 수량</th>
+                            <th scope="col">결제액</th>
+                            <th scope="col">쿠폰 할인 금액</th>
+                            <th scope="col">고객 ID</th>
+                            <th scope="col">배송지</th>
+                            <th scope="col">주문 상태 변경</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:if="${orderList.getSize() == 0}">
+                        <tr><td colspan="10">첫 구매를 시작 해 보세요!</td></tr>
+                    </th:block>
+                    <th:block th:unless="${orderList.getSize() == 0}">
+                        <tr th:each="order : ${orderList}">
+                            <td class="order-item-id" th:text="${order.orderItemId}"></td>
+                            <td th:text="${order.orderHistoryId}"></td>
+                            <td th:text="${order.orderItemName}"></td>
+                            <td th:text="${order.orderItemQuantity}"></td>
+                            <td th:text="${order.paymentAmount}"></td>
+                            <td th:text="${order.couponDiscountAmount}"></td>
+                            <td th:text="${order.memberId}"></td>
+                            <td th:text="${order.address}"></td>
+                            <td>
+                                <select class="form-select" id="orderStatus" required="">
+                                    <option value="order_completed" th:selected="${#strings.toLowerCase(order.orderState.name()) eq 'order_completed'}">주문 완료</option>
+                                    <option value="prepare" th:selected="${#strings.toLowerCase(order.orderState.name()) eq 'prepare'}">배송 준비중</option>
+                                    <option value="onprogress" th:selected="${#strings.toLowerCase(order.orderState.name()) eq 'onprogress'}">배송중</option>
+                                    <option value="arrived" th:selected="${#strings.toLowerCase(order.orderState.name()) eq 'arrived'}">배송 완료</option>
+                                    <option value="confirmed" th:selected="${#strings.toLowerCase(order.orderState.name()) eq 'confirmed'}">구매 확정</option>
+                                    <option value="reviewed" th:selected="${#strings.toLowerCase(order.orderState.name()) eq 'reviewed'}">리뷰 작성 완료</option>
+                                    <option value="cancel_requested" th:selected="${#strings.toLowerCase(order.orderState.name()) eq 'cancel_requested'}">취소 요청중</option>
+                                    <option value="canceled" th:selected="${#strings.toLowerCase(order.orderState.name()) eq 'canceled'}">취소 완료</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+                <div id="paging-btn-box">
+                    <div th:each="page : ${#numbers.sequence(startPage, endPage)}">
+                        <a th:if="${page != nowPage}" style="cursor: pointer" th:href="@{/admin/orderlist(page=${page - 1})}" th:text="${page}"></a>
+                        <strong th:if="${page == nowPage}" style="color:black" th:text="${page}"></strong>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <script th:inline="javascript">
+
+        var header = $("meta[name='_csrf_header']").attr('content');
+        var token = $("meta[name='_csrf']").attr('content');
+
+        $(document).ready(function() {
+            $('.form-select').on('change', function() {
+                let orderItemId = $(this).parent().parent().find('td.order-item-id').html()
+                console.log("orderItemId : ", orderItemId)
+                let orderStatus = $(this).val();
+                console.log("orderStatus : ", orderStatus)
+                orderStateChange(orderItemId, orderStatus)
+            });
+        })
+        function orderStateChange(orderItemId, orderStatus) {
+
+            const url = "/admin/order/status";
+            // let eventTarget = $(this);
+            // console.log("eventTarget : ", eventTarget)
+            // let option = $('#orderStatus');
+            // console.log("option : ", option)
+            // let orderItemId = eventTarget.parent().parent().find('td.order-item-id').html();
+            // console.log("orderItemId : ", orderItemId)
+            // let orderStatus = option.val()
+            // console.log("orderStatus : ", orderStatus)
+
+
+            fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'X-CSRF-Token' : token
+                },
+                body: JSON.stringify({
+                    'orderItemId' : orderItemId,
+                    'orderStatus' : orderStatus
+                })
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        return response.json();
+                    }
+                })
+                .then(data => {
+                    alert(data.message)
+                })
+        }
+    </script>
 </div>
 </body>
-</div>
 </html>

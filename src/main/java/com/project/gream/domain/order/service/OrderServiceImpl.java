@@ -6,7 +6,6 @@ import com.project.gream.common.util.StringToEnumUtil;
 import com.project.gream.domain.item.dto.ItemDto;
 import com.project.gream.domain.item.entity.Item;
 import com.project.gream.domain.item.repository.ItemRepository;
-import com.project.gream.domain.item.repository.UserCouponRepository;
 import com.project.gream.domain.item.service.DiscountService;
 import com.project.gream.domain.item.service.ItemService;
 import com.project.gream.domain.member.dto.MemberDto;
@@ -18,11 +17,13 @@ import com.project.gream.domain.order.entity.OrderHistory;
 import com.project.gream.domain.order.entity.OrderItem;
 import com.project.gream.domain.order.repository.OrderHistoryRepository;
 import com.project.gream.domain.order.repository.OrderItemRepository;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -39,13 +40,15 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 import java.text.NumberFormat;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import static com.project.gream.domain.item.entity.QItem.item;
 import static com.project.gream.domain.order.entity.QOrderHistory.orderHistory;
+import static com.project.gream.domain.order.entity.QOrderItem.orderItem;
+import static com.project.gream.domain.member.entity.QMember.member;
 
 @Validated
 @RequiredArgsConstructor
@@ -208,6 +211,7 @@ public class OrderServiceImpl implements OrderService {
                     .orderHistory(orderHistory)
                     .quantity(qtyArray.get(i))
                     .state(OrderState.PREPARE)
+                    .couponDiscountAmount(kakaoPayDto.getCouponDiscountMap().get(itemIdArray.get(i)))
                     .totalPrice(item.getPrice() * qtyArray.get(i))
                     .item(item)
                     .build();
@@ -218,14 +222,14 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public void sendPaymentReceiptEmail(KakaoPayApprovedResultVO result, MemberDto memberDto, int totalDiscountAmount) throws Exception {
+    public void sendPaymentReceiptEmail(KakaoPayApprovedResultVO result, MemberDto memberDto, Long totalDiscountAmount) throws Exception {
 
         log.info("----------------------- 결제내역 이메일 발송");
         MimeMessage message = this.createOrderHistoryMessage(result, memberDto, totalDiscountAmount);
         emailSender.send(message);
     }
 
-    private MimeMessage createOrderHistoryMessage(KakaoPayApprovedResultVO result, MemberDto memberDto, int totalDiscountAmount) throws Exception {
+    private MimeMessage createOrderHistoryMessage(KakaoPayApprovedResultVO result, MemberDto memberDto, Long totalDiscountAmount) throws Exception {
         log.info("보내는 대상 : " + memberDto.getEmail());
 //        log.info("인증 번호 : " + ePw);
 
@@ -312,5 +316,56 @@ public class OrderServiceImpl implements OrderService {
                 .limit(5).stream()
                 .map(OrderHistoryDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<OrderResponseDto> getAllOrderItemsForAdmin(Pageable pageable) {
+
+        long totalCount = queryFactory
+                .select(orderItem.id)
+                .from(orderItem)
+                .leftJoin(orderItem.item, item)
+                .leftJoin(orderItem.orderHistory, orderHistory)
+                .leftJoin(orderHistory.member, member)
+                .fetchCount();
+
+        List<OrderResponseDto> content =  queryFactory
+                        .select(Projections.fields(OrderResponseDto.class,
+                        item.name.as("orderItemName"),
+                        member.address.as("address"),
+                        member.id.as("memberId"),
+                        orderHistory.id.as("orderHistoryId"),
+                        orderHistory.totalOrderPrice.as("paymentAmount"),
+                        orderItem.id.as("orderItemId"),
+                        orderItem.quantity.as("orderItemQuantity"),
+                        orderItem.couponDiscountAmount.as("couponDiscountAmount"),
+                        orderItem.state.as("orderState")
+                        ))
+                        .from(orderItem)
+                        .leftJoin(orderItem.item, item)
+                        .leftJoin(orderItem.orderHistory, orderHistory)
+                        .leftJoin(orderHistory.member, member)
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize())
+                        .fetch();
+
+
+        return new PageImpl<>(content, pageable, totalCount);
+    }
+
+    @Override
+    public OrderResponseDto changeOrderStatus(OrderRequestDto request) {
+
+        // orderItemId 받아서 해당 주문건 상태 변경
+        OrderState status = StringToEnumUtil.getEnumFromValue(OrderState.class, request.getOrderStatus());
+        Long orderItemId = request.getOrderItemId();
+
+        OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow();
+        orderItem.updateState(status);
+        orderItemRepository.saveAndFlush(orderItem);
+
+        return OrderResponseDto.builder()
+                .message("변경 완료 되었습니다.")
+                .build();
     }
 }

@@ -73,7 +73,7 @@
                                     <tbody class="table-group-divider">
                                         <th:block th:if="${orderItemList.size() == 0}">
                                             <tr><td colspan="4">첫 구매를 시작 해 보세요!</td></tr>
-                                        </th:block>
+                                        </th:block>해
                                         <th:block th:unless="${orderItemList.size() == 0}">
                                             <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
                                                 <th scope="row">
