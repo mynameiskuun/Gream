@@ -550,18 +550,23 @@
 
     // 개별 상품 쿠폰 할인금액 출력 메소드
     function getCouponDiscountMap() {
-      // return map => key : itemId, value : couponDiscountAmount
-
       const map = new Map();
 
-        let orderItemCards = $('.order-items');
-        orderItemCards.each(orderItem => {
-          let itemId = orderItem.find('div.order-item-ids').val();
-          let discountAmount = orderItem.find('div.coupon-discount-amount').val();
-          map.set(itemId, discountAmount)
-        })
-      return map;
-      }
+      let orderItemCards = $('.order-items');
+      orderItemCards.each(function(index, orderItem) {
+        let itemId = $(orderItem).find('.order-item-id').val();
+        let discountAmount = $(orderItem).find('.coupon-discount-amount').val();
+        map.set(itemId, discountAmount);
+      });
+
+      // Map 객체를 일반 객체로 변환
+      const objectMap = {};
+      map.forEach((value, key) => {
+        objectMap[key] = value;
+      });
+
+      return objectMap;
+    }
 
     function isOrderFromCart() {
       let orderQuantity = [[${orderQuantity}]];
