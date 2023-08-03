@@ -88,7 +88,7 @@
                                     <div th:text="${#strings.replace(orderItemList.createdTime, 'T', ' ')}"></div>
                                 </td>
                                 <td>
-                                    <div th:text="${#numbers.formatInteger(orderItemList.totalPrice, 3, 'COMMA') + ' 원'}"></div>
+                                    <div th:text="${#numbers.formatInteger(orderItemList.totalPrice - orderItemList.couponDiscountAmount, 3, 'COMMA') + ' 원'}"></div>
                                     <div th:text="${orderItemList.quantity + ' 개'}"></div>
                                 </td>
                                 <td>
@@ -99,7 +99,8 @@
                                         <a class="reviewBtn btn-secondary button" th:href="@{/review/{orderItemId}(orderItemId=${orderItemList.id})}">리뷰 작성</a>
                                     </div>
                                     <div th:if="${orderItemList.state.value.equals('주문 완료') || orderItemList.state.value.equals('배송 준비중')}">
-                                        <a class="order-cancel-btn btn-secondary button" th:href="@{/order/{orderItemId}/cancel(orderItemId=${orderItemList.id})}">주문 취소</a>
+                                        <a class="order-cancel-btn btn-secondary button">주문 취소</a>
+                                        <input type="hidden" class="order-item-id" th:value="${orderItemList.id}" />
                                     </div>
                                 </td>
                             </tr>
