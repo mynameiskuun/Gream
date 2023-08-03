@@ -20,12 +20,4 @@ class GreamApplicationTests {
 //        log.info("Test Start!");
 //    }
 
-//    @Test
-//    public void 숫자형식_테스트() {
-//        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
-//
-//        int number = 200;
-//        String formattedNumber = numberFormat.format(number);
-//        log.info(formattedNumber);
-//    }
 }
