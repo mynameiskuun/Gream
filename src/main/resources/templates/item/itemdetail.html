@@ -451,6 +451,13 @@
     });
 
     $('#cartBtn').on('click', function() {
+
+        if ([[${session.loginMember}]] == null) {
+            alert('로그인을 해주세요');
+            location.href = '/login';
+            return;
+        }
+
         let cartItem = {
             itemDto : [[${item}]],
             quantity : document.getElementById('orderQuantity').value

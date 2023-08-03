@@ -49,7 +49,7 @@ public class DiscountServiceImpl implements DiscountService {
     public String createCoupon(CouponRequestDto requestDto) {
         log.info("-------------------------- 쿠폰 생성");
 
-        String discountFor = String.join(",", requestDto.getDiscountFor());
+        String discountFor = String.join(", ", requestDto.getDiscountFor());
         try {
             Coupon coupon = Coupon.builder()
                     .type(requestDto.getType())
