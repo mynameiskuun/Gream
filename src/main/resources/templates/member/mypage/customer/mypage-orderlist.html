@@ -98,10 +98,10 @@
                                     <div th:if="${orderItemList.state.value.equals('배송 완료') || orderItemList.state.value.equals('구매 확정')}">
                                         <a class="reviewBtn btn-secondary button" th:href="@{/review/{orderItemId}(orderItemId=${orderItemList.id})}">리뷰 작성</a>
                                     </div>
-                                    <div th:if="${orderItemList.state.value.equals('주문 완료') || orderItemList.state.value.equals('배송 준비중')}">
-                                        <a class="order-cancel-btn btn-secondary button">주문 취소</a>
-                                        <input type="hidden" class="order-item-id" th:value="${orderItemList.id}" />
-                                    </div>
+<!--                                    <div th:if="${orderItemList.state.value.equals('주문 완료') || orderItemList.state.value.equals('배송 준비중')}">-->
+<!--                                        <a class="order-cancel-btn btn-secondary button">주문 취소</a>-->
+<!--                                        <input type="hidden" class="order-item-id" th:value="${orderItemList.id}" />-->
+<!--                                    </div>-->
                                 </td>
                             </tr>
                         </tbody>
