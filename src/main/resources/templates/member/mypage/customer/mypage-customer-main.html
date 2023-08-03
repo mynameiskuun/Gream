@@ -73,7 +73,7 @@
                                     <tbody class="table-group-divider">
                                         <th:block th:if="${orderItemList.size() == 0}">
                                             <tr><td colspan="4">첫 구매를 시작 해 보세요!</td></tr>
-                                        </th:block>해
+                                        </th:block>
                                         <th:block th:unless="${orderItemList.size() == 0}">
                                             <tr class="purchased-item-rows" th:each="orderItemList : ${orderItemList}">
                                                 <th scope="row">
@@ -88,7 +88,7 @@
                                                     <div th:text="${#strings.replace(orderItemList.createdTime, 'T', ' ')}"></div>
                                                 </td>
                                                 <td>
-                                                    <div th:text="${#numbers.formatInteger(orderItemList.totalPrice, 3, 'COMMA') + ' 원'}"></div>
+                                                    <div th:text="${#numbers.formatInteger(orderItemList.totalPrice - orderItemList.couponDiscountAmount, 3, 'COMMA') + ' 원'}"></div>
                                                     <div th:text="${orderItemList.quantity + ' 개'}"></div>
                                                 </td>
                                                 <td>
